@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { User, Task, Reward, Role, AvatarItem, TaskCompletion, ClassGroup, Message, Redemption } from '../types';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, Task, Reward, Role, TaskCompletion, ClassGroup, Message, Redemption } from '../types';
 import { AVATAR_ITEMS } from '../constants';
 import { io, Socket } from 'socket.io-client';
 
@@ -64,13 +65,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Initialize Socket
   useEffect(() => {
-    const newSocket = io(); // Connects to the same host/port serving the file
+    // Si estamos en desarrollo (puerto 5173 p.ej.), nos conectamos explícitamente al 3020
+    const socketUrl = window.location.port === '3020' ? '/' : 'http://localhost:3020';
+    const newSocket = io(socketUrl);
     setSocket(newSocket);
 
     newSocket.on('connect', () => setConnected(true));
     newSocket.on('disconnect', () => setConnected(false));
 
-    // Listen for Initial State
     newSocket.on('init_state', (data) => {
         setUsers(data.users);
         setClasses(data.classes);
@@ -81,7 +83,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setRedemptions(data.redemptions);
     });
 
-    // Listen for Sync Updates (Push Data)
     newSocket.on('sync_users', (data) => setUsers(data));
     newSocket.on('sync_classes', (data) => setClasses(data));
     newSocket.on('sync_tasks', (data) => setTasks(data));
@@ -95,12 +96,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
-  // Helpers to emit updates
-  // We use references to current state inside functions to ensure we don't overwrite concurrent changes 
-  // NOTE: In a fully robust app, the server would handle the merging logic. 
-  // Here we optimistically assume the client has the latest array before pushing.
-  // Because we receive 'sync' events instantly, our local state is usually fresh.
-
   const emitUsers = (newUsers: User[]) => socket?.emit('update_users', newUsers);
   const emitClasses = (newClasses: ClassGroup[]) => socket?.emit('update_classes', newClasses);
   const emitTasks = (newTasks: Task[]) => socket?.emit('update_tasks', newTasks);
@@ -108,8 +103,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const emitCompletions = (newCompletions: TaskCompletion[]) => socket?.emit('update_completions', newCompletions);
   const emitMessages = (newMessages: Message[]) => socket?.emit('update_messages', newMessages);
   const emitRedemptions = (newRedemptions: Redemption[]) => socket?.emit('update_redemptions', newRedemptions);
-
-  // --- Actions ---
 
   const login = (userId: string, pin: string) => {
     const user = users.find(u => u.id === userId);
@@ -188,12 +181,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const existingCompletionIndex = completions.findIndex(c => c.taskId === taskId && c.userId === studentId);
 
     if (existingCompletionIndex >= 0) {
-      // Undo completion
       const newCompletions = completions.filter((_, i) => i !== existingCompletionIndex);
       emitCompletions(newCompletions);
       assignPoints(studentId, -task.points);
     } else {
-      // Do completion
       emitCompletions([...completions, { taskId, userId: studentId, timestamp: Date.now() }]);
       assignPoints(studentId, task.points);
     }
@@ -276,8 +267,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitMessages(newMessages);
   };
 
-  // --- Admin Functions ---
-
   const addClass = (name: string) => {
     emitClasses([...classes, { id: `class_${Date.now()}`, name }]);
   };
@@ -287,7 +276,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const deleteClass = (id: string) => {
-    // Also remove classId from users
     const newUsers = users.map(u => u.classId === id ? { ...u, classId: undefined } : u);
     emitUsers(newUsers);
     emitClasses(classes.filter(c => c.id !== id));
