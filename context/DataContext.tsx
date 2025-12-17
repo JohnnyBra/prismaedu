@@ -66,7 +66,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Initialize Socket
   useEffect(() => {
     // Si estamos en desarrollo (puerto 5173 p.ej.), nos conectamos explícitamente al 3020
-    const socketUrl = window.location.port === '3020' ? '/' : 'http://localhost:3020';
+    const socketUrl = import.meta.env.DEV ? 'http://localhost:3020' : '/';
     const newSocket = io(socketUrl);
     setSocket(newSocket);
 
