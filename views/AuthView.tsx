@@ -297,7 +297,7 @@ const AuthView: React.FC = () => {
           <p className="font-semibold tracking-wide">Cooperativa de Enseñanza La Hispanidad</p>
           <p className="mt-1 opacity-60">Creado por Javi Barrero</p>
           <div className="mt-2 opacity-40">
-            PIN de Demo: Admin 1234, Profesor 9999, Padres 8888, Alumnos 00xx
+            PIN de Demo: Admin 2222, Profesor 9999, Padres 8888, Alumnos 00xx
           </div>
        </footer>
     </div>

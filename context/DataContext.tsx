@@ -297,6 +297,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const deleteUser = (id: string) => {
+    if (id === 'admin') return;
     emitUsers(users.filter(u => u.id !== id));
   };
 
