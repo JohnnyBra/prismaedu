@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3020;
 // Initial Data Generators (Copied logic from frontend to seed DB if empty)
 const generateUsers = () => {
     const users = [];
-    users.push({ id: 'admin', name: 'Administrador', role: 'ADMIN', points: 0, pin: '1234' });
+    users.push({ id: 'admin', name: 'Administrador', role: 'ADMIN', points: 0, pin: '2222' });
     users.push({ id: 'tutor1', name: 'Sr. García', role: 'TUTOR', classId: 'classA', points: 0, pin: '9999' });
     users.push({ id: 'parent1', name: 'Sra. López', role: 'PARENT', familyId: 'familyA', points: 0, pin: '8888' });
     for (let i = 1; i <= 24; i++) {

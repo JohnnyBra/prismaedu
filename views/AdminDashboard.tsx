@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key } from 'lucide-react';
 import Avatar from '../components/Avatar';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS';
 
 const AdminDashboard: React.FC = () => {
-  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId } = useData();
+  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
 
   // Local state for edits/creation
@@ -48,8 +48,22 @@ const AdminDashboard: React.FC = () => {
   const [editTaskPoints, setEditTaskPoints] = useState(0);
   const [editTaskPriority, setEditTaskPriority] = useState(false);
 
+  // Admin PIN Change State
+  const [showChangePin, setShowChangePin] = useState(false);
+  const [newAdminPin, setNewAdminPin] = useState('');
 
   // --- HELPERS ---
+
+  const handleChangePin = () => {
+      if (newAdminPin && newAdminPin.length === 4) {
+          updatePin(newAdminPin);
+          setShowChangePin(false);
+          setNewAdminPin('');
+          alert('PIN actualizado correctamente');
+      } else {
+          alert('El PIN debe tener 4 dígitos');
+      }
+  };
 
   const handleCreateClass = () => {
     if (newClassName) {
@@ -634,10 +648,36 @@ const AdminDashboard: React.FC = () => {
               </div>
            </div>
          </div>
-         <button onClick={logout} className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold">
-            <LogOut size={18} /> Salir
-         </button>
+         <div className="flex items-center gap-4">
+             <button onClick={() => setShowChangePin(true)} className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold">
+                <Key size={18} /> Cambiar PIN
+             </button>
+             <button onClick={logout} className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold">
+                <LogOut size={18} /> Salir
+             </button>
+         </div>
       </header>
+
+      {/* Change PIN Modal */}
+      {showChangePin && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+             <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm animate-in zoom-in duration-200">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Cambiar PIN de Administrador</h3>
+                <input
+                  type="text"
+                  value={newAdminPin}
+                  onChange={e => setNewAdminPin(e.target.value)}
+                  maxLength={4}
+                  placeholder="Nuevo PIN (4 dígitos)"
+                  className="w-full px-4 py-2 border rounded-lg mb-4 text-center font-mono text-xl tracking-widest"
+                />
+                <div className="flex gap-2">
+                   <button onClick={() => setShowChangePin(false)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
+                   <button onClick={handleChangePin} className="flex-1 py-2 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800">Guardar</button>
+                </div>
+             </div>
+          </div>
+      )}
       
       {/* Tabs */}
       <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-10">
