@@ -18,7 +18,7 @@ const io = new Server(httpServer, {
   }
 });
 
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.PORT || 3020;
 
 // Initial Data Generators (Copied logic from frontend to seed DB if empty)
 const generateUsers = () => {
@@ -77,11 +77,9 @@ io.on('connection', async (socket) => {
   socket.emit('init_state', { users, classes, tasks, rewards, completions, messages, redemptions });
 
   // Handle Updates
-  // NOTE: In a production app, we would validate permissions here.
-  
   socket.on('update_users', async (newUsers) => {
     await setData('users', newUsers);
-    io.emit('sync_users', newUsers); // Broadcast to ALL clients
+    io.emit('sync_users', newUsers);
   });
 
   socket.on('update_classes', async (newClasses) => {

@@ -50,7 +50,7 @@ chmod +x deploy/install.sh
 ./deploy/install.sh
 ```
 
-Esto instalará Node.js, compilará el frontend, inicializará la base de datos SQLite y arrancará el servidor en el puerto 3005 usando PM2.
+Esto instalará Node.js, compilará el frontend, inicializará la base de datos SQLite y arrancará el servidor en el puerto **3020** usando PM2.
 
 ### Opción B: Instalación Manual
 
@@ -81,6 +81,7 @@ Esto instalará Node.js, compilará el frontend, inicializará la base de datos 
 
 5.  **Desplegar**:
     ```bash
+    # Se utiliza el puerto 3020 definido en server/index.js
     pm2 start server/index.js --name "prismaedu"
     pm2 save
     pm2 startup
