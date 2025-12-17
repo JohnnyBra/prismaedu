@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, Task, Reward, Role, ContextType, AvatarItem, TaskCompletion, ClassGroup, Message, Redemption } from '../types';
-import { AVATAR_ITEMS, INITIAL_TASKS, INITIAL_REWARDS, INITIAL_CLASSES } from '../constants';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import { User, Task, Reward, Role, AvatarItem, TaskCompletion, ClassGroup, Message, Redemption } from '../types';
+import { AVATAR_ITEMS } from '../constants';
+import { io, Socket } from 'socket.io-client';
 
 interface DataContextType {
   currentUser: User | null;
@@ -11,6 +12,7 @@ interface DataContextType {
   completions: TaskCompletion[];
   messages: Message[];
   redemptions: Redemption[];
+  connected: boolean;
   
   // Actions
   login: (userId: string, pin: string) => boolean;
@@ -18,7 +20,7 @@ interface DataContextType {
   assignPoints: (studentId: string, amount: number) => void;
   createTask: (task: Omit<Task, 'id'>) => void;
   completeTask: (taskId: string, studentId: string) => void;
-  toggleTaskCompletion: (taskId: string, studentId: string) => void; // Admin/Tutor override
+  toggleTaskCompletion: (taskId: string, studentId: string) => void;
   createReward: (reward: Omit<Reward, 'id'>) => void;
   deleteReward: (id: string) => void;
   redeemReward: (rewardId: string, studentId: string) => boolean;
@@ -43,123 +45,69 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// Helper to generate mock users
-const generateUsers = (): User[] => {
-  const users: User[] = [];
-
-  // Admin
-  users.push({
-    id: 'admin',
-    name: 'Administrador',
-    role: Role.ADMIN,
-    points: 0,
-    pin: '1234'
-  });
-  
-  // Tutor
-  users.push({
-    id: 'tutor1',
-    name: 'Sr. García',
-    role: Role.TUTOR,
-    classId: 'classA',
-    points: 0,
-    pin: '9999'
-  });
-
-  // Parent
-  users.push({
-    id: 'parent1',
-    name: 'Sra. López',
-    role: Role.PARENT,
-    familyId: 'familyA',
-    points: 0,
-    pin: '8888'
-  });
-
-  // Students (24 students)
-  for (let i = 1; i <= 24; i++) {
-    const paddedId = i.toString().padStart(2, '0');
-    users.push({
-      id: `student${i}`,
-      name: `Alumno ${i}`,
-      role: Role.STUDENT,
-      classId: 'classA',
-      familyId: i <= 2 ? 'familyA' : `family${i}`, // First 2 are Mrs. Johnson's kids
-      points: 100 + (Math.floor(Math.random() * 50)),
-      pin: `00${paddedId}`, // 0001, 0002, etc.
-      inventory: ['base_1', 'top_1', 'bot_1'],
-      avatarConfig: {
-        baseId: 'base_1',
-        topId: 'top_1',
-        bottomId: 'bot_1'
-      }
-    });
-  }
-  return users;
-};
-
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Use ID to track session, deriving the user object from the 'users' array ensures reactivity across tabs
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [connected, setConnected] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(() => localStorage.getItem('sc_session_user'));
 
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem('sc_users');
-    return saved ? JSON.parse(saved) : generateUsers();
-  });
-  const [classes, setClasses] = useState<ClassGroup[]>(() => {
-    const saved = localStorage.getItem('sc_classes');
-    return saved ? JSON.parse(saved) : INITIAL_CLASSES;
-  });
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const saved = localStorage.getItem('sc_tasks');
-    return saved ? JSON.parse(saved) : INITIAL_TASKS as Task[];
-  });
-  const [rewards, setRewards] = useState<Reward[]>(() => {
-    const saved = localStorage.getItem('sc_rewards');
-    return saved ? JSON.parse(saved) : INITIAL_REWARDS as Reward[];
-  });
-  const [completions, setCompletions] = useState<TaskCompletion[]>(() => {
-    const saved = localStorage.getItem('sc_completions');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = localStorage.getItem('sc_messages');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [redemptions, setRedemptions] = useState<Redemption[]>(() => {
-    const saved = localStorage.getItem('sc_redemptions');
-    return saved ? JSON.parse(saved) : [];
-  });
+  // Data State
+  const [users, setUsers] = useState<User[]>([]);
+  const [classes, setClasses] = useState<ClassGroup[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [completions, setCompletions] = useState<TaskCompletion[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
 
   // Derived current user
   const currentUser = users.find(u => u.id === currentUserId) || null;
 
-  // --- Persistence & Synchronization ---
-
-  // Separate effects for granularity to avoid race conditions rewriting unrelated data
-  useEffect(() => { localStorage.setItem('sc_users', JSON.stringify(users)); }, [users]);
-  useEffect(() => { localStorage.setItem('sc_classes', JSON.stringify(classes)); }, [classes]);
-  useEffect(() => { localStorage.setItem('sc_tasks', JSON.stringify(tasks)); }, [tasks]);
-  useEffect(() => { localStorage.setItem('sc_rewards', JSON.stringify(rewards)); }, [rewards]);
-  useEffect(() => { localStorage.setItem('sc_completions', JSON.stringify(completions)); }, [completions]);
-  useEffect(() => { localStorage.setItem('sc_messages', JSON.stringify(messages)); }, [messages]);
-  useEffect(() => { localStorage.setItem('sc_redemptions', JSON.stringify(redemptions)); }, [redemptions]);
-
-  // Listen for changes in other tabs to keep UI synchronized
+  // Initialize Socket
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'sc_users' && e.newValue) setUsers(JSON.parse(e.newValue));
-      if (e.key === 'sc_classes' && e.newValue) setClasses(JSON.parse(e.newValue));
-      if (e.key === 'sc_tasks' && e.newValue) setTasks(JSON.parse(e.newValue));
-      if (e.key === 'sc_rewards' && e.newValue) setRewards(JSON.parse(e.newValue));
-      if (e.key === 'sc_completions' && e.newValue) setCompletions(JSON.parse(e.newValue));
-      if (e.key === 'sc_messages' && e.newValue) setMessages(JSON.parse(e.newValue));
-      if (e.key === 'sc_redemptions' && e.newValue) setRedemptions(JSON.parse(e.newValue));
-    };
+    const newSocket = io(); // Connects to the same host/port serving the file
+    setSocket(newSocket);
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    newSocket.on('connect', () => setConnected(true));
+    newSocket.on('disconnect', () => setConnected(false));
+
+    // Listen for Initial State
+    newSocket.on('init_state', (data) => {
+        setUsers(data.users);
+        setClasses(data.classes);
+        setTasks(data.tasks);
+        setRewards(data.rewards);
+        setCompletions(data.completions);
+        setMessages(data.messages);
+        setRedemptions(data.redemptions);
+    });
+
+    // Listen for Sync Updates (Push Data)
+    newSocket.on('sync_users', (data) => setUsers(data));
+    newSocket.on('sync_classes', (data) => setClasses(data));
+    newSocket.on('sync_tasks', (data) => setTasks(data));
+    newSocket.on('sync_rewards', (data) => setRewards(data));
+    newSocket.on('sync_completions', (data) => setCompletions(data));
+    newSocket.on('sync_messages', (data) => setMessages(data));
+    newSocket.on('sync_redemptions', (data) => setRedemptions(data));
+
+    return () => {
+        newSocket.close();
+    };
   }, []);
+
+  // Helpers to emit updates
+  // We use references to current state inside functions to ensure we don't overwrite concurrent changes 
+  // NOTE: In a fully robust app, the server would handle the merging logic. 
+  // Here we optimistically assume the client has the latest array before pushing.
+  // Because we receive 'sync' events instantly, our local state is usually fresh.
+
+  const emitUsers = (newUsers: User[]) => socket?.emit('update_users', newUsers);
+  const emitClasses = (newClasses: ClassGroup[]) => socket?.emit('update_classes', newClasses);
+  const emitTasks = (newTasks: Task[]) => socket?.emit('update_tasks', newTasks);
+  const emitRewards = (newRewards: Reward[]) => socket?.emit('update_rewards', newRewards);
+  const emitCompletions = (newCompletions: TaskCompletion[]) => socket?.emit('update_completions', newCompletions);
+  const emitMessages = (newMessages: Message[]) => socket?.emit('update_messages', newMessages);
+  const emitRedemptions = (newRedemptions: Redemption[]) => socket?.emit('update_redemptions', newRedemptions);
 
   // --- Actions ---
 
@@ -167,25 +115,31 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const user = users.find(u => u.id === userId);
     if (user && user.pin === pin) {
       setCurrentUserId(user.id);
+      localStorage.setItem('sc_session_user', user.id);
       return true;
     }
     return false;
   };
 
-  const logout = () => setCurrentUserId(null);
+  const logout = () => {
+      setCurrentUserId(null);
+      localStorage.removeItem('sc_session_user');
+  };
 
   const updatePin = (newPin: string) => {
     if (!currentUserId) return;
-    setUsers(prev => prev.map(u => u.id === currentUserId ? { ...u, pin: newPin } : u));
+    const newUsers = users.map(u => u.id === currentUserId ? { ...u, pin: newPin } : u);
+    emitUsers(newUsers);
   };
 
   const assignPoints = (studentId: string, amount: number) => {
-    setUsers(prev => prev.map(u => {
+    const newUsers = users.map(u => {
       if (u.id === studentId) {
         return { ...u, points: u.points + amount };
       }
       return u;
-    }));
+    });
+    emitUsers(newUsers);
   };
 
   const createTask = (taskData: Omit<Task, 'id'>) => {
@@ -193,7 +147,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       ...taskData,
       id: `task_${Date.now()}`
     };
-    setTasks(prev => [newTask, ...prev]);
+    emitTasks([newTask, ...tasks]);
   };
 
   const createReward = (rewardData: Omit<Reward, 'id'>) => {
@@ -201,23 +155,21 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
        ...rewardData,
        id: `reward_${Date.now()}`
      };
-     setRewards(prev => [newReward, ...prev]);
+     emitRewards([newReward, ...rewards]);
   };
 
   const deleteReward = (id: string) => {
-    setRewards(prev => prev.filter(r => r.id !== id));
+    emitRewards(rewards.filter(r => r.id !== id));
   };
 
   const completeTask = (taskId: string, studentId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
     
-    // Check if already completed today (simple check)
-    // In a real app we'd check timestamps more carefully
     const alreadyDone = completions.some(c => c.taskId === taskId && c.userId === studentId);
     if (alreadyDone && task.isUnique) return;
 
-    setCompletions(prev => [...prev, { taskId, userId: studentId, timestamp: Date.now() }]);
+    emitCompletions([...completions, { taskId, userId: studentId, timestamp: Date.now() }]);
     assignPoints(studentId, task.points);
     
     if (currentUser?.role === Role.STUDENT && (window as any).confetti) {
@@ -229,7 +181,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Allows teacher/admin to Toggle completion (Undo or Do)
   const toggleTaskCompletion = (taskId: string, studentId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
@@ -237,12 +188,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const existingCompletionIndex = completions.findIndex(c => c.taskId === taskId && c.userId === studentId);
 
     if (existingCompletionIndex >= 0) {
-      // Undo completion: Remove record and deduct points
-      setCompletions(prev => prev.filter((_, i) => i !== existingCompletionIndex));
+      // Undo completion
+      const newCompletions = completions.filter((_, i) => i !== existingCompletionIndex);
+      emitCompletions(newCompletions);
       assignPoints(studentId, -task.points);
     } else {
-      // Do completion: Add record and add points
-      setCompletions(prev => [...prev, { taskId, userId: studentId, timestamp: Date.now() }]);
+      // Do completion
+      emitCompletions([...completions, { taskId, userId: studentId, timestamp: Date.now() }]);
       assignPoints(studentId, task.points);
     }
   };
@@ -253,15 +205,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!user || !reward) return false;
     
     if (user.points >= reward.cost) {
-      // Deduct points
       assignPoints(studentId, -reward.cost);
       
-      // Update Stock
       if (reward.stock && reward.stock > 0) {
-         setRewards(prev => prev.map(r => r.id === rewardId ? {...r, stock: (r.stock || 0) - 1} : r));
+         emitRewards(rewards.map(r => r.id === rewardId ? {...r, stock: (r.stock || 0) - 1} : r));
       }
 
-      // Add to history
       const redemption: Redemption = {
         id: `red_${Date.now()}`,
         userId: studentId,
@@ -271,8 +220,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         timestamp: Date.now(),
         context: reward.context
       };
-      setRedemptions(prev => [redemption, ...prev]);
-
+      emitRedemptions([redemption, ...redemptions]);
       return true;
     }
     return false;
@@ -286,7 +234,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (user.inventory?.includes(itemId)) return true; 
 
     if (user.points >= item.cost) {
-      setUsers(prev => prev.map(u => {
+      const newUsers = users.map(u => {
         if (u.id === user.id) {
           return {
             ...u,
@@ -295,7 +243,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           };
         }
         return u;
-      }));
+      });
+      emitUsers(newUsers);
       return true;
     }
     return false;
@@ -303,10 +252,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const updateAvatar = (config: User['avatarConfig']) => {
     if (!currentUserId) return;
-    setUsers(prev => prev.map(u => u.id === currentUserId ? { ...u, avatarConfig: { ...u.avatarConfig, ...config } } : u));
+    const newUsers = users.map(u => u.id === currentUserId ? { ...u, avatarConfig: { ...u.avatarConfig, ...config } } : u);
+    emitUsers(newUsers);
   };
 
-  // --- Messaging ---
   const sendMessage = (toId: string, content: string) => {
     if (!currentUserId) return;
     const msg: Message = {
@@ -317,28 +266,31 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       timestamp: Date.now(),
       read: false
     };
-    setMessages(prev => [...prev, msg]);
+    emitMessages([...messages, msg]);
   };
 
   const markMessagesRead = (fromId: string, toId: string) => {
-    setMessages(prev => prev.map(m => 
+    const newMessages = messages.map(m => 
       (m.fromId === fromId && m.toId === toId) ? { ...m, read: true } : m
-    ));
+    );
+    emitMessages(newMessages);
   };
 
   // --- Admin Functions ---
 
   const addClass = (name: string) => {
-    setClasses(prev => [...prev, { id: `class_${Date.now()}`, name }]);
+    emitClasses([...classes, { id: `class_${Date.now()}`, name }]);
   };
 
   const updateClass = (id: string, name: string) => {
-    setClasses(prev => prev.map(c => c.id === id ? { ...c, name } : c));
+    emitClasses(classes.map(c => c.id === id ? { ...c, name } : c));
   };
 
   const deleteClass = (id: string) => {
-    setUsers(prev => prev.map(u => u.classId === id ? { ...u, classId: undefined } : u));
-    setClasses(prev => prev.filter(c => c.id !== id));
+    // Also remove classId from users
+    const newUsers = users.map(u => u.classId === id ? { ...u, classId: undefined } : u);
+    emitUsers(newUsers);
+    emitClasses(classes.filter(c => c.id !== id));
   };
 
   const addUser = (userData: Omit<User, 'id'>) => {
@@ -349,31 +301,31 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       inventory: ['base_1', 'top_1', 'bot_1'],
       avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' }
     };
-    setUsers(prev => [...prev, newUser]);
+    emitUsers([...users, newUser]);
   };
 
   const updateUser = (id: string, updates: Partial<User>) => {
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
+    emitUsers(users.map(u => u.id === id ? { ...u, ...updates } : u));
   };
 
   const deleteUser = (id: string) => {
-    setUsers(prev => prev.filter(u => u.id !== id));
+    emitUsers(users.filter(u => u.id !== id));
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+    emitTasks(tasks.map(t => t.id === id ? { ...t, ...updates } : t));
   };
 
   const deleteTask = (id: string) => {
-    setTasks(prev => prev.filter(t => t.id !== id));
+    emitTasks(tasks.filter(t => t.id !== id));
   };
 
   const deleteFamily = (familyId: string) => {
-    setUsers(prev => prev.filter(u => u.familyId !== familyId));
+    emitUsers(users.filter(u => u.familyId !== familyId));
   };
 
   const updateFamilyId = (oldId: string, newId: string) => {
-    setUsers(prev => prev.map(u => u.familyId === oldId ? { ...u, familyId: newId } : u));
+    emitUsers(users.map(u => u.familyId === oldId ? { ...u, familyId: newId } : u));
   };
 
   return (
@@ -386,6 +338,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       completions,
       messages,
       redemptions,
+      connected,
       login,
       logout,
       assignPoints,

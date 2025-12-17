@@ -24,17 +24,17 @@ PrismaEdu es una aplicación web progresiva (PWA) diseñada para gamificar la ge
 *   **Tienda de Recompensas:** Canjear puntos por premios reales (definidos por profes o padres).
 *   **Historial:** Ver el registro de premios canjeados.
 
-### ⚙️ Características Técnicas
-*   **Persistencia:** Los datos se guardan localmente (LocalStorage) simulando una base de datos persistente.
-*   **Sincronización:** Actualización en tiempo real entre pestañas del navegador.
-*   **Seguridad:** Sistema de PIN simple para cambio rápido de usuarios (Admin, Profes, Padres, Alumnos).
-*   **Diseño:** Interfaz moderna y responsiva construida con Tailwind CSS.
+### ⚙️ Características Técnicas (Actualizado)
+*   **Backend:** Node.js + Express.
+*   **Persistencia:** Base de datos **SQLite** (`database.sqlite`) alojada en el servidor.
+*   **Sincronización:** **Socket.IO** para actualizaciones "push" en tiempo real (evita condiciones de carrera y mantiene todas las sesiones sincronizadas instantáneamente).
+*   **Diseño:** Interfaz moderna y responsiva construida con Tailwind CSS y React.
 
 ---
 
 ## 🛠️ Instalación en Servidor Ubuntu
 
-Estas instrucciones permiten desplegar la aplicación en un servidor Ubuntu utilizando **Node.js** y **PM2** para mantener la aplicación activa en el puerto **3005**.
+Estas instrucciones permiten desplegar la aplicación en un servidor Ubuntu.
 
 ### Opción A: Instalación Automática (Recomendada)
 
@@ -44,19 +44,20 @@ Hemos incluido scripts automatizados en la carpeta `deploy`.
 2.  **Descarga y ejecuta el script de instalación**:
 
 ```bash
-# Puedes copiar el contenido de deploy/install.sh o clonar y ejecutar:
 git clone https://github.com/JohnnyBra/prismaedu.git
 cd prismaedu
 chmod +x deploy/install.sh
 ./deploy/install.sh
 ```
 
+Esto instalará Node.js, compilará el frontend, inicializará la base de datos SQLite y arrancará el servidor en el puerto 3005 usando PM2.
+
 ### Opción B: Instalación Manual
 
 1.  **Actualizar el sistema e instalar dependencias básicas**:
     ```bash
     sudo apt update && sudo apt upgrade -y
-    sudo apt install -y curl git unzip
+    sudo apt install -y curl git unzip build-essential python3
     ```
 
 2.  **Instalar Node.js (Versión 20)**:
@@ -65,29 +66,22 @@ chmod +x deploy/install.sh
     sudo apt-get install -y nodejs
     ```
 
-3.  **Instalar PM2 (Gestor de procesos) y serve**:
+3.  **Instalar PM2**:
     ```bash
-    sudo npm install -g pm2 serve
+    sudo npm install -g pm2
     ```
 
-4.  **Clonar el repositorio**:
+4.  **Clonar y configurar**:
     ```bash
     git clone https://github.com/JohnnyBra/prismaedu.git
     cd prismaedu
-    ```
-
-5.  **Instalar dependencias y construir**:
-    ```bash
     npm install
     npm run build
     ```
 
-6.  **Desplegar en el puerto 3005**:
+5.  **Desplegar**:
     ```bash
-    # Inicia el servidor estático sirviendo la carpeta 'dist' (o 'build' según tu configuración de Vite/CRA)
-    pm2 start "serve -s dist -l 3005" --name "prismaedu"
-    
-    # Asegurar que arranque al reinicio del sistema
+    pm2 start server/index.js --name "prismaedu"
     pm2 save
     pm2 startup
     ```
@@ -98,28 +92,17 @@ chmod +x deploy/install.sh
 
 Para actualizar la aplicación cuando haya cambios en el repositorio GitHub:
 
-### Opción A: Script Automático
-
 ```bash
 cd prismaedu
 chmod +x deploy/update.sh
 ./deploy/update.sh
 ```
 
-### Opción B: Manual
-
-```bash
-cd prismaedu
-git pull origin main
-npm install
-npm run build
-pm2 restart prismaedu
-```
-
 ---
 
 ## 💻 Desarrollo Local
 
-1.  Clonar el repo: `git clone https://github.com/JohnnyBra/prismaedu.git`
-2.  Instalar: `npm install`
-3.  Ejecutar: `npm run dev` (o `npm start`)
+1.  Clonar el repo.
+2.  `npm install`
+3.  **Para desarrollo con Hot Reload (Frontend):** `npm run dev` (Nota: necesitarás correr el servidor backend por separado o ajustar la configuración para conectar sockets al puerto correcto).
+4.  **Para probar modo producción:** `npm run build` y luego `npm start`.
