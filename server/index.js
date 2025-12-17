@@ -23,21 +23,39 @@ const PORT = process.env.PORT || 3020;
 // Initial Data Generators (Copied logic from frontend to seed DB if empty)
 const generateUsers = () => {
     const users = [];
+
+    // Admin
     users.push({ id: 'admin', name: 'Administrador', role: 'ADMIN', points: 0, pin: '2222' });
-    users.push({ id: 'tutor1', name: 'Sr. García', role: 'TUTOR', classId: 'classA', points: 0, pin: '9999' });
-    users.push({ id: 'parent1', name: 'Sra. López', role: 'PARENT', familyId: 'familyA', points: 0, pin: '8888' });
+
+    // 1 Teacher
+    users.push({ id: 'tutor1', name: 'Profesor', role: 'TUTOR', classId: 'classA', points: 0, pin: '0000' });
+
+    // 24 Students and Parents
     for (let i = 1; i <= 24; i++) {
-      const paddedId = i.toString().padStart(2, '0');
+      const studentId = `student${i}`;
+      const familyId = `family${i}`;
+
+      // Student
       users.push({
-        id: `student${i}`,
+        id: studentId,
         name: `Alumno ${i}`,
         role: 'STUDENT',
         classId: 'classA',
-        familyId: i <= 2 ? 'familyA' : `family${i}`,
-        points: 100 + (Math.floor(Math.random() * 50)),
-        pin: `00${paddedId}`,
+        familyId: familyId,
+        points: 100,
+        pin: '0000',
         inventory: ['base_1', 'top_1', 'bot_1'],
         avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' }
+      });
+
+      // Parent
+      users.push({
+        id: `parent${i}`,
+        name: `Padre ${i}`,
+        role: 'PARENT',
+        familyId: familyId,
+        points: 0,
+        pin: '0000'
       });
     }
     return users;
@@ -57,7 +75,7 @@ io.on('connection', async (socket) => {
 
   // Send initial state to the connecting client
   const users = await getData('users', generateUsers());
-  const classes = await getData('classes', [{ id: 'classA', name: '4º A - Primaria' }, { id: 'classB', name: '4º B - Primaria' }]);
+  const classes = await getData('classes', [{ id: 'classA', name: '4º A - Primaria' }]);
   const tasks = await getData('tasks', [
     { id: 't1', title: 'Completar ficha de Mates', points: 15, icon: 'Calculator', context: 'SCHOOL', assignedTo: [], createdBy: 'tutor1', isPriority: true },
     { id: 't2', title: 'Ayudar a un compañero', points: 10, icon: 'Users', context: 'SCHOOL', assignedTo: [], createdBy: 'tutor1', isPriority: false },
