@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
-import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map } from 'lucide-react';
-import { Role, User } from '../types';
+import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, LayoutDashboard, ListChecks, ChevronRight } from 'lucide-react';
+import { Role, User, Task } from '../types';
 
 type Tab = 'CLASSROOM' | 'REWARDS' | 'MESSAGES';
 
@@ -19,6 +19,7 @@ const TutorDashboard: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<User | null>(null); // For detail view
+  const [selectedTaskDetails, setSelectedTaskDetails] = useState<Task | null>(null); // For task detail view
 
   // Form States
   const [newPin, setNewPin] = useState('');
@@ -87,6 +88,20 @@ const TutorDashboard: React.FC = () => {
       sendMessage(chatUser.id, chatMessage);
       setChatMessage('');
     }
+  };
+
+  const handleAssignPointsWithNotification = (student: User, amount: number) => {
+    assignPoints(student.id, amount);
+
+    // Notify parents
+    const studentParents = parents.filter(p => p.familyId === student.familyId);
+    const action = amount > 0 ? 'asignado' : 'retirado';
+    const emoji = amount > 0 ? '🌟' : '⚠️';
+    const msg = `${emoji} Hola. Se le han ${action} ${Math.abs(amount)} puntos a su hijo/a ${student.name} en clase.`;
+
+    studentParents.forEach(p => {
+        sendMessage(p.id, msg);
+    });
   };
 
   const getConversation = (userId: string) => {
@@ -179,39 +194,130 @@ const TutorDashboard: React.FC = () => {
 
   // --- DASHBOARD RENDERERS ---
 
+  const renderTaskDashboard = () => {
+    const schoolTasks = tasks.filter(t => t.context === 'SCHOOL');
+
+    return (
+        <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-500">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                    <LayoutDashboard size={24} />
+                </div>
+                Dashboard de Tareas
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {schoolTasks.map(task => {
+                     const assignedStudentIds = task.assignedTo.length > 0 ? task.assignedTo : students.map(s => s.id);
+                     const relevantStudents = students.filter(s => assignedStudentIds.includes(s.id));
+                     const completedCount = completions.filter(c => c.taskId === task.id && relevantStudents.some(s => s.id === c.userId)).length;
+                     const total = relevantStudents.length;
+                     const percentage = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+                     return (
+                         <button
+                            key={task.id}
+                            onClick={() => setSelectedTaskDetails(task)}
+                            className="bg-white text-left p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden"
+                         >
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+
+                            <div className="relative z-10">
+                                <div className="flex justify-between items-start mb-3">
+                                    <div className="p-2.5 bg-blue-100 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-sm">
+                                        <ListChecks size={22}/>
+                                    </div>
+                                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${percentage === 100 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                        {percentage}%
+                                    </span>
+                                </div>
+                                <h3 className="font-bold text-gray-800 text-lg mb-1 truncate pr-2">{task.title}</h3>
+                                <p className="text-gray-400 text-xs font-medium mb-4">{completedCount} de {total} completados</p>
+
+                                <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden mb-2">
+                                    <div
+                                        className={`h-full rounded-full transition-all duration-700 ease-out ${percentage === 100 ? 'bg-green-500' : 'bg-blue-500'}`}
+                                        style={{ width: `${percentage}%` }}
+                                    ></div>
+                                </div>
+
+                                <div className="flex items-center text-blue-500 text-xs font-bold gap-1 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                                    Ver alumnos <ChevronRight size={14} />
+                                </div>
+                            </div>
+                         </button>
+                     );
+                })}
+
+                <button 
+                    onClick={() => setShowTaskModal(true)}
+                    className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50/50 text-gray-400 hover:text-blue-500 transition-all group h-full min-h-[160px]"
+                >
+                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
+                        <Plus size={24} />
+                    </div>
+                    <span className="font-bold text-sm">Crear Nueva Tarea</span>
+                </button>
+            </div>
+        </div>
+    );
+  };
+
   const renderClassroom = () => (
     <div className="animate-in fade-in duration-300">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-8">
-          {students.map(student => (
-            <div 
-              key={student.id} 
-              onClick={() => setSelectedStudent(student)}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col cursor-pointer hover:shadow-md hover:border-blue-300 transition-all group"
-            >
-              <div className="p-4 flex flex-col items-center border-b border-gray-50 bg-blue-50/30 group-hover:bg-blue-50 transition-colors">
-                <Avatar config={student.avatarConfig} size={80} />
-                <h3 className="mt-3 font-bold text-gray-800 truncate w-full text-center">{student.name}</h3>
-                <div className="mt-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
-                   {student.points} pts
-                </div>
-              </div>
-              
-              <div className="p-3 bg-gray-50 flex justify-between gap-2 mt-auto" onClick={e => e.stopPropagation()}>
-                <button 
-                  onClick={() => assignPoints(student.id, -10)}
-                  className="flex-1 bg-white border border-gray-200 hover:bg-red-50 text-red-500 rounded-lg py-2 flex justify-center transition-colors"
-                >
-                  <Minus size={16} />
-                </button>
-                <button 
-                  onClick={() => assignPoints(student.id, 10)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 flex justify-center transition-colors shadow-sm"
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
+
+      {/* 1. Task Dashboard Section */}
+      {renderTaskDashboard()}
+
+      {/* 2. Students Grid Section */}
+      <div>
+        <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                <Users size={24} />
             </div>
-          ))}
+            Gestión de Alumnos
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 mb-8">
+            {students.map(student => (
+                <div
+                key={student.id}
+                onClick={() => setSelectedStudent(student)}
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col cursor-pointer hover:shadow-xl hover:border-blue-200 hover:-translate-y-1 transition-all duration-300 group relative"
+                >
+                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-blue-50 to-indigo-50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-colors"></div>
+
+                <div className="p-5 flex flex-col items-center relative z-10">
+                    <div className="transform group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">
+                        <Avatar config={student.avatarConfig} size={90} />
+                    </div>
+
+                    <div className="mt-4 text-center w-full">
+                        <h3 className="font-bold text-gray-800 text-lg truncate w-full">{student.name}</h3>
+                        <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold shadow-sm">
+                            <span>{student.points}</span>
+                            <span className="text-yellow-600 text-xs uppercase tracking-wider">PTS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-4 mt-auto border-t border-gray-50 bg-gray-50/50 flex gap-3" onClick={e => e.stopPropagation()}>
+                    <button
+                    onClick={() => handleAssignPointsWithNotification(student, -10)}
+                    className="flex-1 bg-white border border-gray-200 hover:bg-red-50 hover:border-red-200 text-gray-400 hover:text-red-500 rounded-xl py-2.5 flex justify-center items-center transition-all shadow-sm hover:shadow active:scale-95"
+                    title="Restar Puntos"
+                    >
+                    <Minus size={18} />
+                    </button>
+                    <button
+                    onClick={() => handleAssignPointsWithNotification(student, 10)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white border border-transparent rounded-xl py-2.5 flex justify-center items-center transition-all shadow-md hover:shadow-lg active:scale-95"
+                    title="Sumar Puntos"
+                    >
+                    <Plus size={18} />
+                    </button>
+                </div>
+                </div>
+            ))}
+        </div>
       </div>
     </div>
   );
@@ -423,10 +529,84 @@ const TutorDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* Selected Task Details Modal */}
+        {selectedTaskDetails && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-200">
+                    <div className="p-6 bg-indigo-600 text-white flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-4">
+                            <div className="bg-white/20 p-2 rounded-lg">
+                                <ListChecks size={28} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold">{selectedTaskDetails.title}</h2>
+                                <p className="text-indigo-200 text-sm">Detalles de Tarea</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setSelectedTaskDetails(null)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full text-white transition-colors">
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {/* Completed Column */}
+                            <div>
+                                <h3 className="text-sm font-bold text-green-700 uppercase mb-3 flex items-center gap-2 bg-green-50 p-2 rounded-lg">
+                                    <CheckCircle size={16}/> Completado
+                                </h3>
+                                <div className="space-y-2">
+                                    {students.filter(s => {
+                                         const assigned = selectedTaskDetails.assignedTo.length === 0 || selectedTaskDetails.assignedTo.includes(s.id);
+                                         const done = completions.some(c => c.taskId === selectedTaskDetails.id && c.userId === s.id);
+                                         return assigned && done;
+                                    }).map(s => (
+                                        <div key={s.id} className="flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-100 shadow-sm">
+                                            <Avatar config={s.avatarConfig} size={32} />
+                                            <span className="font-medium text-gray-700 text-sm">{s.name}</span>
+                                        </div>
+                                    ))}
+                                    {students.filter(s => {
+                                         const assigned = selectedTaskDetails.assignedTo.length === 0 || selectedTaskDetails.assignedTo.includes(s.id);
+                                         const done = completions.some(c => c.taskId === selectedTaskDetails.id && c.userId === s.id);
+                                         return assigned && done;
+                                    }).length === 0 && <p className="text-gray-400 text-sm italic">Nadie ha completado aún.</p>}
+                                </div>
+                            </div>
+
+                            {/* Pending Column */}
+                            <div>
+                                <h3 className="text-sm font-bold text-orange-700 uppercase mb-3 flex items-center gap-2 bg-orange-50 p-2 rounded-lg">
+                                    <Circle size={16}/> Pendiente
+                                </h3>
+                                <div className="space-y-2">
+                                    {students.filter(s => {
+                                         const assigned = selectedTaskDetails.assignedTo.length === 0 || selectedTaskDetails.assignedTo.includes(s.id);
+                                         const done = completions.some(c => c.taskId === selectedTaskDetails.id && c.userId === s.id);
+                                         return assigned && !done;
+                                    }).map(s => (
+                                        <div key={s.id} className="flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-100 shadow-sm opacity-70">
+                                            <Avatar config={s.avatarConfig} size={32} />
+                                            <span className="font-medium text-gray-700 text-sm">{s.name}</span>
+                                        </div>
+                                    ))}
+                                    {students.filter(s => {
+                                         const assigned = selectedTaskDetails.assignedTo.length === 0 || selectedTaskDetails.assignedTo.includes(s.id);
+                                         const done = completions.some(c => c.taskId === selectedTaskDetails.id && c.userId === s.id);
+                                         return assigned && !done;
+                                    }).length === 0 && <p className="text-gray-400 text-sm italic">¡Todos han terminado!</p>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
         {/* Student Detail Modal */}
         {selectedStudent && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
                {/* Header */}
                <div className="p-6 bg-blue-600 text-white flex justify-between items-center shrink-0">
                   <div className="flex items-center gap-4">
