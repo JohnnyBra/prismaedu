@@ -7,12 +7,14 @@ import { Role, User, Task } from '../types';
 type Tab = 'CLASSROOM' | 'REWARDS' | 'MESSAGES';
 
 const TutorDashboard: React.FC = () => {
-  const { users, currentUser, logout, assignPoints, createTask, updatePin, tasks, completions, toggleTaskCompletion, rewards, createReward, deleteReward, messages, sendMessage } = useData();
+  const { users, currentUser, logout, assignPoints, createTask, updatePin, tasks, completions, toggleTaskCompletion, rewards, createReward, deleteReward, messages, sendMessage, classes } = useData();
   
   // New State: Teacher Hub View
   const [showHub, setShowHub] = useState(true);
 
   const [activeTab, setActiveTab] = useState<Tab>('CLASSROOM');
+
+  const currentClass = classes.find(c => c.id === currentUser?.classId);
 
   // Modals
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -526,7 +528,7 @@ const TutorDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+      <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex items-center gap-3">
@@ -534,7 +536,7 @@ const TutorDashboard: React.FC = () => {
               <Users size={24} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">Panel Clase 4-B</h1>
+              <h1 className="text-xl font-bold text-gray-800">Panel {currentClass?.name || 'del Profesor'}</h1>
               <p className="text-sm text-gray-500">Bienvenido/a, {currentUser?.name}</p>
             </div>
           </div>
@@ -565,7 +567,7 @@ const TutorDashboard: React.FC = () => {
       </header>
       
       {/* Tabs */}
-      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-10">
+      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-40">
         <div className="flex gap-6">
            <button onClick={() => setActiveTab('CLASSROOM')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'CLASSROOM' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400'}`}>
               <Users size={18} /> Alumnos
