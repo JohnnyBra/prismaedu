@@ -66,75 +66,91 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !importingClassId) return;
 
-    const text = await file.text();
-    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      if (!text) return;
 
-    if (lines.length < 2) {
-      alert('El archivo CSV está vacío o no tiene cabecera.');
-      return;
-    }
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
 
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
-    const surnameIndex = headers.indexOf('apellidos');
-    const nameIndex = headers.indexOf('nombre');
+      if (lines.length < 2) {
+        alert('El archivo CSV está vacío o no tiene cabecera.');
+        return;
+      }
 
-    if (surnameIndex === -1 || nameIndex === -1) {
-      alert('El archivo CSV debe tener las columnas "apellidos" y "nombre".');
-      return;
-    }
+      // Check for "Alumno" header (case insensitive, removing quotes)
+      const headerLine = lines[0].toLowerCase();
+      if (!headerLine.includes('alumno')) {
+         alert('El archivo CSV debe tener una cabecera "Alumno".');
+         return;
+      }
 
-    const newUsers: Omit<User, 'id'>[] = [];
-    let count = 0;
+      const newUsers: Omit<User, 'id'>[] = [];
+      let count = 0;
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      // Handle simple CSV splitting (assuming no commas in names for simplicity or handling quotes roughly)
-      // A more robust CSV parser might be needed for complex cases
-      const parts = line.split(',').map(p => p.trim().replace(/"/g, ''));
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim()) continue;
 
-      if (parts.length <= Math.max(surnameIndex, nameIndex)) continue;
+        // Parse "Surnames, Name" format
+        // We assume the whole line is one column or the first column is the relevant one
+        // Remove surrounding quotes if present
+        let cleanLine = line.trim();
+        if (cleanLine.startsWith('"') && cleanLine.endsWith('"')) {
+            cleanLine = cleanLine.substring(1, cleanLine.length - 1);
+        }
 
-      const surname = parts[surnameIndex];
-      const name = parts[nameIndex];
+        // Split by the first comma only
+        const separatorIndex = cleanLine.indexOf(',');
+        if (separatorIndex === -1) continue;
 
-      if (!surname || !name) continue;
+        const rawSurname = cleanLine.substring(0, separatorIndex).trim().replace(/"/g, '');
+        const rawName = cleanLine.substring(separatorIndex + 1).trim().replace(/"/g, '');
 
-      const familyId = `family_${Date.now()}_${i}`;
+        if (!rawSurname || !rawName) continue;
 
-      // Create Student
-      newUsers.push({
-        name: `${name} ${surname}`,
-        role: Role.STUDENT,
-        classId: importingClassId,
-        familyId: familyId,
-        pin: '0000',
-        points: 0
-      });
+        const familyId = `family_${Date.now()}_${i}`;
+        const fullName = `${rawName} ${rawSurname}`;
 
-      // Create Parent
-      newUsers.push({
-        name: `Familia ${surname}`,
-        role: Role.PARENT,
-        familyId: familyId,
-        pin: '0000',
-        points: 0
-      });
+        // Create Student
+        newUsers.push({
+          name: fullName,
+          firstName: rawName,
+          lastName: rawSurname,
+          role: Role.STUDENT,
+          classId: importingClassId,
+          familyId: familyId,
+          pin: '0000',
+          points: 0
+        });
 
-      count++;
-    }
+        // Create Parent
+        newUsers.push({
+          name: `Familia ${rawSurname}`,
+          role: Role.PARENT,
+          familyId: familyId,
+          pin: '0000',
+          points: 0
+        });
 
-    if (newUsers.length > 0) {
-      addUsers(newUsers);
-      alert(`Se han importado ${count} alumnos y creado ${count} familias correctamente.`);
-    } else {
-      alert('No se encontraron datos válidos para importar.');
-    }
+        count++;
+      }
 
-    setImportingClassId(null);
+      if (newUsers.length > 0) {
+        addUsers(newUsers);
+        alert(`Se han importado ${count} alumnos y creado ${count} familias correctamente.`);
+      } else {
+        alert('No se encontraron datos válidos para importar.');
+      }
+      setImportingClassId(null);
+    };
+
+    // Read as Windows-1252 (ANSI)
+    reader.readAsText(file, 'windows-1252');
   };
 
   const handleChangePin = () => {
@@ -335,7 +351,9 @@ const AdminDashboard: React.FC = () => {
   );
 
   const renderTutorsTab = () => {
-    const tutors = users.filter(u => u.role === Role.TUTOR);
+    const tutors = users
+       .filter(u => u.role === Role.TUTOR)
+       .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
     return (
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="flex justify-between items-center">
@@ -473,8 +491,12 @@ const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 gap-4">
            {familyIds.map(famId => {
              const members = users.filter(u => u.familyId === famId);
-             const parents = members.filter(u => u.role === Role.PARENT);
-             const students = members.filter(u => u.role === Role.STUDENT);
+             const parents = members
+                .filter(u => u.role === Role.PARENT)
+                .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
+             const students = members
+                .filter(u => u.role === Role.STUDENT)
+                .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
              const familyName = getFamilyName(famId);
              const isEditing = editingFamilyId === famId;
 
