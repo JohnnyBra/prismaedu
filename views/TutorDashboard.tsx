@@ -26,6 +26,7 @@ const TutorDashboard: React.FC = () => {
   const [taskTitle, setTaskTitle] = useState('');
   const [taskPoints, setTaskPoints] = useState(10);
   const [isPriority, setIsPriority] = useState(false);
+  const [workType, setWorkType] = useState<'CLASSWORK' | 'HOMEWORK'>('CLASSWORK');
   
   const [rewardTitle, setRewardTitle] = useState('');
   const [rewardCost, setRewardCost] = useState(50);
@@ -51,10 +52,12 @@ const TutorDashboard: React.FC = () => {
       assignedTo: students.map(s => s.id),
       createdBy: currentUser!.id,
       isPriority: isPriority,
+      workType: workType,
     });
     setTaskTitle('');
     setTaskPoints(10);
     setIsPriority(false);
+    setWorkType('CLASSWORK');
     setShowTaskModal(false);
     alert('¡Tarea enviada a ' + students.length + ' alumnos!');
   };
@@ -786,6 +789,24 @@ const TutorDashboard: React.FC = () => {
                   onChange={(e) => setTaskPoints(Number(e.target.value))}
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Tarea</label>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setWorkType('CLASSWORK')}
+                    className={`flex-1 py-2 px-3 rounded-lg border-2 font-bold text-sm transition-all ${workType === 'CLASSWORK' ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-400 hover:border-blue-300'}`}
+                  >
+                    Clase
+                  </button>
+                  <button
+                    onClick={() => setWorkType('HOMEWORK')}
+                    className={`flex-1 py-2 px-3 rounded-lg border-2 font-bold text-sm transition-all ${workType === 'HOMEWORK' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-400 hover:border-indigo-300'}`}
+                  >
+                    Casa (Deberes)
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-100 cursor-pointer" onClick={() => setIsPriority(!isPriority)}>
