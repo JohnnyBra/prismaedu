@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
-import { Plus, Minus, LogOut, Home, Star, Settings, X, MessageSquare, Send, Gift, ListChecks, Trash2 } from 'lucide-react';
+import { Plus, Minus, LogOut, Home, Star, Settings, X, MessageSquare, Send, Gift, ListChecks, Trash2, CheckCircle, School, BookOpen } from 'lucide-react';
 import { Role } from '../types';
 
 const ParentDashboard: React.FC = () => {
-  const { users, currentUser, logout, assignPoints, createTask, updatePin, messages, sendMessage, rewards, createReward, deleteReward } = useData();
+  const { users, currentUser, logout, assignPoints, createTask, updatePin, messages, sendMessage, rewards, createReward, deleteReward, tasks, completions } = useData();
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskPoints, setTaskPoints] = useState(10);
@@ -237,13 +237,65 @@ const ParentDashboard: React.FC = () => {
 
                 <div className="p-4 bg-orange-50/50 flex-1">
                   <h4 className="text-xs font-bold text-gray-400 uppercase mb-3">Acciones Rápidas</h4>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 mb-6">
                       <button onClick={() => assignPoints(kid.id, -5)} className="flex-1 py-3 rounded-xl border border-red-100 bg-white text-red-500 font-bold hover:bg-red-50 transition-colors">
                         Mal Comportamiento
                       </button>
                       <button onClick={() => assignPoints(kid.id, 5)} className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-colors shadow-green-200 shadow-lg">
                         Buen Trabajo
                       </button>
+                  </div>
+
+                  <h4 className="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2">
+                    <ListChecks size={14}/> Tareas Pendientes
+                  </h4>
+                  <div className="space-y-2">
+                    {tasks
+                        .filter(t => (t.assignedTo.length === 0 || t.assignedTo.includes(kid.id)))
+                        .filter(t => !completions.some(c => c.taskId === t.id && c.userId === kid.id))
+                        .map(task => {
+                            let icon = <School size={16} className="text-blue-500"/>;
+                            let label = 'Clase';
+                            let bgColor = 'bg-blue-50';
+                            let borderColor = 'border-blue-100';
+
+                            if (task.context === 'SCHOOL' && task.workType === 'HOMEWORK') {
+                                icon = <BookOpen size={16} className="text-indigo-500"/>;
+                                label = 'Deberes';
+                                bgColor = 'bg-indigo-50';
+                                borderColor = 'border-indigo-100';
+                            } else if (task.context === 'HOME') {
+                                icon = <Home size={16} className="text-orange-500"/>;
+                                label = 'Casa';
+                                bgColor = 'bg-orange-50';
+                                borderColor = 'border-orange-100';
+                            }
+
+                            return (
+                                <div key={task.id} className={`p-3 rounded-xl border ${borderColor} ${bgColor} flex items-center justify-between`}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-white p-1.5 rounded-lg shadow-sm">
+                                            {icon}
+                                        </div>
+                                        <div>
+                                            <h5 className="font-bold text-gray-800 text-sm">{task.title}</h5>
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase">{label}</span>
+                                        </div>
+                                    </div>
+                                    <span className="text-xs font-bold text-yellow-600 bg-yellow-100/50 px-2 py-1 rounded">
+                                        +{task.points}
+                                    </span>
+                                </div>
+                            );
+                        })
+                    }
+                    {tasks
+                        .filter(t => (t.assignedTo.length === 0 || t.assignedTo.includes(kid.id)))
+                        .filter(t => !completions.some(c => c.taskId === t.id && c.userId === kid.id))
+                        .length === 0 && (
+                            <p className="text-center text-gray-400 text-xs py-4 italic">¡Todo al día!</p>
+                        )
+                    }
                   </div>
                 </div>
               </div>

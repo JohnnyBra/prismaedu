@@ -57,6 +57,7 @@ export interface Task {
   // Assignment Logic
   assignedTo: string[]; // User IDs
   createdBy: string;    // Tutor ID or Parent ID
+  workType?: 'CLASSWORK' | 'HOMEWORK'; // Distinguish between Classwork and Homework (created by Tutor)
   
   // School Specifics
   isPriority?: boolean; // If true, shows as a POP-UP for the student (for Tutor tasks)
