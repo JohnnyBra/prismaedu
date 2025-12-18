@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
-import { Plus, Minus, LogOut, Home, Star, Settings, X, MessageSquare, Send } from 'lucide-react';
+import { Plus, Minus, LogOut, Home, Star, Settings, X, MessageSquare, Send, Gift, ListChecks, Trash2 } from 'lucide-react';
 import { Role } from '../types';
 
 const ParentDashboard: React.FC = () => {
-  const { users, currentUser, logout, assignPoints, createTask, updatePin, messages, sendMessage } = useData();
+  const { users, currentUser, logout, assignPoints, createTask, updatePin, messages, sendMessage, rewards, createReward, deleteReward } = useData();
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskPoints, setTaskPoints] = useState(10);
+
+  const [showRewardModal, setShowRewardModal] = useState(false);
+  const [rewardTitle, setRewardTitle] = useState('');
+  const [rewardCost, setRewardCost] = useState(50);
+
+  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'REWARDS'>('DASHBOARD');
+
   const [showSettings, setShowSettings] = useState(false);
   const [newPin, setNewPin] = useState('');
   
@@ -18,6 +25,14 @@ const ParentDashboard: React.FC = () => {
   
   // Filter only my kids
   const myKids = users.filter(u => u.role === Role.STUDENT && u.familyId === currentUser?.familyId);
+
+  // Filter Rewards
+  // Only show rewards created for this family (or by this parent, or generic home rewards without familyId if any)
+  // Logic: context === 'HOME' AND (familyId matches OR familyId is missing)
+  const myRewards = rewards.filter(r =>
+      r.context === 'HOME' &&
+      (r.familyId === currentUser?.familyId || !r.familyId)
+  );
   // Find Tutor (Assuming first kid's class tutor)
   const classId = myKids[0]?.classId;
   const tutor = users.find(u => u.role === Role.TUTOR && u.classId === classId);
@@ -35,6 +50,20 @@ const ParentDashboard: React.FC = () => {
     setTaskTitle('');
     setTaskPoints(10);
     setShowTaskModal(false);
+  };
+
+  const handleCreateReward = () => {
+    if (!rewardTitle) return;
+    createReward({
+      title: rewardTitle,
+      cost: Number(rewardCost),
+      icon: 'Gift',
+      context: 'HOME',
+      familyId: currentUser?.familyId
+    });
+    setRewardTitle('');
+    setRewardCost(50);
+    setShowRewardModal(false);
   };
 
   const handleUpdatePin = () => {
@@ -80,12 +109,22 @@ const ParentDashboard: React.FC = () => {
              <MessageSquare size={24} />
              {conversation.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
            </button>
-           <button 
-            onClick={() => setShowTaskModal(true)}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
-          >
-            <Plus size={18} /> Añadir Tarea
-          </button>
+           {activeTab === 'DASHBOARD' && (
+              <button
+                onClick={() => setShowTaskModal(true)}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+              >
+                <Plus size={18} /> Añadir Tarea
+              </button>
+           )}
+           {activeTab === 'REWARDS' && (
+              <button
+                onClick={() => setShowRewardModal(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+              >
+                <Plus size={18} /> Crear Premio
+              </button>
+           )}
           <button onClick={() => setShowSettings(true)} className="text-gray-500 hover:text-orange-500 p-2">
             <Settings size={24} />
           </button>
@@ -94,6 +133,24 @@ const ParentDashboard: React.FC = () => {
           </button>
         </div>
       </header>
+
+      {/* Navigation Tabs */}
+      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-10 mb-6 flex justify-center">
+         <div className="flex gap-8">
+            <button
+              onClick={() => setActiveTab('DASHBOARD')}
+              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'DASHBOARD' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-400'}`}
+            >
+               <ListChecks size={20} /> Dashboard y Tareas
+            </button>
+            <button
+              onClick={() => setActiveTab('REWARDS')}
+              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'REWARDS' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-400'}`}
+            >
+               <Gift size={20} /> Premios de Casa
+            </button>
+         </div>
+      </div>
 
       <main className="flex-1 p-6 flex flex-col">
         
@@ -164,33 +221,69 @@ const ParentDashboard: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto w-full mb-8">
-          {myKids.map(kid => (
-            <div key={kid.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col border border-orange-100">
-               <div className="p-6 flex items-center gap-4 border-b border-gray-50">
-                <Avatar config={kid.avatarConfig} size={70} />
-                <div>
-                  <h3 className="font-bold text-lg text-gray-800">{kid.name}</h3>
-                  <div className="flex items-center gap-1 text-yellow-600 font-bold bg-yellow-50 px-2 py-0.5 rounded-md text-sm mt-1 w-fit">
-                    <Star size={14} fill="currentColor" /> {kid.points}
+        {activeTab === 'DASHBOARD' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto w-full mb-8 animate-in fade-in duration-300">
+            {myKids.map(kid => (
+              <div key={kid.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col border border-orange-100">
+                <div className="p-6 flex items-center gap-4 border-b border-gray-50">
+                  <Avatar config={kid.avatarConfig} size={70} />
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-800">{kid.name}</h3>
+                    <div className="flex items-center gap-1 text-yellow-600 font-bold bg-yellow-50 px-2 py-0.5 rounded-md text-sm mt-1 w-fit">
+                      <Star size={14} fill="currentColor" /> {kid.points}
+                    </div>
                   </div>
                 </div>
-               </div>
 
-               <div className="p-4 bg-orange-50/50 flex-1">
-                 <h4 className="text-xs font-bold text-gray-400 uppercase mb-3">Acciones Rápidas</h4>
-                 <div className="flex gap-3">
-                    <button onClick={() => assignPoints(kid.id, -5)} className="flex-1 py-3 rounded-xl border border-red-100 bg-white text-red-500 font-bold hover:bg-red-50 transition-colors">
-                      Mal Comportamiento
-                    </button>
-                    <button onClick={() => assignPoints(kid.id, 5)} className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-colors shadow-green-200 shadow-lg">
-                      Buen Trabajo
-                    </button>
-                 </div>
-               </div>
-            </div>
-          ))}
-        </div>
+                <div className="p-4 bg-orange-50/50 flex-1">
+                  <h4 className="text-xs font-bold text-gray-400 uppercase mb-3">Acciones Rápidas</h4>
+                  <div className="flex gap-3">
+                      <button onClick={() => assignPoints(kid.id, -5)} className="flex-1 py-3 rounded-xl border border-red-100 bg-white text-red-500 font-bold hover:bg-red-50 transition-colors">
+                        Mal Comportamiento
+                      </button>
+                      <button onClick={() => assignPoints(kid.id, 5)} className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-colors shadow-green-200 shadow-lg">
+                        Buen Trabajo
+                      </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'REWARDS' && (
+           <div className="max-w-5xl mx-auto w-full mb-8 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                 {myRewards.length === 0 && (
+                    <div className="col-span-3 text-center py-12 text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
+                       <Gift size={48} className="mx-auto mb-2 opacity-50"/>
+                       <p>No has creado premios para casa.</p>
+                       <button onClick={() => setShowRewardModal(true)} className="mt-4 text-orange-500 font-bold hover:underline">Crear el primero</button>
+                    </div>
+                 )}
+                 {myRewards.map(reward => (
+                    <div key={reward.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between group">
+                       <div className="flex items-center gap-4">
+                          <div className="bg-green-100 p-3 rounded-full text-green-600">
+                            <Gift size={24} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-800 text-lg">{reward.title}</h4>
+                            <span className="text-sm text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded">{reward.cost} pts</span>
+                          </div>
+                       </div>
+                       <button
+                         onClick={() => deleteReward(reward.id)}
+                         className="text-gray-300 hover:text-red-500 p-2 transition-colors"
+                         title="Borrar Premio"
+                       >
+                         <Trash2 size={20} />
+                       </button>
+                    </div>
+                 ))}
+              </div>
+           </div>
+        )}
 
         {/* Footer */}
         <footer className="mt-auto py-4 text-center text-gray-400 text-xs">
@@ -216,6 +309,7 @@ const ParentDashboard: React.FC = () => {
                   value={taskPoints}
                   onChange={(e) => setTaskPoints(Number(e.target.value))}
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 outline-none mb-6"
+                  placeholder="Puntos"
                 />
                 <div className="flex gap-3">
                   <button onClick={() => setShowTaskModal(false)} className="flex-1 py-2 text-gray-500">Cancelar</button>
@@ -225,6 +319,37 @@ const ParentDashboard: React.FC = () => {
            </div>
         </div>
       )}
+
+      {showRewardModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+             <div className="p-6">
+               <h3 className="text-lg font-bold text-gray-800 mb-4">Crear Premio de Casa</h3>
+               <input
+                  type="text"
+                  value={rewardTitle}
+                  onChange={(e) => setRewardTitle(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none mb-3"
+                  placeholder="ej. Ver una peli"
+                />
+                <div className="mb-6">
+                    <label className="text-xs font-bold text-gray-500">Coste (Pts)</label>
+                    <input
+                      type="number"
+                      value={rewardCost}
+                      onChange={(e) => setRewardCost(Number(e.target.value))}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none"
+                    />
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowRewardModal(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
+                  <button onClick={handleCreateReward} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700">Crear</button>
+                </div>
+             </div>
+           </div>
+        </div>
+      )}
+
     </div>
   );
 };
