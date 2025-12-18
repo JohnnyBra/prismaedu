@@ -37,7 +37,13 @@ const TutorDashboard: React.FC = () => {
   const [chatMessage, setChatMessage] = useState('');
   const [expandedFamilies, setExpandedFamilies] = useState<Record<string, boolean>>({});
 
-  const students = users.filter(u => u.role === Role.STUDENT && u.classId === currentUser?.classId);
+  const students = users
+      .filter(u => u.role === Role.STUDENT && u.classId === currentUser?.classId)
+      .sort((a, b) => {
+         const nameA = a.lastName || a.name;
+         const nameB = b.lastName || b.name;
+         return nameA.localeCompare(nameB);
+      });
   const parents = users.filter(u => u.role === Role.PARENT && u.familyId && students.some(s => s.familyId === u.familyId)); // Only parents of my students
 
   // --- HELPERS ---

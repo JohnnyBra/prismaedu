@@ -35,6 +35,8 @@ export interface AvatarConfig {
 export interface User {
   id: string;
   name: string;
+  firstName?: string; // For sorting
+  lastName?: string;  // For sorting
   role: Role;
   // Relationships
   familyId?: string; // Links student to parents
