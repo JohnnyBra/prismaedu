@@ -100,7 +100,7 @@ const ParentDashboard: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-800">Panel Familiar</h1>
-              <p className="text-sm text-gray-500">Familia de {currentUser?.name}</p>
+              <p className="text-sm text-gray-500">{currentUser?.name}</p>
             </div>
           </div>
         </div>

@@ -4,14 +4,15 @@ import { GraduationCap, Home, User as UserIcon, Delete, ArrowRight, ArrowLeft, S
 import { Role, User } from '../types';
 import Avatar from '../components/Avatar';
 
-type LoginStep = 'MODE_SELECT' | 'GROUP_SELECT' | 'USER_SELECT' | 'PIN_ENTRY';
+type LoginStep = 'MODE_SELECT' | 'CLASS_SELECT' | 'GROUP_SELECT' | 'USER_SELECT' | 'PIN_ENTRY';
 
 const AuthView: React.FC = () => {
-  const { login, users } = useData();
+  const { login, users, classes } = useData();
   
   // State Machine
   const [step, setStep] = useState<LoginStep>('MODE_SELECT');
   const [selectedContext, setSelectedContext] = useState<'SCHOOL' | 'HOME' | 'ADMIN' | null>(null);
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null); // FamilyId or 'tutors'
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
@@ -61,8 +62,12 @@ const AuthView: React.FC = () => {
           setSelectedGroupId(null);
       }
     } else if (step === 'GROUP_SELECT') {
+      setStep('CLASS_SELECT');
+      setSelectedGroupId(null);
+    } else if (step === 'CLASS_SELECT') {
       setStep('MODE_SELECT');
       setSelectedContext(null);
+      setSelectedClassId(null);
     }
   };
 
@@ -96,7 +101,7 @@ const AuthView: React.FC = () => {
         <button 
           onClick={() => {
             setSelectedContext('HOME');
-            setStep('GROUP_SELECT');
+            setStep('CLASS_SELECT');
           }}
           className="p-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-transparent hover:border-orange-400 hover:scale-105 transition-all flex flex-col items-center gap-4 group"
         >
@@ -121,39 +126,79 @@ const AuthView: React.FC = () => {
     </div>
   );
 
+  // STEP 1.5: Class Select (For Families)
+  const renderClassSelect = () => {
+     return (
+        <div className="w-full max-w-2xl animate-in fade-in slide-in-from-right-8 duration-300">
+           <h2 className="text-3xl font-bold text-center text-white drop-shadow-md mb-8 mt-12">Elige tu Clase</h2>
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {classes.map(cls => (
+                 <button
+                    key={cls.id}
+                    onClick={() => {
+                      setSelectedClassId(cls.id);
+                      setStep('GROUP_SELECT');
+                    }}
+                    className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all border border-white/20 text-center"
+                 >
+                   <div className="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-3">
+                      <School size={28} />
+                   </div>
+                   <span className="font-bold text-gray-700">{cls.name}</span>
+                 </button>
+              ))}
+           </div>
+        </div>
+     );
+  };
+
   // STEP 2: Group Select (Families)
   const renderGroupSelect = () => {
-    // Get unique families
-    const families = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId)))
-      .map(famId => {
+    // Get unique families in selected class
+    // 1. Find all students in this class
+    const studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedClassId);
+    // 2. Get their familyIds
+    const familyIdsInClass = Array.from(new Set(studentsInClass.map(s => s.familyId))).filter(Boolean);
+
+    const families = familyIdsInClass.map(famId => {
         // Find a parent in this family to get a name
         const parent = users.find(u => u.familyId === famId && u.role === Role.PARENT);
+        // Clean name display: If seeded as 'Familia X Y', we want 'Familia X' or just 'X Y'
+        // User asked for "Familia [apellidos]".
+        const displayName = parent ? parent.name : `Familia ${famId}`;
+
         return {
           id: famId,
-          name: parent ? `Familia de ${parent.name.split(' ')[1] || parent.name}` : `Familia ${famId}`
+          name: displayName
         };
       });
 
     return (
       <div className="w-full max-w-2xl animate-in fade-in slide-in-from-right-8 duration-300">
          <h2 className="text-3xl font-bold text-center text-white drop-shadow-md mb-8 mt-12">Elige tu Familia</h2>
-         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {families.map(fam => (
-               <button
-                  key={fam.id}
-                  onClick={() => {
-                    setSelectedGroupId(fam.id!);
-                    setStep('USER_SELECT');
-                  }}
-                  className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all border border-white/20 text-center"
-               >
-                 <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center text-orange-600 mb-3">
-                    <Home size={28} />
-                 </div>
-                 <span className="font-bold text-gray-700">{fam.name}</span>
-               </button>
-            ))}
-         </div>
+         {families.length === 0 ? (
+            <div className="bg-white/90 p-8 rounded-xl text-center shadow-xl">
+                <p className="text-gray-500 font-medium">No hay familias en esta clase.</p>
+            </div>
+         ) : (
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {families.map(fam => (
+                   <button
+                      key={fam.id}
+                      onClick={() => {
+                        setSelectedGroupId(fam.id!);
+                        setStep('USER_SELECT');
+                      }}
+                      className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all border border-white/20 text-center"
+                   >
+                     <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center text-orange-600 mb-3">
+                        <Home size={28} />
+                     </div>
+                     <span className="font-bold text-gray-700">{fam.name}</span>
+                   </button>
+                ))}
+             </div>
+         )}
       </div>
     );
   };
@@ -287,6 +332,7 @@ const AuthView: React.FC = () => {
        {/* Content Wrapper */}
        <div className="flex-1 flex flex-col items-center justify-center w-full z-10">
           {step === 'MODE_SELECT' && renderModeSelect()}
+          {step === 'CLASS_SELECT' && renderClassSelect()}
           {step === 'GROUP_SELECT' && renderGroupSelect()}
           {step === 'USER_SELECT' && renderUserSelect()}
           {step === 'PIN_ENTRY' && renderPinEntry()}
