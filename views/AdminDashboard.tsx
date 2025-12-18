@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useData } from '../context/DataContext';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload } from 'lucide-react';
 import Avatar from '../components/Avatar';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS';
 
 const AdminDashboard: React.FC = () => {
-  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin } = useData();
+  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
 
   // Local state for edits/creation
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   
+  // CSV Import State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importingClassId, setImportingClassId] = useState<string | null>(null);
+
   // Creation States
   const [showAddClass, setShowAddClass] = useState(false);
   const [newClassName, setNewClassName] = useState('');
@@ -53,6 +57,85 @@ const AdminDashboard: React.FC = () => {
   const [newAdminPin, setNewAdminPin] = useState('');
 
   // --- HELPERS ---
+
+  const handleImportCSV = (classId: string) => {
+    setImportingClassId(classId);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !importingClassId) return;
+
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+
+    if (lines.length < 2) {
+      alert('El archivo CSV está vacío o no tiene cabecera.');
+      return;
+    }
+
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+    const surnameIndex = headers.indexOf('apellidos');
+    const nameIndex = headers.indexOf('nombre');
+
+    if (surnameIndex === -1 || nameIndex === -1) {
+      alert('El archivo CSV debe tener las columnas "apellidos" y "nombre".');
+      return;
+    }
+
+    const newUsers: Omit<User, 'id'>[] = [];
+    let count = 0;
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      // Handle simple CSV splitting (assuming no commas in names for simplicity or handling quotes roughly)
+      // A more robust CSV parser might be needed for complex cases
+      const parts = line.split(',').map(p => p.trim().replace(/"/g, ''));
+
+      if (parts.length <= Math.max(surnameIndex, nameIndex)) continue;
+
+      const surname = parts[surnameIndex];
+      const name = parts[nameIndex];
+
+      if (!surname || !name) continue;
+
+      const familyId = `family_${Date.now()}_${i}`;
+
+      // Create Student
+      newUsers.push({
+        name: `${name} ${surname}`,
+        role: Role.STUDENT,
+        classId: importingClassId,
+        familyId: familyId,
+        pin: '0000',
+        points: 0
+      });
+
+      // Create Parent
+      newUsers.push({
+        name: `Familia ${surname}`,
+        role: Role.PARENT,
+        familyId: familyId,
+        pin: '0000',
+        points: 0
+      });
+
+      count++;
+    }
+
+    if (newUsers.length > 0) {
+      addUsers(newUsers);
+      alert(`Se han importado ${count} alumnos y creado ${count} familias correctamente.`);
+    } else {
+      alert('No se encontraron datos válidos para importar.');
+    }
+
+    setImportingClassId(null);
+  };
 
   const handleChangePin = () => {
       if (newAdminPin && newAdminPin.length === 4) {
@@ -228,12 +311,26 @@ const AdminDashboard: React.FC = () => {
             )}
             
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleImportCSV(cls.id)}
+                className="p-2 text-gray-400 hover:text-green-600 flex items-center gap-1 text-xs font-bold bg-gray-50 rounded border border-transparent hover:border-green-200 hover:bg-green-50"
+                title="Importar alumnos desde CSV"
+              >
+                <Upload size={16} /> <span className="hidden sm:inline">CSV</span>
+              </button>
               <button onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-gray-400 hover:text-blue-600"><Edit2 size={18} /></button>
               <button onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={18} /></button>
             </div>
           </div>
         ))}
       </div>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept=".csv"
+        className="hidden"
+      />
     </div>
   );
 
