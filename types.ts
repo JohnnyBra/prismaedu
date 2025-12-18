@@ -83,6 +83,7 @@ export interface Reward {
   icon: string;
   context: ContextType; // 'SCHOOL' (decided by Tutor) or 'HOME' (decided by Parent)
   stock?: number;       // Optional limit
+  familyId?: string;    // Optional: Only for HOME rewards to link to a specific family
 }
 
 // Redemption History Entity

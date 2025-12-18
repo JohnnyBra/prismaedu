@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
-import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, LayoutDashboard, ListChecks, ChevronRight } from 'lucide-react';
+import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, LayoutDashboard, ListChecks, ChevronRight, ChevronDown } from 'lucide-react';
 import { Role, User, Task } from '../types';
 
 type Tab = 'CLASSROOM' | 'REWARDS' | 'MESSAGES';
@@ -34,6 +34,7 @@ const TutorDashboard: React.FC = () => {
   // Messaging State
   const [chatUser, setChatUser] = useState<User | null>(null);
   const [chatMessage, setChatMessage] = useState('');
+  const [expandedFamilies, setExpandedFamilies] = useState<Record<string, boolean>>({});
 
   const students = users.filter(u => u.role === Role.STUDENT && u.classId === currentUser?.classId);
   const parents = users.filter(u => u.role === Role.PARENT && u.familyId && students.some(s => s.familyId === u.familyId)); // Only parents of my students
@@ -357,48 +358,114 @@ const TutorDashboard: React.FC = () => {
   };
 
   const renderMessages = () => {
-    // List of people to chat with: Parents and Students
-    const contactList = [
-      { section: 'Padres', list: parents },
-      { section: 'Alumnos', list: students }
-    ];
+    // Group users by Family
+    const families: Record<string, { name: string; members: User[] }> = {};
+    const noFamilyUsers: User[] = [];
+
+    // 1. Initialize families based on students
+    students.forEach(s => {
+      if (s.familyId) {
+        if (!families[s.familyId]) {
+          families[s.familyId] = {
+            name: `Familia ${s.name.split(' ')[0]}`, // Approximate family name
+            members: []
+          };
+        }
+        families[s.familyId].members.push(s);
+      } else {
+        noFamilyUsers.push(s);
+      }
+    });
+
+    // 2. Add parents to families
+    parents.forEach(p => {
+      if (p.familyId && families[p.familyId]) {
+        families[p.familyId].members.push(p);
+      } else {
+        // Parents without linked student in this class or no familyId
+        // We can just add them to noFamilyUsers or ignore?
+        // Let's add them to "Otros"
+        noFamilyUsers.push(p);
+      }
+    });
+
+    // 3. Sort members: Parents first, then Students
+    Object.values(families).forEach(fam => {
+      fam.members.sort((a, b) => {
+        if (a.role === Role.PARENT && b.role !== Role.PARENT) return -1;
+        if (a.role !== Role.PARENT && b.role === Role.PARENT) return 1;
+        return 0;
+      });
+    });
+
+    const toggleFamily = (fid: string) => {
+        setExpandedFamilies(prev => ({...prev, [fid]: !prev[fid]}));
+    };
 
     return (
       <div className="animate-in fade-in duration-300 flex h-[600px] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Sidebar */}
         <div className="w-1/3 border-r border-gray-100 bg-gray-50 flex flex-col">
-          <div className="p-4 border-b border-gray-100 font-bold text-gray-700">Contactos</div>
+          <div className="p-4 border-b border-gray-100 font-bold text-gray-700">Familias</div>
           <div className="flex-1 overflow-y-auto p-2">
-            {contactList.map(group => (
-              <div key={group.section} className="mb-4">
-                <h5 className="px-2 text-xs font-bold text-gray-400 uppercase mb-2">{group.section}</h5>
-                {group.list.map(u => {
-                  let secondaryText = '';
-                  if (u.role === Role.PARENT && u.familyId) {
-                      const associatedStudent = students.find(s => s.familyId === u.familyId);
-                      if (associatedStudent) {
-                          secondaryText = `(Alumno: ${associatedStudent.name})`;
-                      }
-                  }
+             {Object.keys(families).length === 0 && noFamilyUsers.length === 0 && (
+                <p className="text-gray-400 text-sm text-center mt-4">No hay contactos.</p>
+             )}
 
-                  return (
+             {Object.entries(families).map(([fid, data]) => {
+                const isExpanded = expandedFamilies[fid];
+                return (
+                  <div key={fid} className="mb-2 border border-gray-100 rounded-lg overflow-hidden">
                     <button
-                      key={u.id}
-                      onClick={() => setChatUser(u)}
-                      className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-200'}`}
+                      onClick={() => toggleFamily(fid)}
+                      className="w-full flex justify-between items-center p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0">
-                         {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
-                      </div>
-                      <div className="overflow-hidden">
-                          <div className="text-sm font-medium truncate">{u.name}</div>
-                          {secondaryText && <div className="text-xs text-gray-500 truncate">{secondaryText}</div>}
-                      </div>
+                       <span className="font-bold text-sm text-gray-700">{data.name}</span>
+                       {isExpanded ? <ChevronDown size={16} className="text-gray-500"/> : <ChevronRight size={16} className="text-gray-500"/>}
                     </button>
-                  );
-                })}
-              </div>
-            ))}
+
+                    {isExpanded && (
+                       <div className="bg-white p-1">
+                          {data.members.map(u => (
+                             <button
+                                key={u.id}
+                                onClick={() => setChatUser(u)}
+                                className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-50'}`}
+                             >
+                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                                   {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
+                                </div>
+                                <div className="overflow-hidden">
+                                    <div className="text-sm font-medium truncate">{u.name}</div>
+                                    <div className="text-xs text-gray-400 truncate">{u.role === Role.PARENT ? 'Padre/Madre' : 'Alumno'}</div>
+                                </div>
+                             </button>
+                          ))}
+                       </div>
+                    )}
+                  </div>
+                );
+             })}
+
+             {noFamilyUsers.length > 0 && (
+               <div className="mt-4">
+                  <h5 className="px-2 text-xs font-bold text-gray-400 uppercase mb-2">Otros</h5>
+                  {noFamilyUsers.map(u => (
+                     <button
+                        key={u.id}
+                        onClick={() => setChatUser(u)}
+                        className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-200'}`}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0">
+                           {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
+                        </div>
+                        <div className="overflow-hidden">
+                            <div className="text-sm font-medium truncate">{u.name}</div>
+                        </div>
+                      </button>
+                  ))}
+               </div>
+             )}
           </div>
         </div>
 

@@ -77,7 +77,10 @@ const StudentDashboard: React.FC = () => {
 
   const avatarItems = AVATAR_ITEMS.filter(i => i.cost > 0);
   const schoolRewards = rewards.filter(r => r.context === 'SCHOOL');
-  const homeRewards = rewards.filter(r => r.context === 'HOME');
+  const homeRewards = rewards.filter(r =>
+      r.context === 'HOME' &&
+      (r.familyId === currentUser?.familyId || !r.familyId)
+  );
 
   const myRedemptions = redemptions
     .filter(r => r.userId === currentUser?.id)
@@ -88,28 +91,30 @@ const StudentDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 flex flex-col">
-      {/* Top Bar */}
-      <div className="bg-indigo-600 text-white p-4 sticky top-0 z-20 shadow-lg rounded-b-3xl md:rounded-none">
+    <div className="min-h-screen bg-indigo-50 pb-20 md:pb-0 flex flex-col font-sans">
+      {/* Top Bar - Child Friendly Redesign */}
+      <div className="bg-white border-b-4 border-indigo-200 p-4 sticky top-0 z-20 shadow-sm">
         <div className="flex justify-between items-center max-w-4xl mx-auto">
-          <div className="flex items-center gap-3">
-             <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain bg-white/20 rounded-lg p-1" onError={(e) => e.currentTarget.style.display = 'none'} />
-            <div className="bg-white/20 p-1 rounded-full backdrop-blur-sm cursor-pointer" onClick={() => setShowSettings(true)}>
-               <Avatar config={currentUser?.avatarConfig} size={48} className="border-2 border-white/50" />
-            </div>
-            <div>
-               <h1 className="font-bold text-lg leading-tight">{currentUser?.name}</h1>
-               <div className="flex items-center gap-1 text-yellow-300 font-mono font-bold">
-                 <Star size={16} fill="currentColor" /> {currentUser?.points} PTS
+          <div className="flex items-center gap-4">
+             {/* Logo hidden on mobile to save space, maybe */}
+             <img src="/logo.png" alt="Logo" className="hidden md:block h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
+
+            <div className="flex items-center gap-3 bg-indigo-50 p-2 pr-4 rounded-full border-2 border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-colors" onClick={() => setShowSettings(true)}>
+               <Avatar config={currentUser?.avatarConfig} size={48} className="border-2 border-white shadow-sm" />
+               <div>
+                 <h1 className="font-black text-indigo-900 leading-none text-lg">{currentUser?.name?.split(' ')[0]}</h1>
+                 <div className="flex items-center gap-1 text-orange-500 font-black text-sm">
+                   <Star size={14} fill="currentColor" /> {currentUser?.points}
+                 </div>
                </div>
             </div>
           </div>
-          <div className="flex gap-2">
-             <button onClick={() => setShowSettings(true)} className="bg-white/10 p-2 rounded-full hover:bg-white/20">
-               <Settings size={20} />
+          <div className="flex gap-3">
+             <button onClick={() => setShowSettings(true)} className="bg-gray-100 text-gray-400 hover:text-indigo-600 p-3 rounded-2xl hover:bg-indigo-50 transition-colors">
+               <Settings size={24} />
              </button>
-             <button onClick={logout} className="bg-white/10 p-2 rounded-full hover:bg-white/20">
-               <LogOut size={20} />
+             <button onClick={logout} className="bg-red-50 text-red-300 hover:text-red-500 p-3 rounded-2xl hover:bg-red-100 transition-colors">
+               <LogOut size={24} />
              </button>
           </div>
         </div>
@@ -178,25 +183,36 @@ const StudentDashboard: React.FC = () => {
            </div>
         )}
 
-        {/* Tabs Switcher */}
-        <div className="flex p-1 bg-white rounded-xl shadow-sm mb-6 sticky top-24 z-10 mx-auto max-w-md">
+        {/* Big Juicy Tabs */}
+        <div className="grid grid-cols-3 gap-4 mb-8 max-w-lg mx-auto">
           <button 
             onClick={() => setActiveTab('tasks')}
-            className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === 'tasks' ? 'bg-indigo-100 text-indigo-700 shadow-sm' : 'text-gray-400'}`}
+            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'tasks' ? 'bg-blue-500 border-blue-700 text-white shadow-lg shadow-blue-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
           >
-            Mis Tareas
+            <div className={`p-2 rounded-2xl mb-1 ${activeTab === 'tasks' ? 'bg-white/20' : 'bg-gray-100'}`}>
+              <CheckCircle size={28} />
+            </div>
+            <span className="font-black text-sm uppercase tracking-wide">Tareas</span>
           </button>
+
           <button 
             onClick={() => setActiveTab('shop')}
-            className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === 'shop' ? 'bg-indigo-100 text-indigo-700 shadow-sm' : 'text-gray-400'}`}
+            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'shop' ? 'bg-orange-500 border-orange-700 text-white shadow-lg shadow-orange-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
           >
-            Tienda
+            <div className={`p-2 rounded-2xl mb-1 ${activeTab === 'shop' ? 'bg-white/20' : 'bg-gray-100'}`}>
+              <ShoppingBag size={28} />
+            </div>
+            <span className="font-black text-sm uppercase tracking-wide">Tienda</span>
           </button>
+
           <button 
             onClick={() => setActiveTab('chat')}
-            className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-1 ${activeTab === 'chat' ? 'bg-indigo-100 text-indigo-700 shadow-sm' : 'text-gray-400'}`}
+            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'chat' ? 'bg-indigo-500 border-indigo-700 text-white shadow-lg shadow-indigo-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
           >
-             <MessageSquare size={16} /> Chat Profe
+            <div className={`p-2 rounded-2xl mb-1 ${activeTab === 'chat' ? 'bg-white/20' : 'bg-gray-100'}`}>
+              <MessageSquare size={28} />
+            </div>
+            <span className="font-black text-sm uppercase tracking-wide">Profe</span>
           </button>
         </div>
 
