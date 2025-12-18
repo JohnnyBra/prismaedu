@@ -36,6 +36,7 @@ interface DataContextType {
   updateClass: (id: string, name: string) => void;
   deleteClass: (id: string) => void;
   addUser: (user: Omit<User, 'id'>) => void;
+  addUsers: (users: Omit<User, 'id'>[]) => void;
   updateUser: (id: string, updates: Partial<User>) => void;
   deleteUser: (id: string) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
@@ -292,6 +293,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitUsers([...users, newUser]);
   };
 
+  const addUsers = (usersData: Omit<User, 'id'>[]) => {
+    const newUsers: User[] = usersData.map((userData, index) => ({
+      ...userData,
+      id: `user_${Date.now()}_${index}_${Math.floor(Math.random() * 1000)}`,
+      points: userData.points ?? 0,
+      inventory: userData.inventory ?? ['base_1', 'top_1', 'bot_1'],
+      avatarConfig: userData.avatarConfig ?? { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' }
+    }));
+    emitUsers([...users, ...newUsers]);
+  };
+
   const updateUser = (id: string, updates: Partial<User>) => {
     emitUsers(users.map(u => u.id === id ? { ...u, ...updates } : u));
   };
@@ -346,6 +358,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       updateClass,
       deleteClass,
       addUser,
+      addUsers,
       updateUser,
       deleteUser,
       updateTask,
