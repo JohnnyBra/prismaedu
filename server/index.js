@@ -20,6 +20,13 @@ const io = new Server(httpServer, {
 
 const PORT = process.env.PORT || 3020;
 
+const SURNAMES = [
+  'García', 'Rodríguez', 'González', 'Fernández', 'López', 'Martínez', 'Sánchez', 'Pérez', 'Gómez', 'Martín',
+  'Jiménez', 'Ruiz', 'Hernández', 'Díaz', 'Moreno', 'Muñoz', 'Álvarez', 'Romero', 'Alonso', 'Gutiérrez',
+  'Navarro', 'Torres', 'Domínguez', 'Vázquez', 'Ramos', 'Gil', 'Ramírez', 'Serrano', 'Blanco', 'Molina',
+  'Morales', 'Suárez', 'Ortega', 'Delgado', 'Castro', 'Ortiz', 'Rubio', 'Marín', 'Sanz', 'Iglesias'
+];
+
 // Initial Data Generators (Copied logic from frontend to seed DB if empty)
 const generateUsers = () => {
     const users = [];
@@ -34,6 +41,13 @@ const generateUsers = () => {
     for (let i = 1; i <= 24; i++) {
       const studentId = `student${i}`;
       const familyId = `family${i}`;
+
+      // Pick two random distinct surnames
+      const surname1 = SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
+      let surname2 = SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
+      while (surname2 === surname1) {
+          surname2 = SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
+      }
 
       // Student
       users.push({
@@ -51,7 +65,7 @@ const generateUsers = () => {
       // Parent
       users.push({
         id: `parent${i}`,
-        name: `Padre ${i}`,
+        name: `Familia ${surname1} ${surname2}`,
         role: 'PARENT',
         familyId: familyId,
         points: 0,
