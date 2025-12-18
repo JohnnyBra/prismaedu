@@ -372,18 +372,31 @@ const TutorDashboard: React.FC = () => {
             {contactList.map(group => (
               <div key={group.section} className="mb-4">
                 <h5 className="px-2 text-xs font-bold text-gray-400 uppercase mb-2">{group.section}</h5>
-                {group.list.map(u => (
-                  <button 
-                    key={u.id}
-                    onClick={() => setChatUser(u)}
-                    className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-200'}`}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                       {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
-                    </div>
-                    <span className="text-sm font-medium truncate">{u.name}</span>
-                  </button>
-                ))}
+                {group.list.map(u => {
+                  let secondaryText = '';
+                  if (u.role === Role.PARENT && u.familyId) {
+                      const associatedStudent = students.find(s => s.familyId === u.familyId);
+                      if (associatedStudent) {
+                          secondaryText = `(Alumno: ${associatedStudent.name})`;
+                      }
+                  }
+
+                  return (
+                    <button
+                      key={u.id}
+                      onClick={() => setChatUser(u)}
+                      className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-200'}`}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0">
+                         {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
+                      </div>
+                      <div className="overflow-hidden">
+                          <div className="text-sm font-medium truncate">{u.name}</div>
+                          {secondaryText && <div className="text-xs text-gray-500 truncate">{secondaryText}</div>}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             ))}
           </div>
