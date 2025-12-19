@@ -90,12 +90,12 @@ const ParentDashboard: React.FC = () => {
   ).sort((a, b) => a.timestamp - b.timestamp) : [];
 
   return (
-    <div className="min-h-screen bg-orange-50 flex flex-col">
-       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+    <div className="min-h-screen flex flex-col relative">
+       <header className="glass-header px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex items-center gap-3">
-            <div className="bg-orange-500 p-2 rounded-lg text-white">
+            <div className="bg-orange-500 p-2 rounded-lg text-white shadow-glass">
               <Home size={24} />
             </div>
             <div>
@@ -105,14 +105,14 @@ const ParentDashboard: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-3">
-           <button onClick={() => setShowChat(true)} className="text-gray-500 hover:text-indigo-600 p-2 relative">
+           <button onClick={() => setShowChat(true)} className="text-gray-500 hover:text-indigo-600 p-2 relative transition-colors">
              <MessageSquare size={24} />
              {conversation.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
            </button>
            {activeTab === 'DASHBOARD' && (
               <button
                 onClick={() => setShowTaskModal(true)}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-glass"
               >
                 <Plus size={18} /> Añadir Tarea
               </button>
@@ -120,44 +120,44 @@ const ParentDashboard: React.FC = () => {
            {activeTab === 'REWARDS' && (
               <button
                 onClick={() => setShowRewardModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-glass"
               >
                 <Plus size={18} /> Crear Premio
               </button>
            )}
-          <button onClick={() => setShowSettings(true)} className="text-gray-500 hover:text-orange-500 p-2">
+          <button onClick={() => setShowSettings(true)} className="text-gray-500 hover:text-orange-500 p-2 transition-colors">
             <Settings size={24} />
           </button>
-          <button onClick={logout} className="text-gray-500 hover:text-red-500 p-2">
+          <button onClick={logout} className="text-gray-500 hover:text-red-500 p-2 transition-colors">
             <LogOut size={24} />
           </button>
         </div>
       </header>
 
       {/* Navigation Tabs */}
-      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-10 mb-6 flex justify-center">
+      <div className="glass-header border-t-0 px-6 sticky top-[72px] z-10 mb-6 flex justify-center">
          <div className="flex gap-8">
             <button
               onClick={() => setActiveTab('DASHBOARD')}
-              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'DASHBOARD' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-400'}`}
+              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'DASHBOARD' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
             >
                <ListChecks size={20} /> Dashboard y Tareas
             </button>
             <button
               onClick={() => setActiveTab('REWARDS')}
-              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'REWARDS' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-400'}`}
+              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'REWARDS' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
             >
                <Gift size={20} /> Premios de Casa
             </button>
          </div>
       </div>
 
-      <main className="flex-1 p-6 flex flex-col">
+      <main className="flex-1 p-6 flex flex-col max-w-7xl mx-auto w-full">
         
         {/* Settings Modal */}
         {showSettings && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
+             <div className="glass-panel rounded-2xl p-6 w-full max-w-sm shadow-glass relative animate-in zoom-in duration-200">
                 <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                   <X size={24} />
                 </button>
@@ -170,7 +170,7 @@ const ParentDashboard: React.FC = () => {
                       maxLength={4}
                       value={newPin}
                       onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))}
-                      className="w-full text-center text-2xl tracking-widest border-2 border-orange-100 rounded-xl py-3 focus:border-orange-500 outline-none transition-colors"
+                      className="w-full text-center text-2xl tracking-widest border-2 border-orange-100 rounded-xl py-3 focus:border-orange-500 outline-none transition-colors bg-white/50"
                       placeholder="0000"
                    />
                    <p className="text-xs text-gray-400 mt-2">Introduce 4 números nuevos</p>
@@ -178,7 +178,7 @@ const ParentDashboard: React.FC = () => {
 
                 <button 
                   onClick={handleUpdatePin}
-                  className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-colors"
+                  className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-colors shadow-glass"
                 >
                   Guardar Nuevo PIN
                 </button>
@@ -189,17 +189,17 @@ const ParentDashboard: React.FC = () => {
         {/* Chat Modal */}
         {showChat && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl flex flex-col h-[500px] overflow-hidden">
-                <div className="p-4 bg-indigo-600 text-white flex justify-between items-center">
+             <div className="glass-panel rounded-2xl w-full max-w-md shadow-glass flex flex-col h-[500px] overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="p-4 bg-indigo-600 text-white flex justify-between items-center shadow-md">
                    <div className="font-bold">Chat con Profesor ({tutor?.name || 'No asignado'})</div>
-                   <button onClick={() => setShowChat(false)}><X size={20}/></button>
+                   <button onClick={() => setShowChat(false)} className="hover:bg-white/20 rounded-full p-1"><X size={20}/></button>
                 </div>
-                <div className="flex-1 bg-gray-50 p-4 overflow-y-auto space-y-3">
+                <div className="flex-1 bg-gray-50/50 p-4 overflow-y-auto space-y-3">
                    {conversation.map(msg => {
                       const isMe = msg.fromId === currentUser?.id;
                       return (
                         <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                           <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${isMe ? 'bg-indigo-500 text-white' : 'bg-white border text-gray-800'}`}>
+                           <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm shadow-sm ${isMe ? 'bg-indigo-500 text-white' : 'bg-white border text-gray-800'}`}>
                              {msg.content}
                            </div>
                         </div>
@@ -207,38 +207,38 @@ const ParentDashboard: React.FC = () => {
                    })}
                    {conversation.length === 0 && <p className="text-center text-gray-400 text-sm mt-10">Inicia una conversación con el tutor.</p>}
                 </div>
-                <div className="p-3 bg-white border-t flex gap-2">
+                <div className="p-3 bg-white/80 border-t flex gap-2 backdrop-blur-sm">
                    <input 
-                     className="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-500" 
+                     className="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 bg-white/50"
                      placeholder="Mensaje..."
                      value={chatMessage}
                      onChange={e => setChatMessage(e.target.value)}
                      onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                    />
-                   <button onClick={handleSendMessage} className="bg-indigo-600 text-white p-2 rounded-full"><Send size={18}/></button>
+                   <button onClick={handleSendMessage} className="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700 shadow-glass"><Send size={18}/></button>
                 </div>
              </div>
           </div>
         )}
 
         {activeTab === 'DASHBOARD' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto w-full mb-8 animate-in fade-in duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-8 animate-in fade-in duration-300">
             {myKids.map(kid => (
-              <div key={kid.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col border border-orange-100">
-                <div className="p-6 flex items-center gap-4 border-b border-gray-50">
+              <div key={kid.id} className="glass-panel rounded-2xl shadow-glass overflow-hidden flex flex-col border border-white/40">
+                <div className="p-6 flex items-center gap-4 border-b border-gray-50 bg-white/40">
                   <Avatar config={kid.avatarConfig} size={70} />
                   <div>
                     <h3 className="font-bold text-lg text-gray-800">{kid.name}</h3>
-                    <div className="flex items-center gap-1 text-yellow-600 font-bold bg-yellow-50 px-2 py-0.5 rounded-md text-sm mt-1 w-fit">
+                    <div className="flex items-center gap-1 text-yellow-600 font-bold bg-yellow-50 px-2 py-0.5 rounded-md text-sm mt-1 w-fit border border-yellow-100">
                       <Star size={14} fill="currentColor" /> {kid.points}
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 bg-orange-50/50 flex-1">
+                <div className="p-4 bg-orange-50/30 flex-1">
                   <h4 className="text-xs font-bold text-gray-400 uppercase mb-3">Acciones Rápidas</h4>
                   <div className="flex gap-3 mb-6">
-                      <button onClick={() => assignPoints(kid.id, -5)} className="flex-1 py-3 rounded-xl border border-red-100 bg-white text-red-500 font-bold hover:bg-red-50 transition-colors">
+                      <button onClick={() => assignPoints(kid.id, -5)} className="flex-1 py-3 rounded-xl border border-red-100 bg-white/60 text-red-500 font-bold hover:bg-red-50 transition-colors shadow-sm">
                         Mal Comportamiento
                       </button>
                       <button onClick={() => assignPoints(kid.id, 5)} className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-colors shadow-green-200 shadow-lg">
@@ -256,18 +256,18 @@ const ParentDashboard: React.FC = () => {
                         .map(task => {
                             let icon = <School size={16} className="text-blue-500"/>;
                             let label = 'Clase';
-                            let bgColor = 'bg-blue-50';
+                            let bgColor = 'bg-blue-50/50';
                             let borderColor = 'border-blue-100';
 
                             if (task.context === 'SCHOOL' && task.workType === 'HOMEWORK') {
                                 icon = <BookOpen size={16} className="text-indigo-500"/>;
                                 label = 'Deberes';
-                                bgColor = 'bg-indigo-50';
+                                bgColor = 'bg-indigo-50/50';
                                 borderColor = 'border-indigo-100';
                             } else if (task.context === 'HOME') {
                                 icon = <Home size={16} className="text-orange-500"/>;
                                 label = 'Casa';
-                                bgColor = 'bg-orange-50';
+                                bgColor = 'bg-orange-50/50';
                                 borderColor = 'border-orange-100';
                             }
 
@@ -282,7 +282,7 @@ const ParentDashboard: React.FC = () => {
                                             <span className="text-[10px] font-bold text-gray-400 uppercase">{label}</span>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-bold text-yellow-600 bg-yellow-100/50 px-2 py-1 rounded">
+                                    <span className="text-xs font-bold text-yellow-600 bg-yellow-100/50 px-2 py-1 rounded border border-yellow-200">
                                         +{task.points}
                                     </span>
                                 </div>
@@ -304,24 +304,24 @@ const ParentDashboard: React.FC = () => {
         )}
 
         {activeTab === 'REWARDS' && (
-           <div className="max-w-5xl mx-auto w-full mb-8 animate-in fade-in duration-300">
+           <div className="w-full mb-8 animate-in fade-in duration-300">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                  {myRewards.length === 0 && (
-                    <div className="col-span-3 text-center py-12 text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
+                    <div className="col-span-3 text-center py-12 text-gray-400 bg-white/50 rounded-xl border border-dashed border-gray-300">
                        <Gift size={48} className="mx-auto mb-2 opacity-50"/>
                        <p>No has creado premios para casa.</p>
                        <button onClick={() => setShowRewardModal(true)} className="mt-4 text-orange-500 font-bold hover:underline">Crear el primero</button>
                     </div>
                  )}
                  {myRewards.map(reward => (
-                    <div key={reward.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between group">
+                    <div key={reward.id} className="glass-panel p-5 rounded-xl shadow-glass border border-white/40 flex items-center justify-between group hover:shadow-glass-hover transition-all">
                        <div className="flex items-center gap-4">
                           <div className="bg-green-100 p-3 rounded-full text-green-600">
                             <Gift size={24} />
                           </div>
                           <div>
                             <h4 className="font-bold text-gray-800 text-lg">{reward.title}</h4>
-                            <span className="text-sm text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded">{reward.cost} pts</span>
+                            <span className="text-sm text-gray-500 font-bold bg-white/60 px-2 py-0.5 rounded border border-gray-100">{reward.cost} pts</span>
                           </div>
                        </div>
                        <button
@@ -346,26 +346,26 @@ const ParentDashboard: React.FC = () => {
 
       {showTaskModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+           <div className="glass-panel rounded-2xl shadow-glass w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
              <div className="p-6">
                <h3 className="text-lg font-bold text-gray-800 mb-4">Asignar Tarea de Casa</h3>
                <input 
                   type="text" 
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 outline-none mb-3"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 outline-none mb-3 bg-white/50"
                   placeholder="ej. Poner el lavavajillas"
                 />
                 <input 
                   type="number" 
                   value={taskPoints}
                   onChange={(e) => setTaskPoints(Number(e.target.value))}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 outline-none mb-6"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 outline-none mb-6 bg-white/50"
                   placeholder="Puntos"
                 />
                 <div className="flex gap-3">
-                  <button onClick={() => setShowTaskModal(false)} className="flex-1 py-2 text-gray-500">Cancelar</button>
-                  <button onClick={handleCreateChore} className="flex-1 py-2 bg-orange-500 text-white rounded-lg font-bold">Asignar</button>
+                  <button onClick={() => setShowTaskModal(false)} className="flex-1 py-2 text-gray-500 hover:bg-white/50 rounded-lg transition-colors">Cancelar</button>
+                  <button onClick={handleCreateChore} className="flex-1 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600 shadow-glass">Asignar</button>
                 </div>
              </div>
            </div>
@@ -374,14 +374,14 @@ const ParentDashboard: React.FC = () => {
 
       {showRewardModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+           <div className="glass-panel rounded-2xl shadow-glass w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
              <div className="p-6">
                <h3 className="text-lg font-bold text-gray-800 mb-4">Crear Premio de Casa</h3>
                <input
                   type="text"
                   value={rewardTitle}
                   onChange={(e) => setRewardTitle(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none mb-3"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none mb-3 bg-white/50"
                   placeholder="ej. Ver una peli"
                 />
                 <div className="mb-6">
@@ -390,12 +390,12 @@ const ParentDashboard: React.FC = () => {
                       type="number"
                       value={rewardCost}
                       onChange={(e) => setRewardCost(Number(e.target.value))}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none bg-white/50"
                     />
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => setShowRewardModal(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
-                  <button onClick={handleCreateReward} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700">Crear</button>
+                  <button onClick={() => setShowRewardModal(false)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-white/50 rounded-lg transition-colors">Cancelar</button>
+                  <button onClick={handleCreateReward} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-glass">Crear</button>
                 </div>
              </div>
            </div>
