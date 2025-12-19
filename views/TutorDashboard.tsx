@@ -141,7 +141,7 @@ const TutorDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 w-full">
             {/* External Tools */}
             <a href="https://bibliohispa.es/" target="_blank" rel="noopener noreferrer" 
-            className="glass-panel p-6 rounded-xl shadow-glass hover:shadow-glass-hover hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-emerald-500">
+            className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-emerald-500">
             <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                 <BookOpen size={28} />
             </div>
@@ -153,7 +153,7 @@ const TutorDashboard: React.FC = () => {
             </a>
 
             <a href="https://aulas.bibliohispa.es/" target="_blank" rel="noopener noreferrer" 
-            className="glass-panel p-6 rounded-xl shadow-glass hover:shadow-glass-hover hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-purple-500">
+            className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-purple-500">
             <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                 <Monitor size={28} />
             </div>
@@ -165,7 +165,7 @@ const TutorDashboard: React.FC = () => {
             </a>
 
             <a href="https://excursiones.bibliohispa.es/" target="_blank" rel="noopener noreferrer" 
-            className="glass-panel p-6 rounded-xl shadow-glass hover:shadow-glass-hover hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-orange-500">
+            className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-orange-500">
             <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
                 <Map size={28} />
             </div>
@@ -179,9 +179,9 @@ const TutorDashboard: React.FC = () => {
             {/* Internal App */}
             <button 
             onClick={() => setShowHub(false)}
-            className="glass-panel p-6 rounded-xl shadow-glass hover:shadow-glass-hover hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-brand-600"
+            className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-blue-600"
             >
-            <div className="w-14 h-14 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+            <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                 <School size={28} />
             </div>
             <div className="text-left flex-1">
@@ -192,7 +192,7 @@ const TutorDashboard: React.FC = () => {
             </button>
         </div>
 
-        <button onClick={logout} className="mt-8 text-white/60 hover:text-white flex items-center gap-2 text-sm font-bold bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm transition-colors">
+        <button onClick={logout} className="mt-8 text-white/60 hover:text-white flex items-center gap-2 text-sm font-bold bg-black/20 px-4 py-2 rounded-full">
             <LogOut size={16} /> Cerrar Sesión
         </button>
       </div>
@@ -212,7 +212,7 @@ const TutorDashboard: React.FC = () => {
     return (
         <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-500">
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-brand-100 rounded-lg text-brand-600">
+                <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
                     <LayoutDashboard size={24} />
                 </div>
                 Dashboard de Tareas
@@ -229,13 +229,13 @@ const TutorDashboard: React.FC = () => {
                          <button
                             key={task.id}
                             onClick={() => setSelectedTaskDetails(task)}
-                            className="glass-panel text-left p-5 rounded-2xl shadow-glass border border-white/20 hover:shadow-glass-hover hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden"
+                            className="bg-white text-left p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden"
                          >
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-brand-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110 opacity-50"></div>
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
                             <div className="relative z-10">
                                 <div className="flex justify-between items-start mb-3">
-                                    <div className="p-2.5 bg-brand-100 rounded-xl text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition-colors shadow-sm">
+                                    <div className="p-2.5 bg-blue-100 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-sm">
                                         <ListChecks size={22}/>
                                     </div>
                                     <span className={`text-xs font-bold px-2 py-1 rounded-full ${percentage === 100 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -243,16 +243,16 @@ const TutorDashboard: React.FC = () => {
                                     </span>
                                 </div>
                                 <h3 className="font-bold text-gray-800 text-lg mb-1 truncate pr-2">{task.title}</h3>
-                                <p className="text-gray-500 text-xs font-medium mb-4">{completedCount} de {total} completados</p>
+                                <p className="text-gray-400 text-xs font-medium mb-4">{completedCount} de {total} completados</p>
 
                                 <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden mb-2">
                                     <div
-                                        className={`h-full rounded-full transition-all duration-700 ease-out ${percentage === 100 ? 'bg-green-500' : 'bg-brand-500'}`}
+                                        className={`h-full rounded-full transition-all duration-700 ease-out ${percentage === 100 ? 'bg-green-500' : 'bg-blue-500'}`}
                                         style={{ width: `${percentage}%` }}
                                     ></div>
                                 </div>
 
-                                <div className="flex items-center text-brand-500 text-xs font-bold gap-1 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                                <div className="flex items-center text-blue-500 text-xs font-bold gap-1 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
                                     Ver alumnos <ChevronRight size={14} />
                                 </div>
                             </div>
@@ -262,9 +262,9 @@ const TutorDashboard: React.FC = () => {
 
                 <button 
                     onClick={() => setShowTaskModal(true)}
-                    className="glass-panel flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-gray-300 hover:border-brand-500 hover:bg-brand-50/50 text-gray-400 hover:text-brand-500 transition-all group h-full min-h-[160px]"
+                    className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50/50 text-gray-400 hover:text-blue-500 transition-all group h-full min-h-[160px]"
                 >
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-brand-100 transition-colors">
+                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
                         <Plus size={24} />
                     </div>
                     <span className="font-bold text-sm">Crear Nueva Tarea</span>
@@ -283,7 +283,7 @@ const TutorDashboard: React.FC = () => {
       {/* 2. Students Grid Section */}
       <div>
         <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-            <div className="p-2 bg-brand-100 rounded-lg text-brand-600">
+            <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
                 <Users size={24} />
             </div>
             Gestión de Alumnos
@@ -293,9 +293,9 @@ const TutorDashboard: React.FC = () => {
                 <div
                 key={student.id}
                 onClick={() => setSelectedStudent(student)}
-                className="glass-panel rounded-2xl shadow-glass border border-white/20 overflow-hidden flex flex-col cursor-pointer hover:shadow-glass-hover hover:border-brand-200 hover:-translate-y-1 transition-all duration-300 group relative"
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col cursor-pointer hover:shadow-xl hover:border-blue-200 hover:-translate-y-1 transition-all duration-300 group relative"
                 >
-                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-brand-50 to-indigo-50 group-hover:from-brand-100 group-hover:to-indigo-100 transition-colors"></div>
+                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-blue-50 to-indigo-50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-colors"></div>
 
                 <div className="p-5 flex flex-col items-center relative z-10">
                     <div className="transform group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">
@@ -311,7 +311,7 @@ const TutorDashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="p-4 mt-auto border-t border-gray-50 bg-white/40 flex gap-3" onClick={e => e.stopPropagation()}>
+                <div className="p-4 mt-auto border-t border-gray-50 bg-gray-50/50 flex gap-3" onClick={e => e.stopPropagation()}>
                     <button
                     onClick={() => handleAssignPointsWithNotification(student, -10)}
                     className="flex-1 bg-white border border-gray-200 hover:bg-red-50 hover:border-red-200 text-gray-400 hover:text-red-500 rounded-xl py-2.5 flex justify-center items-center transition-all shadow-sm hover:shadow active:scale-95"
@@ -321,7 +321,7 @@ const TutorDashboard: React.FC = () => {
                     </button>
                     <button
                     onClick={() => handleAssignPointsWithNotification(student, 10)}
-                    className="flex-1 bg-brand-600 hover:bg-brand-700 text-white border border-transparent rounded-xl py-2.5 flex justify-center items-center transition-all shadow-md hover:shadow-lg active:scale-95"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white border border-transparent rounded-xl py-2.5 flex justify-center items-center transition-all shadow-md hover:shadow-lg active:scale-95"
                     title="Sumar Puntos"
                     >
                     <Plus size={18} />
@@ -340,7 +340,7 @@ const TutorDashboard: React.FC = () => {
       <div className="animate-in fade-in duration-300">
          <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-800">Premios del Colegio</h2>
-            <button onClick={() => setShowRewardModal(true)} className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 shadow-glass">
+            <button onClick={() => setShowRewardModal(true)} className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700">
               <Plus size={18} /> Crear Premio
             </button>
          </div>
@@ -348,7 +348,7 @@ const TutorDashboard: React.FC = () => {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {schoolRewards.length === 0 && <p className="text-gray-400 col-span-4 text-center py-10">No has creado premios todavía.</p>}
             {schoolRewards.map(reward => (
-              <div key={reward.id} className="glass-panel p-4 rounded-xl shadow-glass border border-white/20 flex items-center justify-between">
+              <div key={reward.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                  <div className="flex items-center gap-3">
                     <div className="bg-green-100 p-2 rounded-full text-green-600">
                       <Gift size={24} />
@@ -414,9 +414,9 @@ const TutorDashboard: React.FC = () => {
     };
 
     return (
-      <div className="animate-in fade-in duration-300 flex h-[600px] glass-panel rounded-xl shadow-glass border border-white/20 overflow-hidden">
+      <div className="animate-in fade-in duration-300 flex h-[600px] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-1/3 border-r border-gray-100 bg-gray-50/50 flex flex-col">
+        <div className="w-1/3 border-r border-gray-100 bg-gray-50 flex flex-col">
           <div className="p-4 border-b border-gray-100 font-bold text-gray-700">Familias</div>
           <div className="flex-1 overflow-y-auto p-2">
              {Object.keys(families).length === 0 && noFamilyUsers.length === 0 && (
@@ -426,22 +426,22 @@ const TutorDashboard: React.FC = () => {
              {Object.entries(families).map(([fid, data]) => {
                 const isExpanded = expandedFamilies[fid];
                 return (
-                  <div key={fid} className="mb-2 border border-gray-100 rounded-lg overflow-hidden bg-white/50">
+                  <div key={fid} className="mb-2 border border-gray-100 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleFamily(fid)}
-                      className="w-full flex justify-between items-center p-3 hover:bg-white transition-colors"
+                      className="w-full flex justify-between items-center p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
                     >
                        <span className="font-bold text-sm text-gray-700">{data.name}</span>
                        {isExpanded ? <ChevronDown size={16} className="text-gray-500"/> : <ChevronRight size={16} className="text-gray-500"/>}
                     </button>
 
                     {isExpanded && (
-                       <div className="bg-white/80 p-1">
+                       <div className="bg-white p-1">
                           {data.members.map(u => (
                              <button
                                 key={u.id}
                                 onClick={() => setChatUser(u)}
-                                className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-brand-100 text-brand-800' : 'hover:bg-gray-50'}`}
+                                className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-50'}`}
                              >
                                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                                    {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
@@ -465,7 +465,7 @@ const TutorDashboard: React.FC = () => {
                      <button
                         key={u.id}
                         onClick={() => setChatUser(u)}
-                        className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-brand-100 text-brand-800' : 'hover:bg-gray-200'}`}
+                        className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-200'}`}
                       >
                         <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0">
                            {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
@@ -481,19 +481,19 @@ const TutorDashboard: React.FC = () => {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col bg-white/40">
+        <div className="flex-1 flex flex-col">
           {chatUser ? (
             <>
-              <div className="p-4 border-b border-gray-100 bg-white/80 font-bold text-gray-800 flex items-center gap-2 backdrop-blur-sm">
+              <div className="p-4 border-b border-gray-100 bg-white font-bold text-gray-800 flex items-center gap-2">
                  <span>Chat con {chatUser.name}</span>
                  <span className="text-xs font-normal text-gray-400">({chatUser.role === Role.PARENT ? 'Padre/Madre' : 'Alumno'})</span>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/50">
                 {getConversation(chatUser.id).map(msg => {
                   const isMe = msg.fromId === currentUser?.id;
                   return (
                     <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                       <div className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm shadow-sm ${isMe ? 'bg-brand-600 text-white rounded-tr-none' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'}`}>
+                       <div className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm ${isMe ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'}`}>
                          {msg.content}
                        </div>
                     </div>
@@ -501,21 +501,21 @@ const TutorDashboard: React.FC = () => {
                 })}
                 {getConversation(chatUser.id).length === 0 && <p className="text-center text-gray-400 text-sm mt-10">No hay mensajes. ¡Saluda!</p>}
               </div>
-              <div className="p-4 bg-white/80 border-t border-gray-100 flex gap-2 backdrop-blur-sm">
+              <div className="p-4 bg-white border-t border-gray-100 flex gap-2">
                  <input 
                    value={chatMessage}
                    onChange={e => setChatMessage(e.target.value)}
                    onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                    placeholder="Escribe un mensaje..."
-                   className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-brand-500 bg-white/50"
+                   className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500"
                  />
-                 <button onClick={handleSendMessage} className="bg-brand-600 text-white p-2 rounded-full hover:bg-brand-700 shadow-glass">
+                 <button onClick={handleSendMessage} className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700">
                    <Send size={20} />
                  </button>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-gray-400/50">
+            <div className="flex-1 flex flex-col items-center justify-center text-gray-300">
                <MessageSquare size={48} className="mb-2" />
                <p>Selecciona un contacto para chatear</p>
             </div>
@@ -526,13 +526,13 @@ const TutorDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="glass-header px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+      <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex items-center gap-3">
-            <div className="bg-brand-600 p-2 rounded-lg text-white shadow-glass">
+            <div className="bg-blue-600 p-2 rounded-lg text-white">
               <Users size={24} />
             </div>
             <div>
@@ -544,7 +544,7 @@ const TutorDashboard: React.FC = () => {
         <div className="flex gap-3">
           <button 
             onClick={() => setShowHub(true)}
-            className="text-gray-500 hover:text-brand-600 p-2 font-bold text-xs flex flex-col items-center transition-colors"
+            className="text-gray-500 hover:text-blue-600 p-2 font-bold text-xs flex flex-col items-center"
             title="Volver al Portal"
           >
             <School size={20} />
@@ -553,29 +553,29 @@ const TutorDashboard: React.FC = () => {
           <div className="w-px h-8 bg-gray-200 mx-1"></div>
           <button 
             onClick={() => setShowTaskModal(true)}
-            className="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-glass"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
           >
             <Send size={18} /> Nueva Tarea
           </button>
-          <button onClick={() => setShowSettings(true)} className="text-gray-500 hover:text-brand-600 p-2 transition-colors">
+          <button onClick={() => setShowSettings(true)} className="text-gray-500 hover:text-blue-600 p-2">
             <Settings size={24} />
           </button>
-          <button onClick={logout} className="text-gray-500 hover:text-red-500 p-2 transition-colors">
+          <button onClick={logout} className="text-gray-500 hover:text-red-500 p-2">
             <LogOut size={24} />
           </button>
         </div>
       </header>
       
       {/* Tabs */}
-      <div className="glass-header px-6 border-t-0 sticky top-[72px] z-40">
+      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-40">
         <div className="flex gap-6">
-           <button onClick={() => setActiveTab('CLASSROOM')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'CLASSROOM' ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
+           <button onClick={() => setActiveTab('CLASSROOM')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'CLASSROOM' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400'}`}>
               <Users size={18} /> Alumnos
            </button>
-           <button onClick={() => setActiveTab('REWARDS')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'REWARDS' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
+           <button onClick={() => setActiveTab('REWARDS')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'REWARDS' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-400'}`}>
               <Gift size={18} /> Premios
            </button>
-           <button onClick={() => setActiveTab('MESSAGES')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'MESSAGES' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
+           <button onClick={() => setActiveTab('MESSAGES')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'MESSAGES' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400'}`}>
               <MessageSquare size={18} /> Mensajería
            </button>
         </div>
@@ -591,7 +591,7 @@ const TutorDashboard: React.FC = () => {
         {/* Settings Modal */}
         {showSettings && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="glass-panel rounded-2xl p-6 w-full max-w-sm shadow-glass relative animate-in zoom-in duration-200">
+             <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
                 <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                   <X size={24} />
                 </button>
@@ -604,7 +604,7 @@ const TutorDashboard: React.FC = () => {
                       maxLength={4}
                       value={newPin}
                       onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))}
-                      className="w-full text-center text-2xl tracking-widest border-2 border-brand-100 rounded-xl py-3 focus:border-brand-500 outline-none transition-colors bg-white/50"
+                      className="w-full text-center text-2xl tracking-widest border-2 border-blue-100 rounded-xl py-3 focus:border-blue-500 outline-none transition-colors"
                       placeholder="0000"
                    />
                    <p className="text-xs text-gray-400 mt-2">Introduce 4 números nuevos</p>
@@ -612,7 +612,7 @@ const TutorDashboard: React.FC = () => {
 
                 <button 
                   onClick={handleUpdatePin}
-                  className="w-full bg-brand-600 text-white font-bold py-3 rounded-xl hover:bg-brand-700 transition-colors shadow-glass"
+                  className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors"
                 >
                   Guardar Nuevo PIN
                 </button>
@@ -623,15 +623,15 @@ const TutorDashboard: React.FC = () => {
         {/* Selected Task Details Modal */}
         {selectedTaskDetails && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div className="glass-panel rounded-2xl w-full max-w-2xl shadow-glass overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-200">
-                    <div className="p-6 bg-brand-600 text-white flex justify-between items-center shrink-0 shadow-md">
+                <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-200">
+                    <div className="p-6 bg-indigo-600 text-white flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-4">
-                            <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                            <div className="bg-white/20 p-2 rounded-lg">
                                 <ListChecks size={28} />
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold">{selectedTaskDetails.title}</h2>
-                                <p className="text-brand-100 text-sm">Detalles de Tarea</p>
+                                <p className="text-indigo-200 text-sm">Detalles de Tarea</p>
                             </div>
                         </div>
                         <button onClick={() => setSelectedTaskDetails(null)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full text-white transition-colors">
@@ -639,7 +639,7 @@ const TutorDashboard: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+                    <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             {/* Completed Column */}
                             <div>
@@ -697,25 +697,25 @@ const TutorDashboard: React.FC = () => {
         {/* Student Detail Modal */}
         {selectedStudent && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass-panel rounded-2xl w-full max-w-2xl shadow-glass overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
+            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
                {/* Header */}
-               <div className="p-6 bg-brand-600 text-white flex justify-between items-center shrink-0 shadow-md">
+               <div className="p-6 bg-blue-600 text-white flex justify-between items-center shrink-0">
                   <div className="flex items-center gap-4">
                      <div className="bg-white/20 p-1 rounded-full">
                         <Avatar config={selectedStudent.avatarConfig} size={48} />
                      </div>
                      <div>
                        <h2 className="text-xl font-bold">{selectedStudent.name}</h2>
-                       <p className="text-brand-100 text-sm">Gestión de Alumno</p>
+                       <p className="text-blue-100 text-sm">Gestión de Alumno</p>
                      </div>
                   </div>
-                  <button onClick={() => setSelectedStudent(null)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full text-white transition-colors">
+                  <button onClick={() => setSelectedStudent(null)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full text-white">
                     <X size={24} />
                   </button>
                </div>
 
                {/* Body */}
-               <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+               <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
                   <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2"><School size={20}/> Tareas Escolares Asignadas</h3>
                   <div className="space-y-3">
                     {tasks.filter(t => t.context === 'SCHOOL' && (t.assignedTo.length === 0 || t.assignedTo.includes(selectedStudent.id))).map(task => {
@@ -749,7 +749,7 @@ const TutorDashboard: React.FC = () => {
                          setSelectedStudent(null);
                          setActiveTab('MESSAGES');
                        }}
-                       className="w-full py-3 bg-brand-100 text-brand-700 font-bold rounded-xl hover:bg-brand-200 transition-colors flex justify-center items-center gap-2"
+                       className="w-full py-3 bg-indigo-100 text-indigo-700 font-bold rounded-xl hover:bg-indigo-200 transition-colors flex justify-center items-center gap-2"
                      >
                        <MessageSquare size={20} /> Abrir Chat con Alumno
                      </button>
@@ -769,8 +769,8 @@ const TutorDashboard: React.FC = () => {
       {/* Broadcast Modal */}
       {showTaskModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-panel rounded-2xl shadow-glass w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
               <h3 className="font-bold text-lg text-gray-800">Crear Tarea de Clase</h3>
               <button onClick={() => setShowTaskModal(false)} className="text-gray-400 hover:text-gray-600">
                 <span className="text-2xl">&times;</span>
@@ -784,7 +784,7 @@ const TutorDashboard: React.FC = () => {
                   type="text" 
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white/50"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   placeholder="ej. Leer Capítulo 4"
                 />
               </div>
@@ -795,7 +795,7 @@ const TutorDashboard: React.FC = () => {
                   type="number" 
                   value={taskPoints}
                   onChange={(e) => setTaskPoints(Number(e.target.value))}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none bg-white/50"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
 
@@ -804,7 +804,7 @@ const TutorDashboard: React.FC = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setWorkType('CLASSWORK')}
-                    className={`flex-1 py-2 px-3 rounded-lg border-2 font-bold text-sm transition-all ${workType === 'CLASSWORK' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 text-gray-400 hover:border-brand-300'}`}
+                    className={`flex-1 py-2 px-3 rounded-lg border-2 font-bold text-sm transition-all ${workType === 'CLASSWORK' ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-400 hover:border-blue-300'}`}
                   >
                     Clase
                   </button>
@@ -828,16 +828,16 @@ const TutorDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50/50 flex gap-3">
+            <div className="p-6 bg-gray-50 flex gap-3">
               <button 
                 onClick={() => setShowTaskModal(false)}
-                className="flex-1 py-3 text-gray-600 font-medium hover:bg-white rounded-xl transition-colors"
+                className="flex-1 py-3 text-gray-600 font-medium hover:bg-gray-200 rounded-xl transition-colors"
               >
                 Cancelar
               </button>
               <button 
                 onClick={handleBroadcastTask}
-                className="flex-1 py-3 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 shadow-glass transition-all"
+                className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
               >
                 Enviar a Todos
               </button>
@@ -849,14 +849,14 @@ const TutorDashboard: React.FC = () => {
       {/* Create Reward Modal */}
       {showRewardModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-           <div className="glass-panel rounded-2xl shadow-glass w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
              <div className="p-6">
                <h3 className="text-lg font-bold text-gray-800 mb-4">Crear Premio Escolar</h3>
                <input 
                   type="text" 
                   value={rewardTitle}
                   onChange={(e) => setRewardTitle(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none mb-3 bg-white/50"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none mb-3"
                   placeholder="ej. Ayudante del día"
                 />
                 <div className="flex gap-2 mb-6">
@@ -866,7 +866,7 @@ const TutorDashboard: React.FC = () => {
                       type="number" 
                       value={rewardCost}
                       onChange={(e) => setRewardCost(Number(e.target.value))}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none bg-white/50"
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none"
                     />
                   </div>
                   <div className="flex-1">
@@ -875,13 +875,13 @@ const TutorDashboard: React.FC = () => {
                       type="number" 
                       value={rewardStock}
                       onChange={(e) => setRewardStock(Number(e.target.value))}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none bg-white/50"
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none"
                     />
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => setShowRewardModal(false)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-white/50 rounded-lg">Cancelar</button>
-                  <button onClick={handleCreateReward} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-glass">Crear</button>
+                  <button onClick={() => setShowRewardModal(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
+                  <button onClick={handleCreateReward} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700">Crear</button>
                 </div>
              </div>
            </div>
