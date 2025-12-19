@@ -526,7 +526,11 @@ const TutorDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 flex flex-col relative">
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+          <img src="/watermark.png" className="opacity-5 w-[60%] max-w-[500px] object-contain" />
+      </div>
+
       {/* Header */}
       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-4">
@@ -582,7 +586,7 @@ const TutorDashboard: React.FC = () => {
       </div>
 
       {/* Main Grid */}
-      <main className="flex-1 p-6 overflow-auto max-w-7xl mx-auto w-full">
+      <main className="flex-1 p-6 overflow-auto max-w-7xl mx-auto w-full relative z-10">
         
         {activeTab === 'CLASSROOM' && renderClassroom()}
         {activeTab === 'REWARDS' && renderRewards()}
