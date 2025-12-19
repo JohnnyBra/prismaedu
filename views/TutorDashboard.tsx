@@ -39,6 +39,8 @@ const TutorDashboard: React.FC = () => {
   const [chatMessage, setChatMessage] = useState('');
   const [expandedFamilies, setExpandedFamilies] = useState<Record<string, boolean>>({});
 
+  const { markMessagesRead } = useData();
+
   const students = users
       .filter(u => u.role === Role.STUDENT && u.classId === currentUser?.classId)
       .sort((a, b) => {
@@ -121,6 +123,16 @@ const TutorDashboard: React.FC = () => {
       (m.fromId === currentUser?.id && m.toId === userId) || 
       (m.fromId === userId && m.toId === currentUser?.id)
     ).sort((a, b) => a.timestamp - b.timestamp);
+  };
+
+  const getUnreadCount = (userId: string) => {
+    if (!currentUser) return 0;
+    return messages.filter(m => m.fromId === userId && m.toId === currentUser.id && !m.read).length;
+  };
+
+  const getTotalUnreadCount = () => {
+    if (!currentUser) return 0;
+    return messages.filter(m => m.toId === currentUser.id && !m.read).length;
   };
 
   // --- RENDERERS ---
@@ -425,33 +437,50 @@ const TutorDashboard: React.FC = () => {
 
              {Object.entries(families).map(([fid, data]) => {
                 const isExpanded = expandedFamilies[fid];
+                const familyUnreadCount = data.members.reduce((acc, member) => acc + getUnreadCount(member.id), 0);
+
                 return (
                   <div key={fid} className="mb-2 border border-gray-100 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleFamily(fid)}
                       className="w-full flex justify-between items-center p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
                     >
-                       <span className="font-bold text-sm text-gray-700">{data.name}</span>
+                       <div className="flex items-center gap-2">
+                         <span className="font-bold text-sm text-gray-700">{data.name}</span>
+                         {familyUnreadCount > 0 && !isExpanded && (
+                           <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{familyUnreadCount}</span>
+                         )}
+                       </div>
                        {isExpanded ? <ChevronDown size={16} className="text-gray-500"/> : <ChevronRight size={16} className="text-gray-500"/>}
                     </button>
 
                     {isExpanded && (
                        <div className="bg-white p-1">
-                          {data.members.map(u => (
+                          {data.members.map(u => {
+                             const unreadCount = getUnreadCount(u.id);
+                             return (
                              <button
                                 key={u.id}
-                                onClick={() => setChatUser(u)}
+                                onClick={() => {
+                                    setChatUser(u);
+                                    if (currentUser) markMessagesRead(u.id, currentUser.id);
+                                }}
                                 className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-50'}`}
                              >
-                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0 relative">
                                    {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
+                                   {unreadCount > 0 && (
+                                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
+                                       {unreadCount}
+                                     </span>
+                                   )}
                                 </div>
-                                <div className="overflow-hidden">
+                                <div className="overflow-hidden flex-1">
                                     <div className="text-sm font-medium truncate">{u.name}</div>
                                     <div className="text-xs text-gray-400 truncate">{u.role === Role.PARENT ? 'Padre/Madre' : 'Alumno'}</div>
                                 </div>
                              </button>
-                          ))}
+                          )})}
                        </div>
                     )}
                   </div>
@@ -461,20 +490,30 @@ const TutorDashboard: React.FC = () => {
              {noFamilyUsers.length > 0 && (
                <div className="mt-4">
                   <h5 className="px-2 text-xs font-bold text-gray-400 uppercase mb-2">Otros</h5>
-                  {noFamilyUsers.map(u => (
+                  {noFamilyUsers.map(u => {
+                     const unreadCount = getUnreadCount(u.id);
+                     return (
                      <button
                         key={u.id}
-                        onClick={() => setChatUser(u)}
+                        onClick={() => {
+                            setChatUser(u);
+                            if (currentUser) markMessagesRead(u.id, currentUser.id);
+                        }}
                         className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-200'}`}
                       >
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0 relative">
                            {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16}/>}
+                           {unreadCount > 0 && (
+                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
+                               {unreadCount}
+                             </span>
+                           )}
                         </div>
-                        <div className="overflow-hidden">
+                        <div className="overflow-hidden flex-1">
                             <div className="text-sm font-medium truncate">{u.name}</div>
                         </div>
                       </button>
-                  ))}
+                  )})}
                </div>
              )}
           </div>
@@ -579,8 +618,11 @@ const TutorDashboard: React.FC = () => {
            <button onClick={() => setActiveTab('REWARDS')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'REWARDS' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-400'}`}>
               <Gift size={18} /> Premios
            </button>
-           <button onClick={() => setActiveTab('MESSAGES')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'MESSAGES' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400'}`}>
+           <button onClick={() => setActiveTab('MESSAGES')} className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 relative ${activeTab === 'MESSAGES' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400'}`}>
               <MessageSquare size={18} /> Mensajería
+              {getTotalUnreadCount() > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full -ml-1">{getTotalUnreadCount()}</span>
+              )}
            </button>
         </div>
       </div>
