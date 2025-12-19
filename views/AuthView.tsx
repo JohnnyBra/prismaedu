@@ -78,7 +78,7 @@ const AuthView: React.FC = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 relative w-full max-w-md">
       <div className="text-center mb-8 flex flex-col items-center">
         {/* LOGO PLACEHOLDER */}
-        <img src="/logo.png" alt="Logo Colegio" className="h-20 w-auto object-contain mb-4 drop-shadow-lg" onError={(e) => e.currentTarget.style.display = 'none'} />
+        <img src="/logo.png" alt="Logo Colegio" className="h-32 w-auto object-contain mb-4 drop-shadow-lg" onError={(e) => e.currentTarget.style.display = 'none'} />
         
         <h1 className="text-4xl font-extrabold text-white drop-shadow-md mb-2 tracking-tight">Prisma</h1>
         <p className="text-indigo-100 text-lg font-medium">Cooperativa de Enseñanza La Hispanidad</p>

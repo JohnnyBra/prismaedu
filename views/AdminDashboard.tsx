@@ -756,7 +756,7 @@ const AdminDashboard: React.FC = () => {
       {/* Admin Header */}
       <header className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-md">
          <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain bg-gray-800 rounded p-1" onError={(e) => e.currentTarget.style.display = 'none'} />
+            <img src="/logo.png" alt="Logo" className="h-12 w-auto object-contain bg-gray-800 rounded p-1" onError={(e) => e.currentTarget.style.display = 'none'} />
             <div className="flex items-center gap-3">
               <div className="bg-gray-700 p-2 rounded-lg">
                  <ShieldIcon />
