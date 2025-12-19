@@ -90,8 +90,12 @@ const ParentDashboard: React.FC = () => {
   ).sort((a, b) => a.timestamp - b.timestamp) : [];
 
   return (
-    <div className="min-h-screen bg-orange-50 flex flex-col">
-       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-amber-100 flex flex-col relative">
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+          <img src="/watermark.png" className="opacity-5 w-[60%] max-w-[500px] object-contain" />
+      </div>
+
+       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center relative z-10">
         <div className="flex items-center gap-4">
           <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex items-center gap-3">
@@ -152,7 +156,7 @@ const ParentDashboard: React.FC = () => {
          </div>
       </div>
 
-      <main className="flex-1 p-6 flex flex-col">
+      <main className="flex-1 p-6 flex flex-col relative z-10">
         
         {/* Settings Modal */}
         {showSettings && (

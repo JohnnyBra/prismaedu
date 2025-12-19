@@ -91,7 +91,12 @@ const StudentDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-indigo-50 pb-20 md:pb-0 flex flex-col font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-blue-100 pb-20 md:pb-0 flex flex-col font-sans relative">
+      {/* Watermark */}
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+          <img src="/watermark.png" className="opacity-5 w-[60%] max-w-[500px] object-contain" />
+      </div>
+
       {/* Top Bar - Child Friendly Redesign */}
       <div className="bg-white border-b-4 border-indigo-200 p-4 sticky top-0 z-20 shadow-sm">
         <div className="flex justify-between items-center max-w-4xl mx-auto">
@@ -121,7 +126,7 @@ const StudentDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main className="p-4 max-w-4xl mx-auto flex-1 w-full">
+      <main className="p-4 max-w-4xl mx-auto flex-1 w-full relative z-10">
         
         {/* Settings Modal */}
         {showSettings && (
@@ -383,7 +388,7 @@ const StudentDashboard: React.FC = () => {
       </main>
       
       {/* Footer */}
-      <footer className="mt-auto py-6 text-center text-gray-400 text-xs">
+      <footer className="mt-auto py-6 text-center text-gray-400 text-xs relative z-10">
          <p className="font-semibold text-gray-500">Cooperativa de Enseñanza La Hispanidad</p>
          <p className="mt-1">Creado por Javi Barrero</p>
       </footer>
