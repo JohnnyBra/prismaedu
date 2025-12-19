@@ -752,7 +752,11 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex flex-col relative">
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+          <img src="/watermark.png" className="opacity-5 w-[60%] max-w-[500px] object-contain" />
+      </div>
+
       {/* Admin Header */}
       <header className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-md">
          <div className="flex items-center gap-4">
@@ -809,7 +813,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Content */}
-      <main className="flex-1 p-6 max-w-6xl mx-auto w-full flex flex-col">
+      <main className="flex-1 p-6 max-w-6xl mx-auto w-full flex flex-col relative z-10">
          {activeTab === 'CLASSES' && renderClassesTab()}
          {activeTab === 'TUTORS' && renderTutorsTab()}
          {activeTab === 'FAMILIES' && renderFamiliesTab()}
