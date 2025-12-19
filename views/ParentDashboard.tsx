@@ -5,7 +5,7 @@ import { Plus, Minus, LogOut, Home, Star, Settings, X, MessageSquare, Send, Gift
 import { Role } from '../types';
 
 const ParentDashboard: React.FC = () => {
-  const { users, currentUser, logout, assignPoints, createTask, updatePin, messages, sendMessage, rewards, createReward, deleteReward, tasks, completions } = useData();
+  const { users, currentUser, logout, assignPoints, createTask, updatePin, messages, sendMessage, rewards, createReward, deleteReward, tasks, completions, markMessagesRead } = useData();
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskPoints, setTaskPoints] = useState(10);
@@ -36,6 +36,9 @@ const ParentDashboard: React.FC = () => {
   // Find Tutor (Assuming first kid's class tutor)
   const classId = myKids[0]?.classId;
   const tutor = users.find(u => u.role === Role.TUTOR && u.classId === classId);
+
+  // Unread messages
+  const unreadMessages = tutor && currentUser ? messages.filter(m => m.fromId === tutor.id && m.toId === currentUser.id && !m.read).length : 0;
 
   const handleCreateChore = () => {
     if (!taskTitle) return;
@@ -109,9 +112,16 @@ const ParentDashboard: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-3">
-           <button onClick={() => setShowChat(true)} className="text-gray-500 hover:text-indigo-600 p-2 relative">
+           <button onClick={() => {
+               setShowChat(true);
+               if (tutor && currentUser) markMessagesRead(tutor.id, currentUser.id);
+             }} className="text-gray-500 hover:text-indigo-600 p-2 relative">
              <MessageSquare size={24} />
-             {conversation.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
+             {unreadMessages > 0 && (
+                <div className="absolute top-1 right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
+                    {unreadMessages}
+                </div>
+             )}
            </button>
            {activeTab === 'DASHBOARD' && (
               <button
