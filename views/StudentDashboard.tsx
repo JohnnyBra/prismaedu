@@ -91,18 +91,18 @@ const StudentDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-indigo-50 pb-20 md:pb-0 flex flex-col font-sans">
-      {/* Top Bar - Child Friendly Redesign */}
-      <div className="bg-white border-b-4 border-indigo-200 p-4 sticky top-0 z-20 shadow-sm">
+    <div className="min-h-screen pb-20 md:pb-0 flex flex-col font-sans relative">
+      {/* Top Bar - Child Friendly Redesign - Glass Header */}
+      <div className="glass-header p-4 sticky top-0 z-20 shadow-glass border-b-4 border-brand-200">
         <div className="flex justify-between items-center max-w-4xl mx-auto">
           <div className="flex items-center gap-4">
              {/* Logo hidden on mobile to save space, maybe */}
              <img src="/logo.png" alt="Logo" className="hidden md:block h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
 
-            <div className="flex items-center gap-3 bg-indigo-50 p-2 pr-4 rounded-full border-2 border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-colors" onClick={() => setShowSettings(true)}>
+            <div className="flex items-center gap-3 bg-white/60 p-2 pr-4 rounded-full border-2 border-brand-100 cursor-pointer hover:bg-white/80 transition-colors backdrop-blur-sm" onClick={() => setShowSettings(true)}>
                <Avatar config={currentUser?.avatarConfig} size={48} className="border-2 border-white shadow-sm" />
                <div>
-                 <h1 className="font-black text-indigo-900 leading-none text-lg">{currentUser?.name?.split(' ')[0]}</h1>
+                 <h1 className="font-black text-brand-900 leading-none text-lg">{currentUser?.name?.split(' ')[0]}</h1>
                  <div className="flex items-center gap-1 text-orange-500 font-black text-sm">
                    <Star size={14} fill="currentColor" /> {currentUser?.points}
                  </div>
@@ -110,10 +110,10 @@ const StudentDashboard: React.FC = () => {
             </div>
           </div>
           <div className="flex gap-3">
-             <button onClick={() => setShowSettings(true)} className="bg-gray-100 text-gray-400 hover:text-indigo-600 p-3 rounded-2xl hover:bg-indigo-50 transition-colors">
+             <button onClick={() => setShowSettings(true)} className="bg-white/60 text-gray-400 hover:text-brand-600 p-3 rounded-2xl hover:bg-white transition-colors border border-white/40">
                <Settings size={24} />
              </button>
-             <button onClick={logout} className="bg-red-50 text-red-300 hover:text-red-500 p-3 rounded-2xl hover:bg-red-100 transition-colors">
+             <button onClick={logout} className="bg-red-50/60 text-red-300 hover:text-red-500 p-3 rounded-2xl hover:bg-red-100 transition-colors border border-red-50/40">
                <LogOut size={24} />
              </button>
           </div>
@@ -126,7 +126,7 @@ const StudentDashboard: React.FC = () => {
         {/* Settings Modal */}
         {showSettings && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
+             <div className="glass-panel rounded-2xl p-6 w-full max-w-sm shadow-glass relative animate-in zoom-in duration-200">
                 <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                   <X size={24} />
                 </button>
@@ -139,7 +139,7 @@ const StudentDashboard: React.FC = () => {
                       maxLength={4}
                       value={newPin}
                       onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))}
-                      className="w-full text-center text-2xl tracking-widest border-2 border-indigo-100 rounded-xl py-3 focus:border-indigo-500 outline-none transition-colors"
+                      className="w-full text-center text-2xl tracking-widest border-2 border-brand-100 rounded-xl py-3 focus:border-brand-500 outline-none transition-colors bg-white/50"
                       placeholder="0000"
                    />
                    <p className="text-xs text-gray-400 mt-2">Introduce 4 números nuevos</p>
@@ -147,7 +147,7 @@ const StudentDashboard: React.FC = () => {
 
                 <button 
                   onClick={handleUpdatePin}
-                  className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors"
+                  className="w-full bg-brand-600 text-white font-bold py-3 rounded-xl hover:bg-brand-700 transition-colors shadow-glass"
                 >
                   Guardar Nuevo PIN
                 </button>
@@ -158,24 +158,24 @@ const StudentDashboard: React.FC = () => {
         {/* Priority Modal Overlay */}
         {priorityAck && pendingPriorityTask && (
            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
-             <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform scale-100">
+             <div className="glass-panel rounded-3xl p-8 max-w-md w-full text-center shadow-glass transform scale-100 bg-white">
                 <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
                   <Star size={40} className="text-red-500" fill="currentColor" />
                 </div>
                 <h2 className="text-2xl font-black text-gray-800 mb-2">¡Nueva Tarea Prioritaria!</h2>
                 <p className="text-gray-500 mb-6">Tu profe ha mandado una tarea importante.</p>
                 
-                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 text-left">
-                  <h3 className="font-bold text-blue-900 text-lg">{pendingPriorityTask.title}</h3>
+                <div className="bg-brand-50 p-4 rounded-xl border border-brand-100 mb-6 text-left">
+                  <h3 className="font-bold text-brand-900 text-lg">{pendingPriorityTask.title}</h3>
                   <div className="flex justify-between items-center mt-2">
-                     <span className="bg-blue-200 text-blue-800 text-xs font-bold px-2 py-1 rounded">COLEGIO</span>
+                     <span className="bg-brand-200 text-brand-800 text-xs font-bold px-2 py-1 rounded">COLEGIO</span>
                      <span className="font-bold text-yellow-600">+{pendingPriorityTask.points} pts</span>
                   </div>
                 </div>
 
                 <button 
                   onClick={handlePriorityAck}
-                  className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl text-lg shadow-lg shadow-indigo-200 hover:scale-[1.02] transition-transform"
+                  className="w-full py-4 bg-brand-600 text-white font-bold rounded-xl text-lg shadow-glass hover:scale-[1.02] transition-transform"
                 >
                   ¡A ello!
                 </button>
@@ -187,7 +187,7 @@ const StudentDashboard: React.FC = () => {
         <div className="grid grid-cols-3 gap-4 mb-8 max-w-lg mx-auto">
           <button 
             onClick={() => setActiveTab('tasks')}
-            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'tasks' ? 'bg-blue-500 border-blue-700 text-white shadow-lg shadow-blue-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
+            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'tasks' ? 'bg-brand-500 border-brand-700 text-white shadow-glass translate-y-0' : 'bg-white/60 border-transparent text-gray-400 hover:bg-white'}`}
           >
             <div className={`p-2 rounded-2xl mb-1 ${activeTab === 'tasks' ? 'bg-white/20' : 'bg-gray-100'}`}>
               <CheckCircle size={28} />
@@ -197,7 +197,7 @@ const StudentDashboard: React.FC = () => {
 
           <button 
             onClick={() => setActiveTab('shop')}
-            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'shop' ? 'bg-orange-500 border-orange-700 text-white shadow-lg shadow-orange-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
+            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'shop' ? 'bg-orange-500 border-orange-700 text-white shadow-glass translate-y-0' : 'bg-white/60 border-transparent text-gray-400 hover:bg-white'}`}
           >
             <div className={`p-2 rounded-2xl mb-1 ${activeTab === 'shop' ? 'bg-white/20' : 'bg-gray-100'}`}>
               <ShoppingBag size={28} />
@@ -207,7 +207,7 @@ const StudentDashboard: React.FC = () => {
 
           <button 
             onClick={() => setActiveTab('chat')}
-            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'chat' ? 'bg-indigo-500 border-indigo-700 text-white shadow-lg shadow-indigo-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
+            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'chat' ? 'bg-indigo-500 border-indigo-700 text-white shadow-glass translate-y-0' : 'bg-white/60 border-transparent text-gray-400 hover:bg-white'}`}
           >
             <div className={`p-2 rounded-2xl mb-1 ${activeTab === 'chat' ? 'bg-white/20' : 'bg-gray-100'}`}>
               <MessageSquare size={28} />
@@ -220,15 +220,15 @@ const StudentDashboard: React.FC = () => {
         {activeTab === 'tasks' && (
           <div className="animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
-              <button onClick={() => setTaskFilter('ALL')} className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap border ${taskFilter === 'ALL' ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-200'}`}>Todas</button>
-              <button onClick={() => setTaskFilter('SCHOOL')} className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap border ${taskFilter === 'SCHOOL' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200'}`}>Colegio</button>
-              <button onClick={() => setTaskFilter('HOME')} className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap border ${taskFilter === 'HOME' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-600 border-gray-200'}`}>Casa</button>
+              <button onClick={() => setTaskFilter('ALL')} className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap border ${taskFilter === 'ALL' ? 'bg-gray-800 text-white border-gray-800' : 'bg-white/60 text-gray-600 border-transparent'}`}>Todas</button>
+              <button onClick={() => setTaskFilter('SCHOOL')} className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap border ${taskFilter === 'SCHOOL' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white/60 text-gray-600 border-transparent'}`}>Colegio</button>
+              <button onClick={() => setTaskFilter('HOME')} className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap border ${taskFilter === 'HOME' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white/60 text-gray-600 border-transparent'}`}>Casa</button>
             </div>
 
             <div className="space-y-4">
               {filteredTasks.length === 0 && (
                 <div className="text-center py-10 opacity-50">
-                  <CheckCircle size={48} className="mx-auto mb-2"/>
+                  <CheckCircle size={48} className="mx-auto mb-2 text-gray-400"/>
                   <p>¡No hay tareas!</p>
                 </div>
               )}
@@ -249,7 +249,7 @@ const StudentDashboard: React.FC = () => {
           <div className="animate-in slide-in-from-bottom-4 duration-300">
              
              {/* Shop Mode Toggle */}
-             <div className="flex bg-gray-200 rounded-lg p-1 mb-6">
+             <div className="flex bg-gray-200/50 rounded-lg p-1 mb-6 glass-panel border-none">
                 <button 
                   onClick={() => setShopView('CATALOG')} 
                   className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${shopView === 'CATALOG' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'}`}
@@ -266,9 +266,9 @@ const StudentDashboard: React.FC = () => {
 
              {shopView === 'CATALOG' && (
                <>
-                 <div className="flex gap-2 mb-6 border-b border-gray-200 pb-2">
+                 <div className="flex gap-2 mb-6 border-b border-gray-200/50 pb-2">
                    <button onClick={() => setShopCategory('AVATAR')} className={`flex-1 pb-2 text-sm font-bold border-b-2 ${shopCategory === 'AVATAR' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400'}`}>Avatar</button>
-                   <button onClick={() => setShopCategory('SCHOOL_REWARDS')} className={`flex-1 pb-2 text-sm font-bold border-b-2 ${shopCategory === 'SCHOOL_REWARDS' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400'}`}>Colegio</button>
+                   <button onClick={() => setShopCategory('SCHOOL_REWARDS')} className={`flex-1 pb-2 text-sm font-bold border-b-2 ${shopCategory === 'SCHOOL_REWARDS' ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400'}`}>Colegio</button>
                    <button onClick={() => setShopCategory('HOME_REWARDS')} className={`flex-1 pb-2 text-sm font-bold border-b-2 ${shopCategory === 'HOME_REWARDS' ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-400'}`}>Casa</button>
                  </div>
 
@@ -276,7 +276,7 @@ const StudentDashboard: React.FC = () => {
                     {shopCategory === 'AVATAR' && avatarItems.map(item => {
                       const owned = currentUser?.inventory?.includes(item.id);
                       return (
-                        <div key={item.id} className="bg-white p-4 rounded-xl border border-gray-100 flex flex-col items-center shadow-sm">
+                        <div key={item.id} className="glass-panel p-4 rounded-xl border border-white/20 flex flex-col items-center shadow-glass hover:shadow-glass-hover transition-all">
                           <div className="w-20 h-20 relative mb-3">
                               <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
                                 <g dangerouslySetInnerHTML={{ __html: item.svg }} />
@@ -295,7 +295,7 @@ const StudentDashboard: React.FC = () => {
                                 <button 
                                   onClick={() => buyAvatarItem(item.id)}
                                   disabled={currentUser!.points < item.cost}
-                                  className="w-full py-2 bg-indigo-600 disabled:bg-gray-300 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors"
+                                  className="w-full py-2 bg-indigo-600 disabled:bg-gray-300 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-colors shadow-glass"
                                 >
                                   Comprar {item.cost}
                                 </button>
@@ -325,11 +325,11 @@ const StudentDashboard: React.FC = () => {
                     </div>
                   )}
                   {myRedemptions.map(redemption => (
-                    <div key={redemption.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                    <div key={redemption.id} className="glass-panel p-4 rounded-xl shadow-glass border border-white/20 flex justify-between items-center">
                        <div>
                           <h4 className="font-bold text-gray-800 text-sm">{redemption.rewardTitle}</h4>
                           <div className="flex items-center gap-2 mt-1">
-                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${redemption.context === 'SCHOOL' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'}`}>
+                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${redemption.context === 'SCHOOL' ? 'bg-brand-50 text-brand-600' : 'bg-orange-50 text-orange-600'}`}>
                                {redemption.context === 'SCHOOL' ? 'Colegio' : 'Casa'}
                              </span>
                              <span className="text-xs text-gray-400 flex items-center gap-1">
@@ -350,16 +350,16 @@ const StudentDashboard: React.FC = () => {
 
         {/* CHAT VIEW */}
         {activeTab === 'chat' && (
-          <div className="animate-in slide-in-from-bottom-4 duration-300 h-[60vh] flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-             <div className="p-4 bg-indigo-600 text-white font-bold">
+          <div className="animate-in slide-in-from-bottom-4 duration-300 h-[60vh] flex flex-col glass-panel rounded-xl shadow-glass border border-white/20 overflow-hidden">
+             <div className="p-4 bg-indigo-600 text-white font-bold shadow-md">
                Chat con {tutor?.name || 'Tutor'}
              </div>
-             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white/40">
                {conversation.map(msg => {
                  const isMe = msg.fromId === currentUser?.id;
                  return (
                    <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border text-gray-800 rounded-tl-none'}`}>
+                      <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm shadow-sm ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border text-gray-800 rounded-tl-none'}`}>
                         {msg.content}
                       </div>
                    </div>
@@ -367,15 +367,15 @@ const StudentDashboard: React.FC = () => {
                })}
                {conversation.length === 0 && <p className="text-center text-gray-400 text-sm mt-10">¡Saluda a tu profe!</p>}
              </div>
-             <div className="p-3 bg-white border-t flex gap-2">
+             <div className="p-3 bg-white/60 border-t border-gray-100 flex gap-2 backdrop-blur-sm">
                  <input 
-                   className="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-500" 
+                   className="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 bg-white/60"
                    placeholder="Mensaje..."
                    value={chatMessage}
                    onChange={e => setChatMessage(e.target.value)}
                    onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                  />
-                 <button onClick={handleSendMessage} className="bg-indigo-600 text-white p-2 rounded-full"><Send size={18}/></button>
+                 <button onClick={handleSendMessage} className="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700 shadow-glass"><Send size={18}/></button>
               </div>
           </div>
         )}
@@ -397,9 +397,9 @@ const RewardCard: React.FC<{ reward: any, onRedeem: () => void, userPoints: numb
   const inStock = reward.stock === undefined || reward.stock > 0;
   
   return (
-    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between h-full">
+    <div className="glass-panel p-4 rounded-xl border border-white/20 shadow-glass flex flex-col justify-between h-full hover:shadow-glass-hover transition-all">
       <div className="text-center mb-3">
-        <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${reward.context === 'SCHOOL' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
+        <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${reward.context === 'SCHOOL' ? 'bg-brand-100 text-brand-600' : 'bg-orange-100 text-orange-600'}`}>
           <ShoppingBag size={20} />
         </div>
         <h3 className="font-bold text-sm text-gray-800 leading-tight">{reward.title}</h3>
@@ -408,7 +408,7 @@ const RewardCard: React.FC<{ reward: any, onRedeem: () => void, userPoints: numb
       <button 
         onClick={onRedeem}
         disabled={!canAfford || !inStock}
-        className={`w-full py-2 rounded-lg text-xs font-bold transition-colors ${canAfford && inStock ? 'bg-gray-800 text-white hover:bg-black' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+        className={`w-full py-2 rounded-lg text-xs font-bold transition-colors shadow-sm ${canAfford && inStock ? 'bg-gray-800 text-white hover:bg-black' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
       >
         Canjear {reward.cost}
       </button>

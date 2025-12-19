@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useData } from '../context/DataContext';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Shield } from 'lucide-react';
 import Avatar from '../components/Avatar';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS';
@@ -284,41 +284,41 @@ const AdminDashboard: React.FC = () => {
     <div className="space-y-4 animate-in fade-in duration-300">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-gray-800">Clases del Colegio</h2>
-        <button onClick={() => setShowAddClass(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700">
+        <button onClick={() => setShowAddClass(true)} className="bg-brand-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-brand-700 shadow-glass">
           <Plus size={18} /> Añadir Clase
         </button>
       </div>
 
       {showAddClass && (
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center gap-2">
+        <div className="glass-panel p-4 rounded-xl flex items-center gap-2">
           <input 
             value={newClassName} 
             onChange={e => setNewClassName(e.target.value)}
             placeholder="Nombre de la clase (ej. 3º A)" 
-            className="flex-1 px-4 py-2 rounded-lg border border-gray-300"
+            className="flex-1 px-4 py-2 rounded-lg border border-gray-200/50 bg-white/50"
           />
           <button onClick={handleCreateClass} className="bg-green-600 text-white p-2 rounded-lg"><Save size={20}/></button>
           <button onClick={() => setShowAddClass(false)} className="bg-gray-300 text-gray-700 p-2 rounded-lg"><X size={20}/></button>
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y">
+      <div className="glass-panel rounded-xl divide-y divide-gray-100">
         {classes.length === 0 && <p className="p-8 text-center text-gray-400">No hay clases registradas.</p>}
         {classes.map(cls => (
-          <div key={cls.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+          <div key={cls.id} className="p-4 flex items-center justify-between hover:bg-white/40 transition-colors">
             {editingId === cls.id ? (
               <div className="flex items-center gap-2 flex-1">
                  <input 
                    value={editName} 
                    onChange={e => setEditName(e.target.value)} 
-                   className="flex-1 px-2 py-1 border rounded"
+                   className="flex-1 px-2 py-1 border rounded bg-white/50"
                  />
                  <button onClick={() => { updateClass(cls.id, editName); setEditingId(null); }} className="text-green-600"><Save size={18} /></button>
                  <button onClick={() => setEditingId(null)} className="text-gray-500"><X size={18} /></button>
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">
+                 <div className="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center text-brand-600 font-bold">
                     {cls.name.charAt(0)}
                  </div>
                  <span className="font-bold text-gray-700">{cls.name}</span>
@@ -329,12 +329,12 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleImportCSV(cls.id)}
-                className="p-2 text-gray-400 hover:text-green-600 flex items-center gap-1 text-xs font-bold bg-gray-50 rounded border border-transparent hover:border-green-200 hover:bg-green-50"
+                className="p-2 text-gray-400 hover:text-green-600 flex items-center gap-1 text-xs font-bold bg-white/50 rounded border border-transparent hover:border-green-200 hover:bg-green-50 transition-all"
                 title="Importar alumnos desde CSV"
               >
                 <Upload size={16} /> <span className="hidden sm:inline">CSV</span>
               </button>
-              <button onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-gray-400 hover:text-blue-600"><Edit2 size={18} /></button>
+              <button onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-gray-400 hover:text-brand-600"><Edit2 size={18} /></button>
               <button onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={18} /></button>
             </div>
           </div>
@@ -358,32 +358,32 @@ const AdminDashboard: React.FC = () => {
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">Profesores / Tutores</h2>
-          <button onClick={() => setShowAddTutor(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700">
+          <button onClick={() => setShowAddTutor(true)} className="bg-brand-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-brand-700 shadow-glass">
             <Plus size={18} /> Añadir Profesor
           </button>
         </div>
 
         {showAddTutor && (
-          <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 grid gap-3">
-            <h4 className="font-bold text-indigo-800 text-sm">Nuevo Profesor</h4>
+          <div className="glass-panel p-4 rounded-xl grid gap-3">
+            <h4 className="font-bold text-brand-800 text-sm">Nuevo Profesor</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <input value={newTutorName} onChange={e => setNewTutorName(e.target.value)} placeholder="Nombre" className="px-3 py-2 rounded border" />
-              <select value={newTutorClass} onChange={e => setNewTutorClass(e.target.value)} className="px-3 py-2 rounded border">
+              <input value={newTutorName} onChange={e => setNewTutorName(e.target.value)} placeholder="Nombre" className="px-3 py-2 rounded border bg-white/50" />
+              <select value={newTutorClass} onChange={e => setNewTutorClass(e.target.value)} className="px-3 py-2 rounded border bg-white/50">
                 <option value="">Sin Clase Asignada</option>
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
-              <input value={newTutorPin} onChange={e => setNewTutorPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="px-3 py-2 rounded border" />
+              <input value={newTutorPin} onChange={e => setNewTutorPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="px-3 py-2 rounded border bg-white/50" />
             </div>
             <div className="flex gap-2 justify-end">
                <button onClick={() => setShowAddTutor(false)} className="px-4 py-2 text-gray-600 text-sm font-bold">Cancelar</button>
-               <button onClick={handleCreateTutor} className="px-4 py-2 bg-indigo-600 text-white rounded text-sm font-bold">Guardar</button>
+               <button onClick={handleCreateTutor} className="px-4 py-2 bg-brand-600 text-white rounded text-sm font-bold hover:bg-brand-700">Guardar</button>
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-panel rounded-xl overflow-hidden">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="bg-white/50 border-b border-gray-100">
                <tr>
                  <th className="p-4 text-xs font-bold text-gray-500 uppercase">Nombre</th>
                  <th className="p-4 text-xs font-bold text-gray-500 uppercase">Clase Asignada</th>
@@ -393,13 +393,13 @@ const AdminDashboard: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-gray-50">
                {tutors.map(tutor => (
-                 <tr key={tutor.id} className="hover:bg-gray-50">
+                 <tr key={tutor.id} className="hover:bg-white/40 transition-colors">
                    <td className="p-4 font-bold text-gray-700">{tutor.name}</td>
                    <td className="p-4">
                       <select 
                         value={tutor.classId || ''} 
                         onChange={(e) => updateUser(tutor.id, { classId: e.target.value })}
-                        className="bg-white border border-gray-200 rounded px-2 py-1 text-sm focus:border-indigo-500 outline-none"
+                        className="bg-white/50 border border-gray-200 rounded px-2 py-1 text-sm focus:border-brand-500 outline-none"
                       >
                          <option value="">-- Ninguna --</option>
                          {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -432,7 +432,7 @@ const AdminDashboard: React.FC = () => {
       <div className="space-y-6 animate-in fade-in duration-300">
          <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">Familias Registradas</h2>
-          <button onClick={() => setShowAddFamily(true)} className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600">
+          <button onClick={() => setShowAddFamily(true)} className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600 shadow-glass">
             <Plus size={18} /> Nueva Familia
           </button>
         </div>
@@ -440,8 +440,8 @@ const AdminDashboard: React.FC = () => {
         {/* Move User Modal */}
         {userToMove && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
-                <div className="p-4 bg-orange-50 border-b border-orange-100 flex justify-between items-center">
+             <div className="glass-panel rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
+                <div className="p-4 bg-orange-50/50 border-b border-orange-100 flex justify-between items-center">
                    <h3 className="font-bold text-orange-800">Mover Usuario de Familia</h3>
                    <button onClick={() => setUserToMove(null)}><X size={20} className="text-orange-400" /></button>
                 </div>
@@ -452,7 +452,7 @@ const AdminDashboard: React.FC = () => {
                    <select 
                       value={destinationFamilyId}
                       onChange={(e) => setDestinationFamilyId(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg mb-6 bg-white"
+                      className="w-full p-3 border border-gray-300 rounded-lg mb-6 bg-white/50"
                    >
                      <option value="" disabled>Selecciona familia...</option>
                      {familyIds.map(fid => (
@@ -461,8 +461,8 @@ const AdminDashboard: React.FC = () => {
                    </select>
                    
                    <div className="flex gap-3">
-                      <button onClick={() => setUserToMove(null)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
-                      <button onClick={confirmMoveUser} className="flex-1 py-2 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600">
+                      <button onClick={() => setUserToMove(null)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-white/50 rounded-lg transition-colors">Cancelar</button>
+                      <button onClick={confirmMoveUser} className="flex-1 py-2 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 shadow-glass">
                         Confirmar
                       </button>
                    </div>
@@ -472,18 +472,18 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {showAddFamily && (
-           <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col md:flex-row gap-3 items-end">
+           <div className="glass-panel p-4 rounded-xl flex flex-col md:flex-row gap-3 items-end">
              <div className="flex-1 w-full">
                <label className="text-xs font-bold text-orange-800 uppercase">Nombre Primer Progenitor</label>
-               <input value={newParentName} onChange={e => setNewParentName(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" placeholder="Ej. Juan Pérez" />
+               <input value={newParentName} onChange={e => setNewParentName(e.target.value)} className="w-full px-3 py-2 rounded border mt-1 bg-white/50" placeholder="Ej. Juan Pérez" />
              </div>
              <div className="w-24">
                <label className="text-xs font-bold text-orange-800 uppercase">PIN</label>
-               <input value={newParentPin} onChange={e => setNewParentPin(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" maxLength={4} />
+               <input value={newParentPin} onChange={e => setNewParentPin(e.target.value)} className="w-full px-3 py-2 rounded border mt-1 bg-white/50" maxLength={4} />
              </div>
              <div className="flex gap-2">
                <button onClick={() => setShowAddFamily(false)} className="px-4 py-2 text-gray-500">Cancelar</button>
-               <button onClick={handleCreateFamily} className="px-4 py-2 bg-orange-600 text-white rounded font-bold">Crear</button>
+               <button onClick={handleCreateFamily} className="px-4 py-2 bg-orange-600 text-white rounded font-bold hover:bg-orange-700">Crear</button>
              </div>
            </div>
         )}
@@ -501,8 +501,8 @@ const AdminDashboard: React.FC = () => {
              const isEditing = editingFamilyId === famId;
 
              return (
-               <div key={famId} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+               <div key={famId} className="glass-panel rounded-xl overflow-hidden">
+                 <div className="bg-white/50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-1">
                        <Home size={18} className="text-orange-500" />
                        <span className="font-bold text-gray-700">{familyName}</span>
@@ -512,13 +512,13 @@ const AdminDashboard: React.FC = () => {
                             <input 
                               value={newFamilyIdString}
                               onChange={e => setNewFamilyIdString(e.target.value)}
-                              className="px-2 py-0.5 text-xs border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                              className="px-2 py-0.5 text-xs border border-brand-300 rounded focus:ring-2 focus:ring-brand-500 bg-white/50"
                             />
                             <button onClick={() => handleSaveFamily(famId)} className="text-green-600 hover:text-green-800"><Save size={16} /></button>
                             <button onClick={() => setEditingFamilyId(null)} className="text-gray-500 hover:text-gray-700"><X size={16} /></button>
                          </div>
                        ) : (
-                         <span className="text-xs text-gray-400 bg-white px-2 py-0.5 rounded border border-gray-200">{famId}</span>
+                         <span className="text-xs text-gray-400 bg-white/50 px-2 py-0.5 rounded border border-gray-200">{famId}</span>
                        )}
                     </div>
 
@@ -527,7 +527,7 @@ const AdminDashboard: React.FC = () => {
                         <>
                           <button 
                             onClick={() => handleEditFamily(famId)}
-                            className="text-gray-400 hover:text-blue-500 p-1 rounded hover:bg-blue-50"
+                            className="text-gray-400 hover:text-brand-500 p-1 rounded hover:bg-brand-50"
                             title="Editar ID Familia"
                           >
                             <Edit2 size={16} />
@@ -545,7 +545,7 @@ const AdminDashboard: React.FC = () => {
                       
                       <button 
                         onClick={() => setAddingMemberToFamily(famId)}
-                        className="text-xs bg-white border border-gray-300 px-3 py-1 rounded hover:bg-gray-50 flex items-center gap-1 font-bold text-gray-600"
+                        className="text-xs bg-white/80 border border-gray-300 px-3 py-1 rounded hover:bg-white flex items-center gap-1 font-bold text-gray-600 transition-colors"
                       >
                         <UserPlus size={14} /> Añadir Miembro
                       </button>
@@ -554,22 +554,22 @@ const AdminDashboard: React.FC = () => {
                  
                  {/* Adding Member Form */}
                  {addingMemberToFamily === famId && (
-                   <div className="bg-blue-50/50 p-4 border-b border-blue-100 animate-in slide-in-from-top-2">
-                      <h5 className="text-xs font-bold text-blue-800 uppercase mb-2">Nuevo Miembro para {familyName}</h5>
+                   <div className="bg-brand-50/50 p-4 border-b border-brand-100 animate-in slide-in-from-top-2">
+                      <h5 className="text-xs font-bold text-brand-800 uppercase mb-2">Nuevo Miembro para {familyName}</h5>
                       <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-2">
                         <select 
                           value={newMemberRole} 
                           onChange={e => setNewMemberRole(e.target.value as Role)}
-                          className="px-2 py-2 rounded border border-gray-300 text-sm"
+                          className="px-2 py-2 rounded border border-gray-300 text-sm bg-white/50"
                         >
                           <option value={Role.PARENT}>Padre/Madre</option>
                           <option value={Role.STUDENT}>Alumno/Hijo</option>
                         </select>
-                        <input value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Nombre" className="px-2 py-2 rounded border border-gray-300 text-sm" />
-                        <input value={newMemberPin} onChange={e => setNewMemberPin(e.target.value)} placeholder="PIN" maxLength={4} className="px-2 py-2 rounded border border-gray-300 text-sm" />
+                        <input value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Nombre" className="px-2 py-2 rounded border border-gray-300 text-sm bg-white/50" />
+                        <input value={newMemberPin} onChange={e => setNewMemberPin(e.target.value)} placeholder="PIN" maxLength={4} className="px-2 py-2 rounded border border-gray-300 text-sm bg-white/50" />
                         
                         {newMemberRole === Role.STUDENT && (
-                          <select value={newMemberClass} onChange={e => setNewMemberClass(e.target.value)} className="px-2 py-2 rounded border border-gray-300 text-sm">
+                          <select value={newMemberClass} onChange={e => setNewMemberClass(e.target.value)} className="px-2 py-2 rounded border border-gray-300 text-sm bg-white/50">
                              <option value="">Clase...</option>
                              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                           </select>
@@ -577,7 +577,7 @@ const AdminDashboard: React.FC = () => {
                       </div>
                       <div className="flex justify-end gap-2">
                          <button onClick={() => setAddingMemberToFamily(null)} className="text-xs text-gray-500 font-bold px-3 py-1">Cancelar</button>
-                         <button onClick={handleAddMember} className="text-xs bg-blue-600 text-white font-bold px-3 py-1 rounded">Guardar Miembro</button>
+                         <button onClick={handleAddMember} className="text-xs bg-brand-600 text-white font-bold px-3 py-1 rounded hover:bg-brand-700">Guardar Miembro</button>
                       </div>
                    </div>
                  )}
@@ -587,7 +587,7 @@ const AdminDashboard: React.FC = () => {
                        <h5 className="text-xs font-bold text-gray-400 uppercase mb-2">Padres / Tutores</h5>
                        <ul className="space-y-2">
                          {parents.map(p => (
-                           <li key={p.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
+                           <li key={p.id} className="flex items-center justify-between bg-white/40 px-3 py-2 rounded-lg hover:bg-white/60 transition-colors">
                              <span className="text-sm font-medium">{p.name} <span className="text-gray-400 text-xs font-mono ml-1">PIN: {p.pin}</span></span>
                              <div className="flex items-center gap-1">
                                <button 
@@ -608,7 +608,7 @@ const AdminDashboard: React.FC = () => {
                        <h5 className="text-xs font-bold text-gray-400 uppercase mb-2">Hijos / Alumnos</h5>
                        <ul className="space-y-2">
                          {students.map(s => (
-                           <li key={s.id} className="flex items-center justify-between bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-50">
+                           <li key={s.id} className="flex items-center justify-between bg-brand-50/50 px-3 py-2 rounded-lg border border-brand-50 hover:bg-brand-50 transition-colors">
                              <div className="flex items-center gap-2">
                                <Avatar config={s.avatarConfig} size={24} />
                                <div className="flex flex-col">
@@ -668,9 +668,9 @@ const AdminDashboard: React.FC = () => {
               For now, we focus on editing existing ones as requested. */}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-panel rounded-xl overflow-hidden">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="bg-white/50 border-b border-gray-100">
                <tr>
                  <th className="p-4 text-xs font-bold text-gray-500 uppercase">Título de la Tarea</th>
                  <th className="p-4 text-xs font-bold text-gray-500 uppercase">Creada Por</th>
@@ -691,12 +691,12 @@ const AdminDashboard: React.FC = () => {
 
                  if (isEditing) {
                    return (
-                     <tr key={task.id} className="bg-blue-50">
+                     <tr key={task.id} className="bg-brand-50/50">
                        <td className="p-4">
                          <input 
                            value={editTaskTitle}
                            onChange={e => setEditTaskTitle(e.target.value)}
-                           className="w-full px-2 py-1 border rounded"
+                           className="w-full px-2 py-1 border rounded bg-white/50"
                            placeholder="Título"
                          />
                        </td>
@@ -706,7 +706,7 @@ const AdminDashboard: React.FC = () => {
                            type="number"
                            value={editTaskPoints}
                            onChange={e => setEditTaskPoints(Number(e.target.value))}
-                           className="w-20 px-2 py-1 border rounded"
+                           className="w-20 px-2 py-1 border rounded bg-white/50"
                          />
                        </td>
                        <td className="p-4">
@@ -726,10 +726,10 @@ const AdminDashboard: React.FC = () => {
                  }
 
                  return (
-                   <tr key={task.id} className="hover:bg-gray-50">
+                   <tr key={task.id} className="hover:bg-white/40 transition-colors">
                      <td className="p-4 font-bold text-gray-700">{task.title}</td>
                      <td className="p-4 text-sm text-gray-500">{creator?.name || 'Desconocido'}</td>
-                     <td className="p-4 font-mono text-blue-600 font-bold">+{task.points}</td>
+                     <td className="p-4 font-mono text-brand-600 font-bold">+{task.points}</td>
                      <td className="p-4">
                        {task.isPriority ? (
                          <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full border border-red-200">PRIORIDAD</span>
@@ -738,7 +738,7 @@ const AdminDashboard: React.FC = () => {
                        )}
                      </td>
                      <td className="p-4 text-right">
-                       <button onClick={() => startEditingTask(task)} className="text-blue-500 hover:text-blue-700 mr-2"><Edit2 size={18} /></button>
+                       <button onClick={() => startEditingTask(task)} className="text-brand-500 hover:text-brand-700 mr-2"><Edit2 size={18} /></button>
                        <button onClick={() => { if(confirm('¿Eliminar esta tarea para todos los alumnos?')) deleteTask(task.id) }} className="text-red-400 hover:text-red-600"><Trash2 size={18} /></button>
                      </td>
                    </tr>
@@ -752,26 +752,26 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Admin Header */}
-      <header className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-md">
+    <div className="min-h-screen flex flex-col">
+      {/* Admin Header - Glass Dark */}
+      <header className="glass-dark text-white px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-glass">
          <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain bg-gray-800 rounded p-1" onError={(e) => e.currentTarget.style.display = 'none'} />
+            <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain bg-white/10 rounded p-1 backdrop-blur-sm" onError={(e) => e.currentTarget.style.display = 'none'} />
             <div className="flex items-center gap-3">
-              <div className="bg-gray-700 p-2 rounded-lg">
-                 <ShieldIcon />
+              <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                 <Shield size={24} />
               </div>
               <div>
                 <h1 className="font-bold text-lg">Panel de Administración</h1>
-                <p className="text-xs text-gray-400">Prisma System</p>
+                <p className="text-xs text-white/60">Prisma System</p>
               </div>
            </div>
          </div>
          <div className="flex items-center gap-4">
-             <button onClick={() => setShowChangePin(true)} className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold">
+             <button onClick={() => setShowChangePin(true)} className="text-white/70 hover:text-white flex items-center gap-2 text-sm font-bold transition-colors">
                 <Key size={18} /> Cambiar PIN
              </button>
-             <button onClick={logout} className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold">
+             <button onClick={logout} className="text-white/70 hover:text-white flex items-center gap-2 text-sm font-bold transition-colors">
                 <LogOut size={18} /> Salir
              </button>
          </div>
@@ -780,7 +780,7 @@ const AdminDashboard: React.FC = () => {
       {/* Change PIN Modal */}
       {showChangePin && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm animate-in zoom-in duration-200">
+             <div className="glass-panel rounded-xl shadow-glass p-6 w-full max-w-sm animate-in zoom-in duration-200">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Cambiar PIN de Administrador</h3>
                 <input
                   type="text"
@@ -788,18 +788,18 @@ const AdminDashboard: React.FC = () => {
                   onChange={e => setNewAdminPin(e.target.value)}
                   maxLength={4}
                   placeholder="Nuevo PIN (4 dígitos)"
-                  className="w-full px-4 py-2 border rounded-lg mb-4 text-center font-mono text-xl tracking-widest"
+                  className="w-full px-4 py-2 border rounded-lg mb-4 text-center font-mono text-xl tracking-widest bg-white/50"
                 />
                 <div className="flex gap-2">
-                   <button onClick={() => setShowChangePin(false)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
-                   <button onClick={handleChangePin} className="flex-1 py-2 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800">Guardar</button>
+                   <button onClick={() => setShowChangePin(false)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-white/50 rounded-lg transition-colors">Cancelar</button>
+                   <button onClick={handleChangePin} className="flex-1 py-2 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 shadow-glass">Guardar</button>
                 </div>
              </div>
           </div>
       )}
       
       {/* Tabs */}
-      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-10">
+      <div className="glass-header px-6 sticky top-[72px] z-10">
         <div className="flex gap-6 overflow-x-auto">
           <TabButton active={activeTab === 'CLASSES'} onClick={() => setActiveTab('CLASSES')} icon={<School size={18}/>} label="Gestión Clases" />
           <TabButton active={activeTab === 'TUTORS'} onClick={() => setActiveTab('TUTORS')} icon={<GraduationCap size={18}/>} label="Gestión Profesores" />
@@ -823,14 +823,10 @@ const AdminDashboard: React.FC = () => {
 const TabButton: React.FC<{ active: boolean, onClick: () => void, icon: React.ReactNode, label: string }> = ({ active, onClick, icon, label }) => (
   <button 
     onClick={onClick}
-    className={`flex items-center gap-2 py-4 border-b-2 font-bold text-sm transition-colors whitespace-nowrap ${active ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+    className={`flex items-center gap-2 py-4 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${active ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
   >
     {icon} {label}
   </button>
-);
-
-const ShieldIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
 );
 
 export default AdminDashboard;
