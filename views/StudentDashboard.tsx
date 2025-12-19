@@ -7,7 +7,7 @@ import { AVATAR_ITEMS } from '../constants';
 import { ShoppingBag, Star, LogOut, Shirt, CheckCircle, Settings, X, MessageSquare, Send, History, Clock } from 'lucide-react';
 
 const StudentDashboard: React.FC = () => {
-  const { users, currentUser, tasks, completions, completeTask, logout, buyAvatarItem, redeemReward, rewards, updatePin, messages, sendMessage, redemptions } = useData();
+  const { users, currentUser, tasks, completions, completeTask, logout, buyAvatarItem, redeemReward, rewards, updatePin, messages, sendMessage, redemptions, markMessagesRead } = useData();
   const [activeTab, setActiveTab] = useState<'tasks' | 'shop' | 'chat'>('tasks');
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'SCHOOL' | 'HOME'>('ALL');
   
@@ -22,6 +22,7 @@ const StudentDashboard: React.FC = () => {
   // Messaging
   const [chatMessage, setChatMessage] = useState('');
   const tutor = users.find(u => u.role === Role.TUTOR && u.classId === currentUser?.classId);
+  const unreadMessages = tutor && currentUser ? messages.filter(m => m.fromId === tutor.id && m.toId === currentUser.id && !m.read).length : 0;
 
   // Logic to find priority tasks
   const myTasks = tasks.filter(t => 
@@ -41,6 +42,12 @@ const StudentDashboard: React.FC = () => {
       setPriorityAck(pendingPriorityTask.id);
     }
   }, [pendingPriorityTask]);
+
+  useEffect(() => {
+    if (activeTab === 'chat' && tutor && currentUser && unreadMessages > 0) {
+        markMessagesRead(tutor.id, currentUser.id);
+    }
+  }, [activeTab, tutor, currentUser, unreadMessages]);
 
   const handlePriorityAck = () => {
     setPriorityAck(null);
@@ -212,8 +219,13 @@ const StudentDashboard: React.FC = () => {
 
           <button 
             onClick={() => setActiveTab('chat')}
-            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 ${activeTab === 'chat' ? 'bg-indigo-500 border-indigo-700 text-white shadow-lg shadow-indigo-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
+            className={`flex flex-col items-center justify-center p-4 rounded-3xl border-b-4 transition-all duration-200 active:scale-95 relative ${activeTab === 'chat' ? 'bg-indigo-500 border-indigo-700 text-white shadow-lg shadow-indigo-200 translate-y-0' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}
           >
+            {unreadMessages > 0 && (
+                <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-white animate-bounce">
+                    {unreadMessages}
+                </div>
+            )}
             <div className={`p-2 rounded-2xl mb-1 ${activeTab === 'chat' ? 'bg-white/20' : 'bg-gray-100'}`}>
               <MessageSquare size={28} />
             </div>
