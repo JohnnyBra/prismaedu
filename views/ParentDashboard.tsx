@@ -93,7 +93,7 @@ const ParentDashboard: React.FC = () => {
     <div className="min-h-screen bg-orange-50 flex flex-col">
        <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
+          <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex items-center gap-3">
             <div className="bg-orange-500 p-2 rounded-lg text-white">
               <Home size={24} />

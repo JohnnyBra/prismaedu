@@ -97,7 +97,7 @@ const StudentDashboard: React.FC = () => {
         <div className="flex justify-between items-center max-w-4xl mx-auto">
           <div className="flex items-center gap-4">
              {/* Logo hidden on mobile to save space, maybe */}
-             <img src="/logo.png" alt="Logo" className="hidden md:block h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
+             <img src="/logo.png" alt="Logo" className="hidden md:block h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
 
             <div className="flex items-center gap-3 bg-indigo-50 p-2 pr-4 rounded-full border-2 border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-colors" onClick={() => setShowSettings(true)}>
                <Avatar config={currentUser?.avatarConfig} size={48} className="border-2 border-white shadow-sm" />
