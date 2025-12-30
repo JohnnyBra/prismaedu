@@ -12,6 +12,9 @@ export type ContextType = 'SCHOOL' | 'HOME'; // Determines where the task/reward
 export interface ClassGroup {
   id: string;
   name: string;
+  stage?: string;
+  cycle?: string;
+  level?: string;
 }
 
 // Avatar System
