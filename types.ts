@@ -1,6 +1,8 @@
 
 export enum Role {
   ADMIN = 'ADMIN',     // System Administrator
+  DIRECCION = 'DIRECCION', // Management/Principal
+  TESORERIA = 'TESORERIA', // Treasury
   TUTOR = 'TUTOR',     // Super Admin (Teacher) - Manages the whole class
   PARENT = 'PARENT',   // Family Admin - Manages only their kids
   STUDENT = 'STUDENT'  // The User doing tasks
