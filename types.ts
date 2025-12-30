@@ -46,6 +46,8 @@ export interface User {
   inventory?: string[]; // IDs of owned avatar items
   points: number;       // Unified balance
   pin: string;          // Simple login PIN (e.g., '0000')
+  email?: string;       // For Google Auth
+  altPin?: string;      // Alternative PIN
 }
 
 // Task Entity

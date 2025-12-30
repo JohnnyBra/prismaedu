@@ -26,6 +26,8 @@ const AdminDashboard: React.FC = () => {
   const [newTutorName, setNewTutorName] = useState('');
   const [newTutorClass, setNewTutorClass] = useState('');
   const [newTutorPin, setNewTutorPin] = useState('9999');
+  const [newTutorEmail, setNewTutorEmail] = useState('');
+  const [newTutorAltPin, setNewTutorAltPin] = useState('');
 
   const [showAddFamily, setShowAddFamily] = useState(false);
   const [newFamilyName, setNewFamilyName] = useState(''); // Just used to generate a family ID logic
@@ -178,12 +180,16 @@ const AdminDashboard: React.FC = () => {
         name: newTutorName,
         role: Role.TUTOR,
         pin: newTutorPin,
+        email: newTutorEmail,
+        altPin: newTutorAltPin,
         classId: newTutorClass || undefined,
         points: 0
       });
       setNewTutorName('');
       setNewTutorClass('');
       setNewTutorPin('9999');
+      setNewTutorEmail('');
+      setNewTutorAltPin('');
       setShowAddTutor(false);
     }
   };
@@ -368,11 +374,13 @@ const AdminDashboard: React.FC = () => {
             <h4 className="font-bold text-indigo-800 text-sm">Nuevo Profesor</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <input value={newTutorName} onChange={e => setNewTutorName(e.target.value)} placeholder="Nombre" className="px-3 py-2 rounded border" />
+              <input value={newTutorEmail} onChange={e => setNewTutorEmail(e.target.value)} placeholder="Email (Google Auth)" className="px-3 py-2 rounded border" />
               <select value={newTutorClass} onChange={e => setNewTutorClass(e.target.value)} className="px-3 py-2 rounded border">
                 <option value="">Sin Clase Asignada</option>
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
               <input value={newTutorPin} onChange={e => setNewTutorPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="px-3 py-2 rounded border" />
+              <input value={newTutorAltPin} onChange={e => setNewTutorAltPin(e.target.value)} placeholder="PIN Alternativo" maxLength={4} className="px-3 py-2 rounded border" />
             </div>
             <div className="flex gap-2 justify-end">
                <button onClick={() => setShowAddTutor(false)} className="px-4 py-2 text-gray-600 text-sm font-bold">Cancelar</button>

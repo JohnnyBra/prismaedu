@@ -49,32 +49,35 @@ const generateSchoolData = async () => {
     // --- 3. Generate Users ---
 
     // SuperAdmin
-    users.push({ id: 'admin', name: 'Administrador', role: 'ADMIN', points: 0, pin: '2222' });
+    users.push({
+        id: 'admin',
+        name: 'Administrador',
+        role: 'ADMIN',
+        points: 0,
+        pin: '2222',
+        email: 'admin@colegiolahispanidad.es',
+        altPin: '2222'
+    });
 
     // Generate 1 Teacher per Class + Students + Parents
-    // NOTE: This might be too much data for a small VPS if we generate 24 students * 30 classes = 720 students.
-    // I will generate 1 Teacher per class, but only populate ONE class with students for demo/performance,
-    // or just a few students per class.
-    // The prompt implies "Generate the relational structure", and "Seeding script".
-    // I will generate teachers for all classes, but students for only a subset to avoid bloating the KV store too much,
-    // unless strictly required. However, "generar 24 Alumno/Parent pairs" was in the original code.
-    // I'll stick to populating 2 classes fully (Infantil 3 Años A and 6º Primaria A) as examples,
-    // and just teachers for the rest, to keep it sane.
-    // actually, let's create teachers for all.
 
     classes.forEach((cls) => {
         const teacherId = `teacher_${cls.id}`;
+        // Create email based on class name to be somewhat realistic
+        const emailSafeName = cls.name.toLowerCase().replace(/º| /g, '').replace(/ñ/g, 'n');
+
         users.push({
             id: teacherId,
             name: `Tutor ${cls.name}`,
             role: 'TUTOR',
             classId: cls.id,
             points: 0,
-            pin: '0000'
+            pin: '0000',
+            email: `tutor.${emailSafeName}@colegiolahispanidad.es`,
+            altPin: '0000'
         });
 
-        // Populate '1º Primaria A' (for demo) fully, others empty or minimal?
-        // Let's populate '1º Primaria A' and '1º ESO A'
+        // Populate '1º Primaria A' and '1º ESO A' fully for demo
         if (cls.name === '1º Primaria A' || cls.name === '1º ESO A') {
             for (let i = 1; i <= 24; i++) {
                 const studentId = `student_${cls.id}_${i}`;
@@ -85,6 +88,9 @@ const generateSchoolData = async () => {
                 while (surname2 === surname1) {
                     surname2 = SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
                 }
+
+                // Student Email (optional, but good for consistency)
+                const studentEmail = `alumno${i}.${emailSafeName}@colegiolahispanidad.es`;
 
                 // Student
                 users.push({
@@ -97,6 +103,8 @@ const generateSchoolData = async () => {
                     familyId: familyId,
                     points: 100,
                     pin: '0000',
+                    altPin: '0000',
+                    email: studentEmail,
                     inventory: ['base_1', 'top_1', 'bot_1'],
                     avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' }
                 });
@@ -108,7 +116,9 @@ const generateSchoolData = async () => {
                     role: 'PARENT',
                     familyId: familyId,
                     points: 0,
-                    pin: '0000'
+                    pin: '0000',
+                    altPin: '0000',
+                    email: `familia${i}.${emailSafeName}@colegiolahispanidad.es`
                 });
             }
         }
