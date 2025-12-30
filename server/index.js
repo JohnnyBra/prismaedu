@@ -287,7 +287,26 @@ io.on('connection', async (socket) => {
 // API routes will be added before it.
 
 // Start Server
-initDB().then(() => {
+initDB().then(async () => {
+  // Ensure Admin User Exists
+  const users = await getData('users', []);
+  const adminExists = users.some(u => u.role === 'ADMIN');
+
+  if (!adminExists) {
+    console.log('Admin user missing. Creating default admin user...');
+    users.push({
+        id: 'admin',
+        name: 'Administrador',
+        role: 'ADMIN',
+        points: 0,
+        pin: '2222',
+        email: 'admin@colegiolahispanidad.es',
+        altPin: '2222'
+    });
+    await setData('users', users);
+    console.log('Default admin user created.');
+  }
+
   httpServer.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
