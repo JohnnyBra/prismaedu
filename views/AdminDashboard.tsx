@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useData } from '../context/DataContext';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase } from 'lucide-react';
 import Avatar from '../components/Avatar';
 
-type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS';
+type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
 
 const AdminDashboard: React.FC = () => {
   const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin } = useData();
@@ -22,12 +22,22 @@ const AdminDashboard: React.FC = () => {
   const [showAddClass, setShowAddClass] = useState(false);
   const [newClassName, setNewClassName] = useState('');
 
+  // Tutor & Staff Creation/Editing States
   const [showAddTutor, setShowAddTutor] = useState(false);
+  const [editingTutorId, setEditingTutorId] = useState<string | null>(null);
   const [newTutorName, setNewTutorName] = useState('');
   const [newTutorClass, setNewTutorClass] = useState('');
   const [newTutorPin, setNewTutorPin] = useState('9999');
   const [newTutorEmail, setNewTutorEmail] = useState('');
   const [newTutorAltPin, setNewTutorAltPin] = useState('');
+
+  // Staff Creation State
+  const [showAddStaff, setShowAddStaff] = useState(false);
+  const [newStaffName, setNewStaffName] = useState('');
+  const [newStaffRole, setNewStaffRole] = useState<Role>(Role.ADMIN);
+  const [newStaffPin, setNewStaffPin] = useState('2222');
+  const [newStaffEmail, setNewStaffEmail] = useState('');
+  const [newStaffAltPin, setNewStaffAltPin] = useState('');
 
   const [showAddFamily, setShowAddFamily] = useState(false);
   const [newFamilyName, setNewFamilyName] = useState(''); // Just used to generate a family ID logic
@@ -176,21 +186,61 @@ const AdminDashboard: React.FC = () => {
 
   const handleCreateTutor = () => {
     if (newTutorName && newTutorPin) {
-      addUser({
-        name: newTutorName,
-        role: Role.TUTOR,
-        pin: newTutorPin,
-        email: newTutorEmail,
-        altPin: newTutorAltPin,
-        classId: newTutorClass || undefined,
-        points: 0
-      });
+      if (editingTutorId) {
+        updateUser(editingTutorId, {
+          name: newTutorName,
+          pin: newTutorPin,
+          email: newTutorEmail,
+          altPin: newTutorAltPin,
+          classId: newTutorClass || undefined
+        });
+        setEditingTutorId(null);
+      } else {
+        addUser({
+          name: newTutorName,
+          role: Role.TUTOR,
+          pin: newTutorPin,
+          email: newTutorEmail,
+          altPin: newTutorAltPin,
+          classId: newTutorClass || undefined,
+          points: 0
+        });
+      }
       setNewTutorName('');
       setNewTutorClass('');
       setNewTutorPin('9999');
       setNewTutorEmail('');
       setNewTutorAltPin('');
       setShowAddTutor(false);
+    }
+  };
+
+  const handleEditTutor = (tutor: User) => {
+    setEditingTutorId(tutor.id);
+    setNewTutorName(tutor.name);
+    setNewTutorClass(tutor.classId || '');
+    setNewTutorPin(tutor.pin);
+    setNewTutorEmail(tutor.email || '');
+    setNewTutorAltPin(tutor.altPin || '');
+    setShowAddTutor(true);
+  };
+
+  const handleCreateStaff = () => {
+    if (newStaffName && newStaffPin) {
+      addUser({
+        name: newStaffName,
+        role: newStaffRole,
+        pin: newStaffPin,
+        email: newStaffEmail,
+        altPin: newStaffAltPin,
+        points: 0
+      });
+      setNewStaffName('');
+      setNewStaffRole(Role.ADMIN);
+      setNewStaffPin('2222');
+      setNewStaffEmail('');
+      setNewStaffAltPin('');
+      setShowAddStaff(false);
     }
   };
 
@@ -364,14 +414,14 @@ const AdminDashboard: React.FC = () => {
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">Profesores / Tutores</h2>
-          <button onClick={() => setShowAddTutor(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700">
+          <button onClick={() => { setEditingTutorId(null); setNewTutorName(''); setNewTutorClass(''); setNewTutorPin('9999'); setNewTutorEmail(''); setNewTutorAltPin(''); setShowAddTutor(true); }} className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700">
             <Plus size={18} /> Añadir Profesor
           </button>
         </div>
 
         {showAddTutor && (
           <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 grid gap-3">
-            <h4 className="font-bold text-indigo-800 text-sm">Nuevo Profesor</h4>
+            <h4 className="font-bold text-indigo-800 text-sm">{editingTutorId ? 'Editar Profesor' : 'Nuevo Profesor'}</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <input value={newTutorName} onChange={e => setNewTutorName(e.target.value)} placeholder="Nombre" className="px-3 py-2 rounded border" />
               <input value={newTutorEmail} onChange={e => setNewTutorEmail(e.target.value)} placeholder="Email (Google Auth)" className="px-3 py-2 rounded border" />
@@ -414,8 +464,84 @@ const AdminDashboard: React.FC = () => {
                       </select>
                    </td>
                    <td className="p-4 font-mono text-gray-500">{tutor.pin}</td>
-                   <td className="p-4 text-right">
+                   <td className="p-4 text-right flex items-center justify-end gap-2">
+                     <button onClick={() => handleEditTutor(tutor)} className="text-gray-400 hover:text-indigo-600"><Edit2 size={18} /></button>
                      <button onClick={() => { if(confirm('¿Eliminar profesor?')) deleteUser(tutor.id) }} className="text-red-400 hover:text-red-600"><Trash2 size={18} /></button>
+                   </td>
+                 </tr>
+               ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStaffTab = () => {
+    const staff = users
+       .filter(u => u.role === Role.ADMIN || u.role === Role.DIRECCION || u.role === Role.TESORERIA)
+       .sort((a, b) => a.role.localeCompare(b.role) || a.name.localeCompare(b.name));
+
+    return (
+      <div className="space-y-4 animate-in fade-in duration-300">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-800">Personal del Centro</h2>
+          <button onClick={() => setShowAddStaff(true)} className="bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-900">
+            <Plus size={18} /> Añadir Personal
+          </button>
+        </div>
+
+        {showAddStaff && (
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 grid gap-3">
+            <h4 className="font-bold text-gray-800 text-sm">Nuevo Usuario Personal</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <input value={newStaffName} onChange={e => setNewStaffName(e.target.value)} placeholder="Nombre" className="px-3 py-2 rounded border" />
+              <select value={newStaffRole} onChange={e => setNewStaffRole(e.target.value as Role)} className="px-3 py-2 rounded border">
+                <option value={Role.ADMIN}>Administrador</option>
+                <option value={Role.DIRECCION}>Dirección</option>
+                <option value={Role.TESORERIA}>Tesorería</option>
+              </select>
+              <input value={newStaffEmail} onChange={e => setNewStaffEmail(e.target.value)} placeholder="Email (Opcional)" className="px-3 py-2 rounded border" />
+              <input value={newStaffPin} onChange={e => setNewStaffPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="px-3 py-2 rounded border" />
+              <input value={newStaffAltPin} onChange={e => setNewStaffAltPin(e.target.value)} placeholder="PIN Alternativo" maxLength={4} className="px-3 py-2 rounded border" />
+            </div>
+            <div className="flex gap-2 justify-end">
+               <button onClick={() => setShowAddStaff(false)} className="px-4 py-2 text-gray-600 text-sm font-bold">Cancelar</button>
+               <button onClick={handleCreateStaff} className="px-4 py-2 bg-gray-800 text-white rounded text-sm font-bold">Guardar</button>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b border-gray-100">
+               <tr>
+                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Nombre</th>
+                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Rol</th>
+                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Email</th>
+                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">PIN</th>
+                 <th className="p-4 text-xs font-bold text-gray-500 uppercase text-right">Acciones</th>
+               </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+               {staff.map(user => (
+                 <tr key={user.id} className="hover:bg-gray-50">
+                   <td className="p-4 font-bold text-gray-700">{user.name}</td>
+                   <td className="p-4">
+                     <span className={`text-[10px] font-bold px-2 py-1 rounded border ${
+                       user.role === Role.ADMIN ? 'bg-gray-100 border-gray-300 text-gray-700' :
+                       user.role === Role.DIRECCION ? 'bg-purple-100 border-purple-200 text-purple-700' :
+                       'bg-green-100 border-green-200 text-green-700'
+                     }`}>
+                       {user.role}
+                     </span>
+                   </td>
+                   <td className="p-4 text-sm text-gray-500">{user.email || '-'}</td>
+                   <td className="p-4 font-mono text-gray-500">{user.pin}</td>
+                   <td className="p-4 text-right">
+                     {user.id !== 'admin' && (
+                       <button onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(user.id) }} className="text-red-400 hover:text-red-600"><Trash2 size={18} /></button>
+                     )}
                    </td>
                  </tr>
                ))}
@@ -817,6 +943,7 @@ const AdminDashboard: React.FC = () => {
           <TabButton active={activeTab === 'TUTORS'} onClick={() => setActiveTab('TUTORS')} icon={<GraduationCap size={18}/>} label="Gestión Profesores" />
           <TabButton active={activeTab === 'FAMILIES'} onClick={() => setActiveTab('FAMILIES')} icon={<Users size={18}/>} label="Gestión Familias" />
           <TabButton active={activeTab === 'TASKS'} onClick={() => setActiveTab('TASKS')} icon={<BookOpen size={18}/>} label="Gestión Tareas" />
+          <TabButton active={activeTab === 'STAFF'} onClick={() => setActiveTab('STAFF')} icon={<Briefcase size={18}/>} label="Personal" />
         </div>
       </div>
 
@@ -826,6 +953,7 @@ const AdminDashboard: React.FC = () => {
          {activeTab === 'TUTORS' && renderTutorsTab()}
          {activeTab === 'FAMILIES' && renderFamiliesTab()}
          {activeTab === 'TASKS' && renderTasksTab()}
+         {activeTab === 'STAFF' && renderStaffTab()}
       </main>
     </div>
   );

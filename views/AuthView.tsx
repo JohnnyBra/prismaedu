@@ -251,7 +251,7 @@ const AuthView: React.FC = () => {
     let filteredUsers: User[] = [];
 
     if (selectedContext === 'ADMIN') {
-       filteredUsers = users.filter(u => u.role === Role.ADMIN);
+       filteredUsers = users.filter(u => u.role === Role.ADMIN || u.role === Role.DIRECCION || u.role === Role.TESORERIA);
     } else if (selectedContext === 'SCHOOL') {
       // Show Tutors
       filteredUsers = users.filter(u => u.role === Role.TUTOR);
@@ -274,8 +274,8 @@ const AuthView: React.FC = () => {
               className="bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all flex flex-col items-center border border-white/20"
             >
               <div className="mb-3">
-                 {user.role === Role.TUTOR || user.role === Role.PARENT || user.role === Role.ADMIN ? (
-                    <div className={`w-20 h-20 rounded-full flex items-center justify-center ${user.role === Role.ADMIN ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                 {user.role === Role.TUTOR || user.role === Role.PARENT || user.role === Role.ADMIN || user.role === Role.DIRECCION || user.role === Role.TESORERIA ? (
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center ${user.role === Role.ADMIN || user.role === Role.DIRECCION || user.role === Role.TESORERIA ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-500'}`}>
                         {user.role === Role.TUTOR ? <GraduationCap size={40} /> : user.role === Role.ADMIN ? <Shield size={40} /> : <UserIcon size={40} />}
                     </div>
                  ) : (
@@ -284,7 +284,7 @@ const AuthView: React.FC = () => {
               </div>
               <span className="font-bold text-gray-800 text-center text-sm">{user.name}</span>
               <span className="text-xs text-gray-400 uppercase mt-1">
-                 {user.role === Role.TUTOR ? 'Profesor' : user.role === Role.PARENT ? 'Admin Familia' : user.role === Role.ADMIN ? 'Administrador' : 'Alumno'}
+                 {user.role === Role.TUTOR ? 'Profesor' : user.role === Role.PARENT ? 'Admin Familia' : user.role === Role.ADMIN ? 'Administrador' : user.role === Role.DIRECCION ? 'Dirección' : user.role === Role.TESORERIA ? 'Tesorería' : 'Alumno'}
               </span>
             </button>
           ))}
