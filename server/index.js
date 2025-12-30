@@ -155,7 +155,8 @@ app.post('/api/auth/external-check', async (req, res) => {
         success: true,
         role: user.role,
         name: user.name,
-        id: user.id
+        id: user.id,
+        email: user.email
       });
     } else {
       return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
@@ -199,7 +200,8 @@ app.get('/api/export/students', checkApiSecret, async (req, res) => {
             id: u.id,
             name: u.name,
             classId: u.classId,
-            familyId: u.familyId
+            familyId: u.familyId,
+            email: u.email
         }));
         res.json(students);
     } catch (e) {
@@ -215,7 +217,8 @@ app.get('/api/export/users', checkApiSecret, async (req, res) => {
             id: u.id,
             name: u.name,
             classId: u.classId,
-            role: u.role
+            role: u.role,
+            email: u.email
         }));
         res.json(teachers);
     } catch (e) {
