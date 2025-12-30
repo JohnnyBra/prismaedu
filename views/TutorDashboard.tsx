@@ -152,7 +152,7 @@ const TutorDashboard: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 w-full">
             {/* External Tools */}
-            <a href="https://bibliohispa.es/" target="_blank" rel="noopener noreferrer" 
+            <a href="https://bibliohispa.es/"
             className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-emerald-500">
             <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                 <BookOpen size={28} />
@@ -164,7 +164,7 @@ const TutorDashboard: React.FC = () => {
             <ArrowRight size={20} className="text-gray-400" />
             </a>
 
-            <a href="https://aulas.bibliohispa.es/" target="_blank" rel="noopener noreferrer" 
+            <a href="https://aulas.bibliohispa.es/"
             className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-purple-500">
             <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                 <Monitor size={28} />
@@ -176,7 +176,7 @@ const TutorDashboard: React.FC = () => {
             <ArrowRight size={20} className="text-gray-400" />
             </a>
 
-            <a href="https://excursiones.bibliohispa.es/" target="_blank" rel="noopener noreferrer" 
+            <a href="https://excursiones.bibliohispa.es/"
             className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all group flex items-center gap-4 border-l-4 border-orange-500">
             <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
                 <Map size={28} />
