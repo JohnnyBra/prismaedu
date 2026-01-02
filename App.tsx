@@ -16,6 +16,8 @@ const Main: React.FC = () => {
 
   switch (currentUser.role) {
     case Role.ADMIN:
+    case Role.DIRECCION:
+    case Role.TESORERIA:
       return <AdminDashboard />;
     case Role.TUTOR:
       return <TutorDashboard />;
