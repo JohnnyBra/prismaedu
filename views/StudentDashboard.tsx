@@ -105,7 +105,7 @@ const StudentDashboard: React.FC = () => {
       </div>
 
       {/* Top Bar - Child Friendly Redesign */}
-      <div className="bg-white border-b-4 border-indigo-200 p-4 sticky top-0 z-20 shadow-sm">
+      <div className="bg-white border-b-4 border-indigo-200 p-4 sticky top-0 z-50 shadow-sm">
         <div className="flex justify-between items-center max-w-4xl mx-auto">
           <div className="flex items-center gap-4">
              {/* Logo hidden on mobile to save space, maybe */}
