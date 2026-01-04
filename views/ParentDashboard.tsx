@@ -98,7 +98,7 @@ const ParentDashboard: React.FC = () => {
           <img src="/watermark.png" className="opacity-5 w-[60%] max-w-[500px] object-contain" />
       </div>
 
-       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center relative z-10">
+       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
           <div className="flex items-center gap-3">
@@ -149,7 +149,7 @@ const ParentDashboard: React.FC = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-10 mb-6 flex justify-center">
+      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-40 mb-6 flex justify-center">
          <div className="flex gap-8">
             <button
               onClick={() => setActiveTab('DASHBOARD')}
