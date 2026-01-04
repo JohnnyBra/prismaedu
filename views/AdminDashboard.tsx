@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useData } from '../context/DataContext';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon } from 'lucide-react';
 import Avatar from '../components/Avatar';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
@@ -13,6 +13,12 @@ const AdminDashboard: React.FC = () => {
   // Local state for edits/creation
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+
+  // Class Detail State
+  const [selectedClassForDetail, setSelectedClassForDetail] = useState<any | null>(null);
+  const [editingStudent, setEditingStudent] = useState<User | null>(null);
+  const [editStudentName, setEditStudentName] = useState('');
+  const [editStudentPin, setEditStudentPin] = useState('');
   
   // CSV Import State
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -372,10 +378,199 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleEditStudent = (student: User) => {
+    setEditingStudent(student);
+    setEditStudentName(student.name);
+    setEditStudentPin(student.pin);
+  };
+
+  const handleSaveStudent = () => {
+    if (editingStudent && editStudentName) {
+      updateUser(editingStudent.id, {
+        name: editStudentName,
+        pin: editStudentPin
+      });
+      setEditingStudent(null);
+    }
+  };
 
   // --- RENDERERS ---
 
-  const renderClassesTab = () => (
+  const renderClassDetail = () => {
+    if (!selectedClassForDetail) return null;
+
+    const classTutor = users.find(u => u.role === Role.TUTOR && u.classId === selectedClassForDetail.id);
+    const classStudents = users
+      .filter(u => u.role === Role.STUDENT && u.classId === selectedClassForDetail.id)
+      .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
+
+    return (
+      <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+        <div className="flex items-center justify-between">
+           <div className="flex items-center gap-4">
+             <button
+               onClick={() => setSelectedClassForDetail(null)}
+               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+             >
+               <ArrowLeft size={24} className="text-gray-600"/>
+             </button>
+             <div>
+               <h2 className="text-2xl font-bold text-gray-800">{selectedClassForDetail.name}</h2>
+               <p className="text-gray-500 text-sm">{classStudents.length} alumnos matriculados</p>
+             </div>
+           </div>
+
+           <div className="flex gap-2">
+             <button
+                onClick={() => { setAddingStudentClassId(selectedClassForDetail.id); setNewStudentName(''); setNewStudentSurnames(''); }}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 font-bold text-sm"
+              >
+                <UserPlus size={18} /> Añadir Alumno
+              </button>
+              <button
+                onClick={() => handleImportCSV(selectedClassForDetail.id)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 font-bold text-sm"
+              >
+                <Upload size={18} /> Importar CSV
+              </button>
+           </div>
+        </div>
+
+        {/* Tutor Section */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+           <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+                <GraduationCap size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-800 text-lg">Tutor/a del Grupo</h3>
+                {classTutor ? (
+                  <p className="text-gray-600">{classTutor.name} <span className="text-gray-400 text-sm">({classTutor.email})</span></p>
+                ) : (
+                  <p className="text-red-400 italic">Sin tutor asignado</p>
+                )}
+              </div>
+           </div>
+           {classTutor ? (
+             <button onClick={() => { setActiveTab('TUTORS'); handleEditTutor(classTutor); }} className="text-indigo-600 font-bold hover:underline text-sm">
+               Gestionar Tutor
+             </button>
+           ) : (
+             <button onClick={() => setActiveTab('TUTORS')} className="text-indigo-600 font-bold hover:underline text-sm">
+               Asignar Tutor
+             </button>
+           )}
+        </div>
+
+        {/* Adding Student Form (Contextual) */}
+        {addingStudentClassId === selectedClassForDetail.id && (
+             <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex items-center gap-3 animate-in slide-in-from-top-2">
+               <span className="text-sm font-bold text-indigo-800 uppercase mr-2">Nuevo Alumno:</span>
+               <input
+                 value={newStudentName}
+                 onChange={e => setNewStudentName(e.target.value)}
+                 placeholder="Nombre"
+                 className="flex-1 px-4 py-2 rounded-lg border border-indigo-200"
+               />
+               <input
+                 value={newStudentSurnames}
+                 onChange={e => setNewStudentSurnames(e.target.value)}
+                 placeholder="Apellidos"
+                 className="flex-1 px-4 py-2 rounded-lg border border-indigo-200"
+               />
+               <button onClick={handleAddStudentToClass} className="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700"><CheckSquare size={20}/></button>
+               <button onClick={() => setAddingStudentClassId(null)} className="text-gray-400 hover:text-gray-600 p-2"><X size={20}/></button>
+             </div>
+        )}
+
+        {/* Students List */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+           <div className="p-4 border-b border-gray-50 bg-gray-50 flex justify-between items-center">
+              <h3 className="font-bold text-gray-700">Listado de Alumnos</h3>
+              <span className="text-xs text-gray-400 uppercase font-bold">Pinchar para editar</span>
+           </div>
+
+           <div className="divide-y divide-gray-50">
+             {classStudents.length === 0 && <p className="p-8 text-center text-gray-400">No hay alumnos en esta clase.</p>}
+             {classStudents.map(student => (
+               <div
+                 key={student.id}
+                 onClick={() => handleEditStudent(student)}
+                 className="p-4 flex items-center justify-between hover:bg-blue-50 cursor-pointer transition-colors group"
+               >
+                  <div className="flex items-center gap-4">
+                     <Avatar config={student.avatarConfig} size={40} />
+                     <div>
+                       <p className="font-bold text-gray-800">{student.name}</p>
+                       <p className="text-xs text-gray-400">PIN: {student.pin} | Puntos: {student.points}</p>
+                     </div>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                     <span className="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">EDITAR</span>
+                     <ChevronRight size={16} className="text-indigo-400" />
+                  </div>
+               </div>
+             ))}
+           </div>
+        </div>
+
+        {/* Edit Student Modal */}
+        {editingStudent && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+             <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-6">
+                   <h3 className="text-lg font-bold text-gray-800">Editar Alumno</h3>
+                   <button onClick={() => setEditingStudent(null)} className="text-gray-400 hover:text-gray-600"><X size={24}/></button>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                   <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre Completo</label>
+                     <input
+                       value={editStudentName}
+                       onChange={e => setEditStudentName(e.target.value)}
+                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none"
+                     />
+                   </div>
+                   <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">PIN de Acceso</label>
+                     <input
+                       value={editStudentPin}
+                       onChange={e => setEditStudentPin(e.target.value)}
+                       maxLength={4}
+                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none font-mono"
+                     />
+                   </div>
+                   <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-500">
+                     <p>Familia vinculada: <span className="font-bold text-gray-700">{users.find(u => u.familyId === editingStudent.familyId && u.role === Role.PARENT)?.name || 'Desconocida'}</span></p>
+                     <p>ID Familia: {editingStudent.familyId}</p>
+                   </div>
+                </div>
+
+                <div className="flex gap-3">
+                   <button
+                     onClick={() => { if(confirm('¿Eliminar alumno? Se borrará también su progreso.')) { deleteUser(editingStudent.id); setEditingStudent(null); } }}
+                     className="px-4 py-2 text-red-500 font-bold hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100"
+                   >
+                     Eliminar
+                   </button>
+                   <div className="flex-1"></div>
+                   <button onClick={() => setEditingStudent(null)} className="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
+                   <button onClick={handleSaveStudent} className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Guardar</button>
+                </div>
+             </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderClassesTab = () => {
+    if (selectedClassForDetail) {
+      return renderClassDetail();
+    }
+
+    return (
     <div className="space-y-4 animate-in fade-in duration-300">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-gray-800">Clases del Colegio</h2>
@@ -401,9 +596,12 @@ const AdminDashboard: React.FC = () => {
         {classes.length === 0 && <p className="p-8 text-center text-gray-400">No hay clases registradas.</p>}
         {classes.map(cls => (
           <React.Fragment key={cls.id}>
-          <div className="p-4 flex items-center justify-between hover:bg-gray-50">
+          <div
+             className="p-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+             onClick={() => setSelectedClassForDetail(cls)}
+          >
             {editingId === cls.id ? (
-              <div className="flex items-center gap-2 flex-1">
+              <div className="flex items-center gap-2 flex-1" onClick={e => e.stopPropagation()}>
                  <input 
                    value={editName} 
                    onChange={e => setEditName(e.target.value)} 
@@ -417,50 +615,19 @@ const AdminDashboard: React.FC = () => {
                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">
                     {cls.name.charAt(0)}
                  </div>
-                 <span className="font-bold text-gray-700">{cls.name}</span>
-                 <span className="text-xs text-gray-400">({users.filter(u => u.classId === cls.id).length} miembros)</span>
+                 <div>
+                    <span className="font-bold text-gray-700 block">{cls.name}</span>
+                    <span className="text-xs text-gray-400">{users.filter(u => u.classId === cls.id && u.role === Role.STUDENT).length} alumnos</span>
+                 </div>
               </div>
             )}
             
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => { setAddingStudentClassId(cls.id); setNewStudentName(''); setNewStudentSurnames(''); }}
-                className="p-2 text-gray-400 hover:text-indigo-600 flex items-center gap-1 text-xs font-bold bg-gray-50 rounded border border-transparent hover:border-indigo-200 hover:bg-indigo-50"
-                title="Añadir alumno manualmente"
-              >
-                <UserPlus size={16} /> <span className="hidden sm:inline">Alumno</span>
-              </button>
-
-              <button
-                onClick={() => handleImportCSV(cls.id)}
-                className="p-2 text-gray-400 hover:text-green-600 flex items-center gap-1 text-xs font-bold bg-gray-50 rounded border border-transparent hover:border-green-200 hover:bg-green-50"
-                title="Importar alumnos desde CSV"
-              >
-                <Upload size={16} /> <span className="hidden sm:inline">CSV</span>
-              </button>
+            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
               <button onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-gray-400 hover:text-blue-600"><Edit2 size={18} /></button>
               <button onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={18} /></button>
+              <ChevronRight size={20} className="text-gray-300 ml-2" />
             </div>
           </div>
-          {addingStudentClassId === cls.id && (
-             <div className="bg-indigo-50 p-4 border-b border-indigo-100 flex items-center gap-2 animate-in slide-in-from-top-2">
-               <span className="text-xs font-bold text-indigo-800 uppercase mr-2">Nuevo Alumno:</span>
-               <input
-                 value={newStudentName}
-                 onChange={e => setNewStudentName(e.target.value)}
-                 placeholder="Nombre"
-                 className="flex-1 px-3 py-1 text-sm rounded border border-indigo-200"
-               />
-               <input
-                 value={newStudentSurnames}
-                 onChange={e => setNewStudentSurnames(e.target.value)}
-                 placeholder="Apellidos"
-                 className="flex-1 px-3 py-1 text-sm rounded border border-indigo-200"
-               />
-               <button onClick={handleAddStudentToClass} className="bg-indigo-600 text-white p-1.5 rounded hover:bg-indigo-700"><CheckSquare size={16}/></button>
-               <button onClick={() => setAddingStudentClassId(null)} className="text-gray-400 hover:text-gray-600 p-1.5"><X size={16}/></button>
-             </div>
-           )}
           </React.Fragment>
         ))}
       </div>
@@ -472,7 +639,8 @@ const AdminDashboard: React.FC = () => {
         className="hidden"
       />
     </div>
-  );
+    );
+  };
 
   const renderTutorsTab = () => {
     const tutors = users
@@ -960,7 +1128,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Admin Header */}
-      <header className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-md">
+      <header className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
          <div className="flex items-center gap-4">
             <img src="/logo.png" alt="Logo" className="h-12 w-auto object-contain bg-gray-800 rounded p-1" onError={(e) => e.currentTarget.style.display = 'none'} />
             <div className="flex items-center gap-3">
@@ -1005,7 +1173,7 @@ const AdminDashboard: React.FC = () => {
       )}
       
       {/* Tabs */}
-      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-10">
+      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-40">
         <div className="flex gap-6 overflow-x-auto">
           <TabButton active={activeTab === 'CLASSES'} onClick={() => setActiveTab('CLASSES')} icon={<School size={18}/>} label="Gestión Clases" />
           <TabButton active={activeTab === 'TUTORS'} onClick={() => setActiveTab('TUTORS')} icon={<GraduationCap size={18}/>} label="Gestión Profesores" />
