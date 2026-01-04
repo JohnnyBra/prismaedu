@@ -18,6 +18,11 @@ const AdminDashboard: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importingClassId, setImportingClassId] = useState<string | null>(null);
 
+  // Single Student Creation State
+  const [addingStudentClassId, setAddingStudentClassId] = useState<string | null>(null);
+  const [newStudentName, setNewStudentName] = useState('');
+  const [newStudentSurnames, setNewStudentSurnames] = useState('');
+
   // Creation States
   const [showAddClass, setShowAddClass] = useState(false);
   const [newClassName, setNewClassName] = useState('');
@@ -69,6 +74,40 @@ const AdminDashboard: React.FC = () => {
   const [newAdminPin, setNewAdminPin] = useState('');
 
   // --- HELPERS ---
+
+  const handleAddStudentToClass = () => {
+    if (addingStudentClassId && newStudentName && newStudentSurnames) {
+      const familyId = `family_${Date.now()}`;
+      const fullName = `${newStudentName} ${newStudentSurnames}`;
+
+      const newUsers: Omit<User, 'id'>[] = [
+        {
+          name: fullName,
+          firstName: newStudentName,
+          lastName: newStudentSurnames,
+          role: Role.STUDENT,
+          classId: addingStudentClassId,
+          familyId: familyId,
+          pin: '0000',
+          points: 0
+        },
+        {
+          name: `Familia ${newStudentSurnames}`,
+          role: Role.PARENT,
+          familyId: familyId,
+          pin: '0000',
+          points: 0
+        }
+      ];
+
+      addUsers(newUsers);
+
+      setAddingStudentClassId(null);
+      setNewStudentName('');
+      setNewStudentSurnames('');
+      alert('Alumno y familia creados correctamente.');
+    }
+  };
 
   const handleImportCSV = (classId: string) => {
     setImportingClassId(classId);
@@ -361,7 +400,8 @@ const AdminDashboard: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y">
         {classes.length === 0 && <p className="p-8 text-center text-gray-400">No hay clases registradas.</p>}
         {classes.map(cls => (
-          <div key={cls.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+          <React.Fragment key={cls.id}>
+          <div className="p-4 flex items-center justify-between hover:bg-gray-50">
             {editingId === cls.id ? (
               <div className="flex items-center gap-2 flex-1">
                  <input 
@@ -384,6 +424,14 @@ const AdminDashboard: React.FC = () => {
             
             <div className="flex items-center gap-2">
               <button
+                onClick={() => { setAddingStudentClassId(cls.id); setNewStudentName(''); setNewStudentSurnames(''); }}
+                className="p-2 text-gray-400 hover:text-indigo-600 flex items-center gap-1 text-xs font-bold bg-gray-50 rounded border border-transparent hover:border-indigo-200 hover:bg-indigo-50"
+                title="Añadir alumno manualmente"
+              >
+                <UserPlus size={16} /> <span className="hidden sm:inline">Alumno</span>
+              </button>
+
+              <button
                 onClick={() => handleImportCSV(cls.id)}
                 className="p-2 text-gray-400 hover:text-green-600 flex items-center gap-1 text-xs font-bold bg-gray-50 rounded border border-transparent hover:border-green-200 hover:bg-green-50"
                 title="Importar alumnos desde CSV"
@@ -394,6 +442,26 @@ const AdminDashboard: React.FC = () => {
               <button onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={18} /></button>
             </div>
           </div>
+          {addingStudentClassId === cls.id && (
+             <div className="bg-indigo-50 p-4 border-b border-indigo-100 flex items-center gap-2 animate-in slide-in-from-top-2">
+               <span className="text-xs font-bold text-indigo-800 uppercase mr-2">Nuevo Alumno:</span>
+               <input
+                 value={newStudentName}
+                 onChange={e => setNewStudentName(e.target.value)}
+                 placeholder="Nombre"
+                 className="flex-1 px-3 py-1 text-sm rounded border border-indigo-200"
+               />
+               <input
+                 value={newStudentSurnames}
+                 onChange={e => setNewStudentSurnames(e.target.value)}
+                 placeholder="Apellidos"
+                 className="flex-1 px-3 py-1 text-sm rounded border border-indigo-200"
+               />
+               <button onClick={handleAddStudentToClass} className="bg-indigo-600 text-white p-1.5 rounded hover:bg-indigo-700"><CheckSquare size={16}/></button>
+               <button onClick={() => setAddingStudentClassId(null)} className="text-gray-400 hover:text-gray-600 p-1.5"><X size={16}/></button>
+             </div>
+           )}
+          </React.Fragment>
         ))}
       </div>
       <input
