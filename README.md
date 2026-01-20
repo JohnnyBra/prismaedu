@@ -32,66 +32,42 @@ PrismaEdu es una aplicación web progresiva (PWA) diseñada para gamificar la ge
 
 ---
 
-## 🛠️ Instalación en Servidor Ubuntu
+## 🛠️ Instalación desde Cero (Ubuntu)
 
-Estas instrucciones permiten desplegar la aplicación en un servidor Ubuntu.
+Sigue estos pasos para instalar PrismaEdu en un servidor Ubuntu limpio utilizando el script de instalación automatizado.
 
-### Opción A: Instalación Automática (Recomendada)
+### 1. Clonar el repositorio
 
-Hemos incluido scripts automatizados en la carpeta `deploy`.
-
-1.  **Conéctate a tu servidor** vía SSH.
-2.  **Descarga y ejecuta el script de instalación**:
+Accede a tu servidor vía SSH y clona el repositorio oficial:
 
 ```bash
 git clone https://github.com/JohnnyBra/prismaedu.git
 cd prismaedu
+```
+
+### 2. Ejecutar el script de instalación
+
+Otorga permisos de ejecución y lanza el script de instalación automática. Este script se encargará de instalar todas las dependencias necesarias (Node.js, PM2, etc.), compilar el proyecto y configurar la base de datos.
+
+```bash
 chmod +x deploy/install.sh
 ./deploy/install.sh
 ```
 
-Esto instalará Node.js, compilará el frontend, inicializará la base de datos SQLite y arrancará el servidor en el puerto **3020** usando PM2.
-
-### Opción B: Instalación Manual
-
-1.  **Actualizar el sistema e instalar dependencias básicas**:
-    ```bash
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install -y curl git unzip build-essential python3
-    ```
-
-2.  **Instalar Node.js (Versión 20)**:
-    ```bash
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-    ```
-
-3.  **Instalar PM2**:
-    ```bash
-    sudo npm install -g pm2
-    ```
-
-4.  **Clonar y configurar**:
-    ```bash
-    git clone https://github.com/JohnnyBra/prismaedu.git
-    cd prismaedu
-    npm install
-    npm run build
-    ```
-
-5.  **Desplegar**:
-    ```bash
-    # Se utiliza el puerto 3020 definido en server/index.js
-    pm2 start server/index.js --name "prismaedu"
-    pm2 save
-    pm2 startup
-    ```
+El script realizará las siguientes acciones:
+1.  Actualizar el sistema y paquetes.
+2.  Instalar Node.js 20 si no está presente.
+3.  Instalar PM2 para la gestión de procesos.
+4.  Instalar las dependencias del proyecto (`npm install`).
+5.  Compilar la aplicación para producción (`npm run build`).
+6.  Inicializar la base de datos (`npm run reset`) si es una instalación nueva.
+7.  Arrancar el servidor en el puerto **3020**.
 
 ---
 
 ## 🔄 Actualización
 
-Para actualizar la aplicación cuando haya cambios en el repositorio GitHub:
+Para actualizar tu instalación con los últimos cambios del repositorio, utiliza el script de actualización incluido. Este script descarga los cambios, recompila el proyecto y reinicia el servicio sin perder tus datos.
 
 ```bash
 cd prismaedu
@@ -103,7 +79,29 @@ chmod +x deploy/update.sh
 
 ## 💻 Desarrollo Local
 
-1.  Clonar el repo.
-2.  `npm install`
-3.  **Para desarrollo con Hot Reload (Frontend):** `npm run dev` (Nota: necesitarás correr el servidor backend por separado o ajustar la configuración para conectar sockets al puerto correcto).
-4.  **Para probar modo producción:** `npm run build` y luego `npm start`.
+Si deseas contribuir o probar la aplicación en tu máquina local:
+
+1.  Clonar el repositorio:
+    ```bash
+    git clone https://github.com/JohnnyBra/prismaedu.git
+    cd prismaedu
+    ```
+2.  Instalar dependencias:
+    ```bash
+    npm install
+    ```
+3.  **Modo Desarrollo (con Hot Reload):**
+    ```bash
+    # Inicia el frontend (Vite)
+    npm run dev
+
+    # En otra terminal, inicia el backend
+    npm start
+    ```
+    *Nota: Asegúrate de que el frontend apunte al puerto correcto del backend (3020).*
+
+4.  **Modo Producción (Prueba local):**
+    ```bash
+    npm run build
+    npm start
+    ```
