@@ -137,6 +137,39 @@ const TutorDashboard: React.FC = () => {
 
   // --- RENDERERS ---
 
+  const renderSettingsModal = () => (
+    showSettings && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+             <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
+                <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                  <X size={24} />
+                </button>
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Settings size={20}/> Ajustes</h2>
+
+                <div className="mb-4">
+                   <label className="block text-sm font-bold text-gray-700 mb-2">Cambiar mi PIN</label>
+                   <input
+                      type="text"
+                      maxLength={4}
+                      value={newPin}
+                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))}
+                      className="w-full text-center text-2xl tracking-widest border-2 border-blue-100 rounded-xl py-3 focus:border-blue-500 outline-none transition-colors"
+                      placeholder="0000"
+                   />
+                   <p className="text-xs text-gray-400 mt-2">Introduce 4 números nuevos</p>
+                </div>
+
+                <button
+                  onClick={handleUpdatePin}
+                  className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors"
+                >
+                  Guardar Nuevo PIN
+                </button>
+             </div>
+          </div>
+        )
+  );
+
   // Hub Renderer
   const renderHub = () => (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -204,10 +237,17 @@ const TutorDashboard: React.FC = () => {
             </button>
         </div>
 
-        <button onClick={logout} className="mt-8 text-white/60 hover:text-white flex items-center gap-2 text-sm font-bold bg-black/20 px-4 py-2 rounded-full">
-            <LogOut size={16} /> Cerrar Sesión
-        </button>
+        <div className="flex gap-4 mt-8">
+            <button onClick={() => setShowSettings(true)} className="text-white/60 hover:text-white flex items-center gap-2 text-sm font-bold bg-black/20 px-4 py-2 rounded-full">
+                <Settings size={16} /> Cambiar PIN
+            </button>
+            <button onClick={logout} className="text-white/60 hover:text-white flex items-center gap-2 text-sm font-bold bg-black/20 px-4 py-2 rounded-full">
+                <LogOut size={16} /> Cerrar Sesión
+            </button>
+        </div>
       </div>
+
+      {renderSettingsModal()}
     </div>
   );
 
@@ -635,36 +675,7 @@ const TutorDashboard: React.FC = () => {
         {activeTab === 'MESSAGES' && renderMessages()}
 
         {/* Settings Modal */}
-        {showSettings && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
-                <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                  <X size={24} />
-                </button>
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Settings size={20}/> Ajustes</h2>
-                
-                <div className="mb-4">
-                   <label className="block text-sm font-bold text-gray-700 mb-2">Cambiar mi PIN</label>
-                   <input 
-                      type="text" 
-                      maxLength={4}
-                      value={newPin}
-                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))}
-                      className="w-full text-center text-2xl tracking-widest border-2 border-blue-100 rounded-xl py-3 focus:border-blue-500 outline-none transition-colors"
-                      placeholder="0000"
-                   />
-                   <p className="text-xs text-gray-400 mt-2">Introduce 4 números nuevos</p>
-                </div>
-
-                <button 
-                  onClick={handleUpdatePin}
-                  className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors"
-                >
-                  Guardar Nuevo PIN
-                </button>
-             </div>
-          </div>
-        )}
+        {renderSettingsModal()}
 
         {/* Selected Task Details Modal */}
         {selectedTaskDetails && (
