@@ -43,6 +43,7 @@ interface DataContextType {
   deleteTask: (id: string) => void;
   deleteFamily: (familyId: string) => void;
   updateFamilyId: (oldId: string, newId: string) => void;
+  setAllUsers: (users: User[]) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -329,6 +330,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitUsers(users.map(u => u.familyId === oldId ? { ...u, familyId: newId } : u));
   };
 
+  const setAllUsers = (newUsersList: User[]) => {
+    emitUsers(newUsersList);
+  };
+
   return (
     <DataContext.Provider value={{
       currentUser,
@@ -364,7 +369,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       updateTask,
       deleteTask,
       deleteFamily,
-      updateFamilyId
+      updateFamilyId,
+      setAllUsers
     }}>
       {children}
     </DataContext.Provider>
