@@ -7,7 +7,7 @@ import Avatar from '../components/Avatar';
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
 
 const AdminDashboard: React.FC = () => {
-  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin } = useData();
+  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
 
   // Local state for edits/creation
@@ -22,6 +22,7 @@ const AdminDashboard: React.FC = () => {
   
   // CSV Import State
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const importTutorsFileRef = useRef<HTMLInputElement>(null);
   const [importingClassId, setImportingClassId] = useState<string | null>(null);
 
   // Single Student Creation State
@@ -227,6 +228,165 @@ const AdminDashboard: React.FC = () => {
       setNewClassName('');
       setShowAddClass(false);
     }
+  };
+
+  const handleImportTutorsCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      if (!text) return;
+
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+      if (lines.length < 1) {
+          alert('Archivo vacío.');
+          return;
+      }
+
+      const newTutors: User[] = [];
+      const classesToUpdate = new Set<string>();
+
+      // Check header row to skip it
+      let startIndex = 0;
+      const header = lines[0].toLowerCase();
+      if (header.includes('nombre') || header.includes('apellidos') || header.includes('email')) {
+          startIndex = 1;
+      }
+
+      let count = 0;
+
+      for (let i = startIndex; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          let nameStr = '';
+          let classStr = '';
+          let emailStr = '';
+
+          // Check for semicolon delimiter (Excel default in some regions)
+          if (line.includes(';')) {
+              const parts = line.split(';');
+              nameStr = parts[0]?.trim();
+              classStr = parts[1]?.trim();
+              emailStr = parts[2]?.trim();
+          } else {
+              // Comma separated. We expect "Surname, Name", Class, Email
+              // Regex to split by comma but ignore commas inside quotes
+              const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+              const parts = line.split(regex).map(p => p.trim());
+
+              if (parts.length >= 1) {
+                  nameStr = parts[0].replace(/^"|"$/g, '').trim();
+                  classStr = parts[1] ? parts[1].replace(/^"|"$/g, '').trim() : '';
+                  emailStr = parts[2] ? parts[2].replace(/^"|"$/g, '').trim() : '';
+              }
+          }
+
+          if (!nameStr) continue;
+
+          // Parse Name: Expected "Apellidos, Nombre"
+          let displayName = nameStr;
+          let firstName = '';
+          let lastName = '';
+
+          if (nameStr.includes(',')) {
+              const parts = nameStr.split(',');
+              // "Apellidos, Nombre" -> Surname=parts[0], Name=parts[1]
+              const rawSurname = parts[0].trim();
+              const rawName = parts[1] ? parts[1].trim() : '';
+              displayName = `${rawName} ${rawSurname}`.trim();
+              firstName = rawName;
+              lastName = rawSurname;
+          } else {
+              displayName = nameStr;
+              lastName = nameStr;
+          }
+
+          // Find Class ID
+          let assignedClassId: string | undefined = undefined;
+          if (classStr) {
+              const cls = classes.find(c => c.name.toLowerCase() === classStr.toLowerCase());
+              if (cls) {
+                  assignedClassId = cls.id;
+                  classesToUpdate.add(cls.id);
+              }
+          }
+
+          // Check if user already exists by Email
+          const existingUser = users.find(u => u.email === emailStr && u.role === Role.TUTOR);
+
+          if (existingUser) {
+              // Update existing user
+              newTutors.push({
+                  ...existingUser,
+                  name: displayName,
+                  firstName,
+                  lastName,
+                  classId: assignedClassId,
+                  // Keep existing ID, PIN, etc unless we want to reset them?
+                  // Prompt says "El pin para todos, por defecto, es 9999." -> Should we reset PIN?
+                  // Usually bulk import might want to reset or keep.
+                  // "El pin para todos... es 9999" implies setting it.
+                  pin: '9999'
+              });
+          } else {
+              // Create User
+              newTutors.push({
+                  id: `user_${Date.now()}_imp_${i}_${Math.floor(Math.random() * 1000)}`,
+                  name: displayName,
+                  firstName,
+                  lastName,
+                  role: Role.TUTOR,
+                  classId: assignedClassId,
+                  email: emailStr,
+                  pin: '9999',
+                  points: 0,
+                  avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' },
+                  inventory: ['base_1', 'top_1', 'bot_1']
+              });
+          }
+          count++;
+      }
+
+      if (count > 0) {
+          const finalUsers: User[] = [];
+
+          // 1. Keep non-tutors
+          finalUsers.push(...users.filter(u => u.role !== Role.TUTOR));
+
+          // 2. Process existing tutors who were NOT in the import list
+          // We need to know which IDs were updated to avoid duplication
+          const updatedUserIds = new Set(newTutors.map(u => u.id));
+
+          const existingTutors = users.filter(u => u.role === Role.TUTOR);
+          existingTutors.forEach(t => {
+              if (updatedUserIds.has(t.id)) {
+                  // This user is in the new list (updated), skip adding the old version
+                  return;
+              }
+
+              // If this tutor's class is being taken over by a newcomer/updated user, unassign them
+              if (t.classId && classesToUpdate.has(t.classId)) {
+                  finalUsers.push({ ...t, classId: undefined });
+              } else {
+                  finalUsers.push(t);
+              }
+          });
+
+          // 3. Add new/updated tutors
+          finalUsers.push(...newTutors);
+
+          setAllUsers(finalUsers);
+          alert(`Se han importado ${count} profesores correctamente.`);
+      } else {
+          alert('No se encontraron datos válidos o el formato es incorrecto.');
+      }
+
+      if (importTutorsFileRef.current) importTutorsFileRef.current.value = '';
+    };
+    reader.readAsText(file);
   };
 
   const handleCreateTutor = () => {
@@ -650,9 +810,14 @@ const AdminDashboard: React.FC = () => {
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">Profesores / Tutores</h2>
-          <button onClick={() => { setEditingTutorId(null); setNewTutorName(''); setNewTutorClass(''); setNewTutorPin('9999'); setNewTutorEmail(''); setNewTutorAltPin(''); setShowAddTutor(true); }} className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700">
-            <Plus size={18} /> Añadir Profesor
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => importTutorsFileRef.current?.click()} className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700">
+                <Upload size={18} /> Importar CSV
+            </button>
+            <button onClick={() => { setEditingTutorId(null); setNewTutorName(''); setNewTutorClass(''); setNewTutorPin('9999'); setNewTutorEmail(''); setNewTutorAltPin(''); setShowAddTutor(true); }} className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700">
+                <Plus size={18} /> Añadir Profesor
+            </button>
+          </div>
         </div>
 
         {showAddTutor && (
@@ -709,6 +874,13 @@ const AdminDashboard: React.FC = () => {
             </tbody>
           </table>
         </div>
+        <input
+            type="file"
+            ref={importTutorsFileRef}
+            onChange={handleImportTutorsCSV}
+            accept=".csv"
+            className="hidden"
+        />
       </div>
     );
   };
