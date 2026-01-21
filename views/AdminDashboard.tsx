@@ -791,13 +791,6 @@ const AdminDashboard: React.FC = () => {
           </React.Fragment>
         ))}
       </div>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept=".csv"
-        className="hidden"
-      />
     </div>
     );
   };
@@ -1362,6 +1355,14 @@ const AdminDashboard: React.FC = () => {
          {activeTab === 'FAMILIES' && renderFamiliesTab()}
          {activeTab === 'TASKS' && renderTasksTab()}
          {activeTab === 'STAFF' && renderStaffTab()}
+
+         <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".csv"
+            className="hidden"
+          />
       </main>
     </div>
   );
