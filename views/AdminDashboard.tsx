@@ -959,6 +959,22 @@ const AdminDashboard: React.FC = () => {
     
     // Helper to get family name from ID
     const getFamilyName = (id: string) => {
+      // Find students in this family
+      const students = users.filter(u => u.familyId === id && u.role === Role.STUDENT);
+
+      if (students.length > 0) {
+        // Use the first student's name
+        const student = students[0];
+        // If firstName and lastName are available, use them to construct "Familia de [ChildName] [ChildSurname]"
+        if (student.firstName && student.lastName) {
+           const firstSurname = student.lastName.split(' ')[0];
+           return `Familia de ${student.firstName} ${firstSurname}`;
+        } else {
+           // Fallback if structured names are missing
+           return `Familia de ${student.name}`;
+        }
+      }
+
       const parent = users.find(u => u.familyId === id && u.role === Role.PARENT);
       return parent ? `Familia de ${parent.name.split(' ')[0]}` : `Familia ${id}`;
     };
