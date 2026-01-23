@@ -65,6 +65,18 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Derived current user
   const currentUser = users.find(u => u.id === currentUserId) || null;
 
+  // Check for Google Login redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('user_id');
+    if (userId) {
+      setCurrentUserId(userId);
+      localStorage.setItem('sc_session_user', userId);
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   // Initialize Socket
   useEffect(() => {
     // Si estamos en desarrollo (puerto 5173 p.ej.), nos conectamos explícitamente al 3020
