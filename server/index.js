@@ -125,7 +125,7 @@ app.get('/auth/google/callback',
   (req, res) => {
     // Successful authentication, redirect to dashboard.
     // In a real app we might redirect to a specific dashboard URL or set a cookie.
-    res.redirect('/');
+    res.redirect(`/?user_id=${req.user.id}`);
   }
 );
 
