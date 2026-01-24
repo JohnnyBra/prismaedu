@@ -554,6 +554,57 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleDeleteStudent = () => {
+    if (!editingStudent) return;
+
+    if (confirm('¿Eliminar alumno? Se borrará también su progreso.')) {
+      let deleteFamilyToo = false;
+      if (editingStudent.familyId) {
+        deleteFamilyToo = confirm('¿Quieres borrar también a la familia asociada (Padres y hermanos)?');
+      }
+
+      if (deleteFamilyToo && editingStudent.familyId) {
+        deleteFamily(editingStudent.familyId);
+      } else {
+        deleteUser(editingStudent.id);
+      }
+      setEditingStudent(null);
+    }
+  };
+
+  const handleDeleteAllStudents = () => {
+    if (!selectedClassForDetail) return;
+    const classId = selectedClassForDetail.id;
+    const studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === classId);
+
+    if (studentsInClass.length === 0) {
+      alert("No hay alumnos en esta clase.");
+      return;
+    }
+
+    if (confirm(`¿Estás seguro de que quieres eliminar a los ${studentsInClass.length} alumnos de esta clase? Esta acción no se puede deshacer.`)) {
+      const deleteFamilies = confirm('¿Quieres eliminar también a las familias de estos alumnos?');
+
+      let newUsers = [...users];
+
+      // Identify users to remove
+      const usersToDelete = new Set<string>();
+
+      studentsInClass.forEach(s => {
+        usersToDelete.add(s.id);
+        if (deleteFamilies && s.familyId) {
+          // Find all family members (parents, siblings, etc.)
+          const familyMembers = users.filter(u => u.familyId === s.familyId);
+          familyMembers.forEach(m => usersToDelete.add(m.id));
+        }
+      });
+
+      newUsers = newUsers.filter(u => !usersToDelete.has(u.id));
+      setAllUsers(newUsers);
+      alert('Alumnos eliminados correctamente.');
+    }
+  };
+
   // --- RENDERERS ---
 
   const renderClassDetail = () => {
@@ -592,6 +643,13 @@ const AdminDashboard: React.FC = () => {
                 className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 font-bold text-sm"
               >
                 <Upload size={18} /> Importar CSV
+              </button>
+              <button
+                onClick={handleDeleteAllStudents}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 font-bold text-sm"
+                title="Eliminar todos los alumnos"
+              >
+                <Trash2 size={18} />
               </button>
            </div>
         </div>
@@ -709,7 +767,7 @@ const AdminDashboard: React.FC = () => {
 
                 <div className="flex gap-3">
                    <button
-                     onClick={() => { if(confirm('¿Eliminar alumno? Se borrará también su progreso.')) { deleteUser(editingStudent.id); setEditingStudent(null); } }}
+                     onClick={handleDeleteStudent}
                      className="px-4 py-2 text-red-500 font-bold hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100"
                    >
                      Eliminar
