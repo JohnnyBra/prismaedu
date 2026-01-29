@@ -16,6 +16,7 @@ const AdminDashboard: React.FC = () => {
 
   // Class Detail State
   const [selectedClassForDetail, setSelectedClassForDetail] = useState<any | null>(null);
+  const [selectedFamilyClass, setSelectedFamilyClass] = useState<any | null>(null);
   const [editingStudent, setEditingStudent] = useState<User | null>(null);
   const [editStudentName, setEditStudentName] = useState('');
   const [editStudentPin, setEditStudentPin] = useState('');
@@ -81,6 +82,16 @@ const AdminDashboard: React.FC = () => {
   const [newAdminPin, setNewAdminPin] = useState('');
 
   // --- HELPERS ---
+
+  const getSortKey = (u: User) => {
+    if (u.lastName) return u.lastName.toLowerCase();
+    const parts = u.name.trim().split(' ');
+    // Assume "First Last" or "First Middle Last" -> Sort by "Last..." + "First"
+    if (parts.length > 1) {
+       return parts.slice(1).join(' ').toLowerCase() + " " + parts[0].toLowerCase();
+    }
+    return u.name.toLowerCase();
+  };
 
   const handleAddStudentToClass = () => {
     if (addingStudentClassId && newStudentName && newStudentSurnames) {
@@ -856,7 +867,7 @@ const AdminDashboard: React.FC = () => {
   const renderTutorsTab = () => {
     const tutors = users
        .filter(u => u.role === Role.TUTOR)
-       .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
+       .sort((a, b) => getSortKey(a).localeCompare(getSortKey(b)));
     return (
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="flex justify-between items-center">
@@ -1012,9 +1023,6 @@ const AdminDashboard: React.FC = () => {
   };
 
   const renderFamiliesTab = () => {
-    // Group users by Family ID
-    const familyIds = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!))) as string[];
-    
     // Helper to get family name from ID
     const getFamilyName = (id: string) => {
       // Find students in this family
@@ -1037,14 +1045,120 @@ const AdminDashboard: React.FC = () => {
       return parent ? `Familia de ${parent.name.split(' ')[0]}` : `Familia ${id}`;
     };
 
+    if (!selectedFamilyClass) {
+        // Calculate unassigned families
+        const allFamilyIds = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!)));
+        const familiesInClasses = new Set<string>();
+        classes.forEach(c => {
+             const students = users.filter(u => u.classId === c.id && u.role === Role.STUDENT);
+             students.forEach(s => {
+                 if (s.familyId) familiesInClasses.add(s.familyId);
+             });
+        });
+
+        const unassignedFamiliesCount = allFamilyIds.filter(fid => !familiesInClasses.has(fid)).length;
+
+        return (
+            <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold text-gray-800">Familias por Clase</h2>
+                     <button onClick={() => setShowAddFamily(true)} className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600">
+                        <Plus size={18} /> Nueva Familia (Sin Clase)
+                     </button>
+                </div>
+
+                {showAddFamily && (
+                   <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col md:flex-row gap-3 items-end mb-4">
+                     <div className="flex-1 w-full">
+                       <label className="text-xs font-bold text-orange-800 uppercase">Nombre Primer Progenitor</label>
+                       <input value={newParentName} onChange={e => setNewParentName(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" placeholder="Ej. Juan Pérez" />
+                     </div>
+                     <div className="w-24">
+                       <label className="text-xs font-bold text-orange-800 uppercase">PIN</label>
+                       <input value={newParentPin} onChange={e => setNewParentPin(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" maxLength={4} />
+                     </div>
+                     <div className="flex gap-2">
+                       <button onClick={() => setShowAddFamily(false)} className="px-4 py-2 text-gray-500">Cancelar</button>
+                       <button onClick={handleCreateFamily} className="px-4 py-2 bg-orange-600 text-white rounded font-bold">Crear</button>
+                     </div>
+                   </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {classes.map(cls => {
+                        const studentsCount = users.filter(u => u.classId === cls.id && u.role === Role.STUDENT).length;
+                        return (
+                            <div
+                                key={cls.id}
+                                onClick={() => setSelectedFamilyClass(cls)}
+                                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                                        <Users size={24} />
+                                    </div>
+                                    <ChevronRight size={24} className="text-gray-300 group-hover:text-orange-500" />
+                                </div>
+                                <h3 className="font-bold text-xl text-gray-800">{cls.name}</h3>
+                                <p className="text-gray-500 text-sm">{studentsCount} alumnos</p>
+                            </div>
+                        );
+                    })}
+
+                    {/* Unassigned Families Card */}
+                    <div
+                        onClick={() => setSelectedFamilyClass({ id: 'unassigned', name: 'Sin Asignar / Otros' })}
+                        className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:border-gray-400 hover:shadow-md transition-all group"
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-gray-500 group-hover:text-white transition-colors">
+                                <Users size={24} />
+                            </div>
+                            <ChevronRight size={24} className="text-gray-300 group-hover:text-gray-500" />
+                        </div>
+                        <h3 className="font-bold text-xl text-gray-700">Sin Asignar</h3>
+                        <p className="text-gray-500 text-sm">{unassignedFamiliesCount} familias</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Detail View
+    let familyIds: string[] = [];
+
+    if (selectedFamilyClass.id === 'unassigned') {
+         const allFamilyIds = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!)));
+         const familiesInClasses = new Set<string>();
+         classes.forEach(c => {
+             const students = users.filter(u => u.classId === c.id && u.role === Role.STUDENT);
+             students.forEach(s => {
+                 if (s.familyId) familiesInClasses.add(s.familyId);
+             });
+         });
+         familyIds = allFamilyIds.filter(fid => !familiesInClasses.has(fid));
+    } else {
+         const studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedFamilyClass.id);
+         familyIds = Array.from(new Set(studentsInClass.map(s => s.familyId).filter(Boolean))) as string[];
+    }
+
+    // Sort families
+    familyIds.sort((a, b) => getFamilyName(a).localeCompare(getFamilyName(b)));
+
     return (
-      <div className="space-y-6 animate-in fade-in duration-300">
-         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Familias Registradas</h2>
-          <button onClick={() => setShowAddFamily(true)} className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600">
-            <Plus size={18} /> Nueva Familia
-          </button>
-        </div>
+      <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+         <div className="flex items-center gap-4">
+             <button
+               onClick={() => setSelectedFamilyClass(null)}
+               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+             >
+               <ArrowLeft size={24} className="text-gray-600"/>
+             </button>
+             <div>
+               <h2 className="text-2xl font-bold text-gray-800">Familias - {selectedFamilyClass.name}</h2>
+               <p className="text-gray-500 text-sm">{familyIds.length} familias asociadas</p>
+             </div>
+         </div>
 
         {/* Move User Modal */}
         {userToMove && (
@@ -1064,7 +1178,8 @@ const AdminDashboard: React.FC = () => {
                       className="w-full p-3 border border-gray-300 rounded-lg mb-6 bg-white"
                    >
                      <option value="" disabled>Selecciona familia...</option>
-                     {familyIds.map(fid => (
+                     {/* Show all families here for moving, not just class families */}
+                     {Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!))).map(fid => (
                        <option key={fid} value={fid}>{getFamilyName(fid)}</option>
                      ))}
                    </select>
@@ -1080,24 +1195,8 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-        {showAddFamily && (
-           <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col md:flex-row gap-3 items-end">
-             <div className="flex-1 w-full">
-               <label className="text-xs font-bold text-orange-800 uppercase">Nombre Primer Progenitor</label>
-               <input value={newParentName} onChange={e => setNewParentName(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" placeholder="Ej. Juan Pérez" />
-             </div>
-             <div className="w-24">
-               <label className="text-xs font-bold text-orange-800 uppercase">PIN</label>
-               <input value={newParentPin} onChange={e => setNewParentPin(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" maxLength={4} />
-             </div>
-             <div className="flex gap-2">
-               <button onClick={() => setShowAddFamily(false)} className="px-4 py-2 text-gray-500">Cancelar</button>
-               <button onClick={handleCreateFamily} className="px-4 py-2 bg-orange-600 text-white rounded font-bold">Crear</button>
-             </div>
-           </div>
-        )}
-
         <div className="grid grid-cols-1 gap-4">
+           {familyIds.length === 0 && <p className="text-center text-gray-400 p-8">No hay familias vinculadas a esta clase.</p>}
            {familyIds.map(famId => {
              const members = users.filter(u => u.familyId === famId);
              const parents = members
