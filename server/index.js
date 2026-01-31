@@ -239,13 +239,15 @@ io.on('connection', async (socket) => {
 
   // Send initial state to the connecting client
   // Default values if DB is empty (though seed script should run first)
-  const users = await getData('users', []);
-  const classes = await getData('classes', []);
-  const tasks = await getData('tasks', []);
-  const rewards = await getData('rewards', []);
-  const completions = await getData('completions', []);
-  const messages = await getData('messages', []);
-  const redemptions = await getData('redemptions', []);
+  const [users, classes, tasks, rewards, completions, messages, redemptions] = await Promise.all([
+    getData('users', []),
+    getData('classes', []),
+    getData('tasks', []),
+    getData('rewards', []),
+    getData('completions', []),
+    getData('messages', []),
+    getData('redemptions', [])
+  ]);
 
   socket.emit('init_state', { users, classes, tasks, rewards, completions, messages, redemptions });
 
