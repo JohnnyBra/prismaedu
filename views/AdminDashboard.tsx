@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { Role, User, Task } from '../types';
 import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon } from 'lucide-react';
@@ -80,6 +80,21 @@ const AdminDashboard: React.FC = () => {
   // Admin PIN Change State
   const [showChangePin, setShowChangePin] = useState(false);
   const [newAdminPin, setNewAdminPin] = useState('');
+
+  // Calculated unassigned families (Memoized for performance)
+  const unassignedFamilyIds = useMemo(() => {
+     const allFamilyIds = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!)));
+     const validClassIds = new Set(classes.map(c => c.id));
+     const assignedFamilies = new Set<string>();
+
+     users.forEach(u => {
+         if (u.role === Role.STUDENT && u.classId && validClassIds.has(u.classId) && u.familyId) {
+             assignedFamilies.add(u.familyId);
+         }
+     });
+
+     return allFamilyIds.filter(fid => !assignedFamilies.has(fid));
+  }, [users, classes]);
 
   // --- HELPERS ---
 
@@ -1047,16 +1062,7 @@ const AdminDashboard: React.FC = () => {
 
     if (!selectedFamilyClass) {
         // Calculate unassigned families
-        const allFamilyIds = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!)));
-        const familiesInClasses = new Set<string>();
-        classes.forEach(c => {
-             const students = users.filter(u => u.classId === c.id && u.role === Role.STUDENT);
-             students.forEach(s => {
-                 if (s.familyId) familiesInClasses.add(s.familyId);
-             });
-        });
-
-        const unassignedFamiliesCount = allFamilyIds.filter(fid => !familiesInClasses.has(fid)).length;
+        const unassignedFamiliesCount = unassignedFamilyIds.length;
 
         return (
             <div className="space-y-4 animate-in fade-in duration-300">
@@ -1128,15 +1134,7 @@ const AdminDashboard: React.FC = () => {
     let familyIds: string[] = [];
 
     if (selectedFamilyClass.id === 'unassigned') {
-         const allFamilyIds = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!)));
-         const familiesInClasses = new Set<string>();
-         classes.forEach(c => {
-             const students = users.filter(u => u.classId === c.id && u.role === Role.STUDENT);
-             students.forEach(s => {
-                 if (s.familyId) familiesInClasses.add(s.familyId);
-             });
-         });
-         familyIds = allFamilyIds.filter(fid => !familiesInClasses.has(fid));
+         familyIds = unassignedFamilyIds;
     } else {
          const studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedFamilyClass.id);
          familyIds = Array.from(new Set(studentsInClass.map(s => s.familyId).filter(Boolean))) as string[];
