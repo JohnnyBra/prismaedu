@@ -98,6 +98,16 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
 
     newSocket.on('sync_users', (data) => setUsers(data));
+    newSocket.on('sync_user_updated', ({ id, updates }) => {
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
+    });
+    newSocket.on('sync_user_added', (user) => {
+      setUsers(prev => [...prev, user]);
+    });
+    newSocket.on('sync_user_deleted', (id) => {
+      setUsers(prev => prev.filter(u => u.id !== id));
+    });
+
     newSocket.on('sync_classes', (data) => setClasses(data));
     newSocket.on('sync_tasks', (data) => setTasks(data));
     newSocket.on('sync_rewards', (data) => setRewards(data));
@@ -111,6 +121,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const emitUsers = (newUsers: User[]) => socket?.emit('update_users', newUsers);
+  const emitUserUpdate = (id: string, updates: Partial<User>) => socket?.emit('user_update', { id, updates });
+  const emitUserAdd = (user: User) => socket?.emit('user_add', user);
+  const emitUserDelete = (id: string) => socket?.emit('user_delete', id);
+
   const emitClasses = (newClasses: ClassGroup[]) => socket?.emit('update_classes', newClasses);
   const emitTasks = (newTasks: Task[]) => socket?.emit('update_tasks', newTasks);
   const emitRewards = (newRewards: Reward[]) => socket?.emit('update_rewards', newRewards);
@@ -135,18 +149,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const updatePin = (newPin: string) => {
     if (!currentUserId) return;
-    const newUsers = users.map(u => u.id === currentUserId ? { ...u, pin: newPin } : u);
-    emitUsers(newUsers);
+    emitUserUpdate(currentUserId, { pin: newPin });
   };
 
   const assignPoints = (studentId: string, amount: number) => {
-    const newUsers = users.map(u => {
-      if (u.id === studentId) {
-        return { ...u, points: u.points + amount };
-      }
-      return u;
-    });
-    emitUsers(newUsers);
+    const user = users.find(u => u.id === studentId);
+    if (user) {
+      emitUserUpdate(studentId, { points: user.points + amount });
+    }
   };
 
   const createTask = (taskData: Omit<Task, 'id'>) => {
@@ -239,17 +249,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (user.inventory?.includes(itemId)) return true; 
 
     if (user.points >= item.cost) {
-      const newUsers = users.map(u => {
-        if (u.id === user.id) {
-          return {
-            ...u,
-            points: u.points - item.cost,
-            inventory: [...(u.inventory || []), itemId]
-          };
-        }
-        return u;
+      emitUserUpdate(user.id, {
+        points: user.points - item.cost,
+        inventory: [...(user.inventory || []), itemId]
       });
-      emitUsers(newUsers);
       return true;
     }
     return false;
@@ -257,8 +260,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const updateAvatar = (config: User['avatarConfig']) => {
     if (!currentUserId) return;
-    const newUsers = users.map(u => u.id === currentUserId ? { ...u, avatarConfig: { ...u.avatarConfig, ...config } } : u);
-    emitUsers(newUsers);
+    const user = users.find(u => u.id === currentUserId);
+    if (user) {
+      emitUserUpdate(user.id, { avatarConfig: { ...user.avatarConfig, ...config } });
+    }
   };
 
   const sendMessage = (toId: string, content: string) => {
@@ -303,7 +308,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       inventory: ['base_1', 'top_1', 'bot_1'],
       avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' }
     };
-    emitUsers([...users, newUser]);
+    emitUserAdd(newUser);
   };
 
   const addUsers = (usersData: Omit<User, 'id'>[]) => {
@@ -318,12 +323,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const updateUser = (id: string, updates: Partial<User>) => {
-    emitUsers(users.map(u => u.id === id ? { ...u, ...updates } : u));
+    emitUserUpdate(id, updates);
   };
 
   const deleteUser = (id: string) => {
     if (id === 'admin') return;
-    emitUsers(users.filter(u => u.id !== id));
+    emitUserDelete(id);
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {

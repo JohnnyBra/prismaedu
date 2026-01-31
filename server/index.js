@@ -257,6 +257,30 @@ io.on('connection', async (socket) => {
     io.emit('sync_users', newUsers);
   });
 
+  socket.on('user_update', async ({ id, updates }) => {
+    const users = await getData('users', []);
+    const index = users.findIndex(u => u.id === id);
+    if (index !== -1) {
+      users[index] = { ...users[index], ...updates };
+      await setData('users', users);
+      io.emit('sync_user_updated', { id, updates });
+    }
+  });
+
+  socket.on('user_add', async (user) => {
+    const users = await getData('users', []);
+    users.push(user);
+    await setData('users', users);
+    io.emit('sync_user_added', user);
+  });
+
+  socket.on('user_delete', async (id) => {
+    let users = await getData('users', []);
+    users = users.filter(u => u.id !== id);
+    await setData('users', users);
+    io.emit('sync_user_deleted', id);
+  });
+
   socket.on('update_classes', async (newClasses) => {
     await setData('classes', newClasses);
     io.emit('sync_classes', newClasses);
