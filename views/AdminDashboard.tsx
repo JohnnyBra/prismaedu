@@ -6,6 +6,16 @@ import Avatar from '../components/Avatar';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
 
+const getSortKey = (u: User) => {
+  if (u.lastName) return u.lastName.toLowerCase();
+  const parts = u.name.trim().split(' ');
+  // Assume "First Last" or "First Middle Last" -> Sort by "Last..." + "First"
+  if (parts.length > 1) {
+     return parts.slice(1).join(' ').toLowerCase() + " " + parts[0].toLowerCase();
+  }
+  return u.name.toLowerCase();
+};
+
 const AdminDashboard: React.FC = () => {
   const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
@@ -96,17 +106,14 @@ const AdminDashboard: React.FC = () => {
      return allFamilyIds.filter(fid => !assignedFamilies.has(fid));
   }, [users, classes]);
 
-  // --- HELPERS ---
+  // Optimized tutors list
+  const tutors = useMemo(() => {
+    return users
+       .filter(u => u.role === Role.TUTOR)
+       .sort((a, b) => getSortKey(a).localeCompare(getSortKey(b)));
+  }, [users]);
 
-  const getSortKey = (u: User) => {
-    if (u.lastName) return u.lastName.toLowerCase();
-    const parts = u.name.trim().split(' ');
-    // Assume "First Last" or "First Middle Last" -> Sort by "Last..." + "First"
-    if (parts.length > 1) {
-       return parts.slice(1).join(' ').toLowerCase() + " " + parts[0].toLowerCase();
-    }
-    return u.name.toLowerCase();
-  };
+  // --- HELPERS ---
 
   const handleAddStudentToClass = () => {
     if (addingStudentClassId && newStudentName && newStudentSurnames) {
@@ -880,9 +887,6 @@ const AdminDashboard: React.FC = () => {
   };
 
   const renderTutorsTab = () => {
-    const tutors = users
-       .filter(u => u.role === Role.TUTOR)
-       .sort((a, b) => getSortKey(a).localeCompare(getSortKey(b)));
     return (
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="flex justify-between items-center">
