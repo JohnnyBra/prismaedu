@@ -18,7 +18,7 @@ const getSortKey = (u: User) => {
 };
 
 const AdminDashboard: React.FC = () => {
-  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers } = useData();
+  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers, migratePins } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
 
   // Local state for edits/creation
@@ -653,6 +653,17 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleMigratePins = async () => {
+    if (confirm('ATENCIÓN: Esto cambiará los PINs de TODAS las familias y alumnos a números primos aleatorios únicos. ¿Estás seguro de continuar?')) {
+      try {
+        const result = await migratePins();
+        alert(`Migración completada. Se han actualizado ${result.count} usuarios.`);
+      } catch (e: any) {
+        alert('Error durante la migración: ' + e);
+      }
+    }
+  };
+
   // --- RENDERERS ---
 
   const renderClassDetail = () => {
@@ -1087,9 +1098,14 @@ const AdminDashboard: React.FC = () => {
             <div className="space-y-4 animate-in fade-in duration-300">
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold text-gray-800">Familias por Clase</h2>
-                     <button onClick={() => setShowAddFamily(true)} className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600">
-                        <Plus size={18} /> Nueva Familia (Sin Clase)
-                     </button>
+                    <div className="flex gap-2">
+                        <button onClick={handleMigratePins} className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 font-bold text-sm" title="Actualizar PINs a Primos Aleatorios">
+                            <Key size={18} /> Reasignar PINs (Migración)
+                        </button>
+                        <button onClick={() => setShowAddFamily(true)} className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600 font-bold text-sm">
+                            <Plus size={18} /> Nueva Familia
+                        </button>
+                    </div>
                 </div>
 
                 {showAddFamily && (
