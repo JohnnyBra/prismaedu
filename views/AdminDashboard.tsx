@@ -2,7 +2,7 @@ import React, { useState, useRef, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { isPrime, generateUniquePrime } from '../utils/primes';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon, Printer } from 'lucide-react';
 import Avatar from '../components/Avatar';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
@@ -31,6 +31,11 @@ const AdminDashboard: React.FC = () => {
   const [editingStudent, setEditingStudent] = useState<User | null>(null);
   const [editStudentName, setEditStudentName] = useState('');
   const [editStudentPin, setEditStudentPin] = useState('');
+
+  // Generic User Edit State (for Families Tab)
+  const [editingUserGeneric, setEditingUserGeneric] = useState<User | null>(null);
+  const [editUserGenericName, setEditUserGenericName] = useState('');
+  const [editUserGenericPin, setEditUserGenericPin] = useState('');
   
   // CSV Import State
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -664,6 +669,160 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleEditGenericUser = (user: User) => {
+    setEditingUserGeneric(user);
+    setEditUserGenericName(user.name);
+    setEditUserGenericPin(user.pin);
+  };
+
+  const handleSaveGenericUser = () => {
+    if (editingUserGeneric && editUserGenericName) {
+      if ((editingUserGeneric.role === Role.STUDENT || editingUserGeneric.role === Role.PARENT) && !isPrime(parseInt(editUserGenericPin))) {
+          if (!confirm('El PIN introducido NO es un número primo. El sistema recomienda números primos para evitar colisiones en la generación automática. ¿Deseas guardarlo de todas formas?')) {
+             return;
+          }
+      }
+
+      // Check Uniqueness in Class (Essential for Family Login)
+      if (editingUserGeneric.role === Role.STUDENT && editingUserGeneric.classId) {
+          const classPeers = users.filter(u => u.classId === editingUserGeneric.classId && u.id !== editingUserGeneric.id);
+          const collision = classPeers.find(u => u.pin === editUserGenericPin);
+          if (collision) {
+              alert(`Error: El PIN ya está siendo usado por ${collision.name} en esta misma clase. Los PINs deben ser únicos por clase.`);
+              return;
+          }
+      }
+
+      updateUser(editingUserGeneric.id, {
+        name: editUserGenericName,
+        pin: editUserGenericPin
+      });
+      setEditingUserGeneric(null);
+    }
+  };
+
+  const handlePrintClassPins = () => {
+    if (!selectedFamilyClass) return;
+
+    // Filter Students and Parents for this class
+    // We want to print cards: One for Student, One for Parent(s) linked to that student?
+    // Or just list all users in the class structure?
+
+    // Strategy: List by Family.
+    // Family Header -> Parent Card -> Student Card(s)
+
+    let studentsInClass: User[] = [];
+    if (selectedFamilyClass.id === 'unassigned') {
+        // Hard to define "class" for unassigned, but we can print them if needed.
+        // Let's focus on real classes for now or just filter by unassigned.
+        // For unassigned, we might pick all unassigned students?
+        studentsInClass = users.filter(u => u.role === Role.STUDENT && !u.classId);
+    } else {
+        studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedFamilyClass.id);
+    }
+
+    // Sort
+    studentsInClass.sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Por favor, permite ventanas emergentes para imprimir.');
+        return;
+    }
+
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Fichas de Acceso - ${selectedFamilyClass.name}</title>
+          <style>
+            body { font-family: sans-serif; padding: 20px; }
+            .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .card { border: 2px dashed #ccc; padding: 20px; border-radius: 10px; page-break-inside: avoid; }
+            .header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+            .logo { height: 50px; }
+            .school-name { font-size: 14px; color: #666; font-weight: bold; }
+            .role-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+            .role-student { background: #e0e7ff; color: #4338ca; }
+            .role-parent { background: #ffedd5; color: #c2410c; }
+            .name { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+            .pin-box { background: #f3f4f6; padding: 10px; text-align: center; border-radius: 8px; margin-top: 10px; }
+            .pin-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+            .pin-code { font-size: 24px; font-family: monospace; font-weight: bold; color: #111; letter-spacing: 5px; }
+            .footer { margin-top: 15px; font-size: 10px; color: #999; text-align: center; }
+            @media print {
+               .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom: 20px; text-align: center;">
+             <button onclick="window.print()" style="font-size: 16px; padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 5px; cursor: pointer;">🖨️ Imprimir Fichas</button>
+             <p>Utiliza la configuración de impresión de tu navegador para ajustar márgenes y escala.</p>
+          </div>
+          <h1 style="text-align: center; margin-bottom: 30px;">Claves de Acceso - ${selectedFamilyClass.name}</h1>
+          <div class="grid">
+            ${studentsInClass.map(student => {
+                // Find Parent
+                const parent = users.find(u => u.familyId === student.familyId && u.role === Role.PARENT);
+
+                const studentCard = `
+                  <div class="card">
+                     <div class="header">
+                        <img src="/logo.png" class="logo" onerror="this.style.display='none'"/>
+                        <div>
+                           <div class="school-name">CE La Hispanidad</div>
+                           <div class="school-name" style="font-weight: normal; font-size: 12px;">Prisma System</div>
+                        </div>
+                     </div>
+                     <span class="role-badge role-student">Alumno / Estudiante</span>
+                     <div class="name">${student.name}</div>
+                     <div style="font-size: 12px; color: #666;">Clase: ${selectedFamilyClass.name}</div>
+
+                     <div class="pin-box">
+                        <div class="pin-label">PIN DE ACCESO</div>
+                        <div class="pin-code">${student.pin}</div>
+                     </div>
+                     <div class="footer">Este PIN es personal e intransferible.</div>
+                  </div>
+                `;
+
+                let parentCard = '';
+                if (parent) {
+                    parentCard = `
+                      <div class="card">
+                         <div class="header">
+                            <img src="/logo.png" class="logo" onerror="this.style.display='none'"/>
+                            <div>
+                               <div class="school-name">CE La Hispanidad</div>
+                               <div class="school-name" style="font-weight: normal; font-size: 12px;">Prisma System</div>
+                            </div>
+                         </div>
+                         <span class="role-badge role-parent">Familia / Tutor Legal</span>
+                         <div class="name">${parent.name}</div>
+                         <div style="font-size: 12px; color: #666;">Familia de: ${student.name}</div>
+
+                         <div class="pin-box">
+                            <div class="pin-label">PIN DE ACCESO</div>
+                            <div class="pin-code">${parent.pin}</div>
+                         </div>
+                         <div class="footer">Accede seleccionando tu clase y familia.</div>
+                      </div>
+                    `;
+                } else {
+                    parentCard = `<div class="card" style="border-style: dotted; opacity: 0.5; display: flex; align-items: center; justify-content: center;">Sin Familia Asignada</div>`;
+                }
+
+                return studentCard + parentCard;
+            }).join('')}
+          </div>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   // --- RENDERERS ---
 
   const renderClassDetail = () => {
@@ -1193,6 +1352,15 @@ const AdminDashboard: React.FC = () => {
              </div>
          </div>
 
+         <div className="flex justify-end">
+             <button
+                onClick={handlePrintClassPins}
+                className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors font-bold text-sm"
+             >
+                <Printer size={18} /> Imprimir Claves (PDF)
+             </button>
+         </div>
+
         {/* Move User Modal */}
         {userToMove && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1223,6 +1391,46 @@ const AdminDashboard: React.FC = () => {
                         Confirmar
                       </button>
                    </div>
+                </div>
+             </div>
+          </div>
+        )}
+
+        {/* Generic User Edit Modal */}
+        {editingUserGeneric && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+             <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-6">
+                   <h3 className="text-lg font-bold text-gray-800">Editar Usuario</h3>
+                   <button onClick={() => setEditingUserGeneric(null)} className="text-gray-400 hover:text-gray-600"><X size={24}/></button>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                   <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre</label>
+                     <input
+                       value={editUserGenericName}
+                       onChange={e => setEditUserGenericName(e.target.value)}
+                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none"
+                     />
+                   </div>
+                   <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">PIN de Acceso</label>
+                     <input
+                       value={editUserGenericPin}
+                       onChange={e => setEditUserGenericPin(e.target.value)}
+                       maxLength={4}
+                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none font-mono"
+                     />
+                   </div>
+                   <p className="text-xs text-gray-400 italic">
+                       * Nota: Se recomienda usar números primos para evitar colisiones, pero puedes asignar cualquier PIN manualmente si lo deseas.
+                   </p>
+                </div>
+
+                <div className="flex justify-end gap-3">
+                   <button onClick={() => setEditingUserGeneric(null)} className="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
+                   <button onClick={handleSaveGenericUser} className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Guardar</button>
                 </div>
              </div>
           </div>
@@ -1331,6 +1539,13 @@ const AdminDashboard: React.FC = () => {
                            <li key={p.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
                              <span className="text-sm font-medium">{p.name} <span className="text-gray-400 text-xs font-mono ml-1">PIN: {p.pin}</span></span>
                              <div className="flex items-center gap-1">
+                               <button
+                                  onClick={() => handleEditGenericUser(p)}
+                                  className="text-gray-400 hover:text-blue-500 p-1"
+                                  title="Editar PIN/Nombre"
+                               >
+                                  <Edit2 size={14} />
+                               </button>
                                <button 
                                   onClick={() => initiateMoveUser(p)}
                                   className="text-gray-400 hover:text-orange-500 p-1"
@@ -1368,6 +1583,13 @@ const AdminDashboard: React.FC = () => {
                                    <option value="">Clase?</option>
                                    {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
+                                <button
+                                  onClick={() => handleEditGenericUser(s)}
+                                  className="text-gray-400 hover:text-blue-500"
+                                  title="Editar PIN/Nombre"
+                                >
+                                  <Edit2 size={14} />
+                                </button>
                                 <button 
                                   onClick={() => initiateMoveUser(s)}
                                   className="text-gray-400 hover:text-orange-500"
