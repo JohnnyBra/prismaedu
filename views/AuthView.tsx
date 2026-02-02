@@ -327,7 +327,7 @@ const AuthView: React.FC = () => {
              )}
           </div>
           <h2 className="text-xl font-bold text-gray-800">
-             {selectedUser ? `Hola, ${selectedUser.name}` : 'Acceso de Alumno'}
+             {selectedUser ? `Hola, ${selectedUser.name}` : 'Acceso de Alumno/Familia'}
           </h2>
           <p className="text-gray-500 text-sm">Introduce tu PIN</p>
         </div>
