@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { useData } from '../context/DataContext';
+import { isPrime, generateUniquePrime } from '../utils/primes';
 import { Role, User, Task } from '../types';
 import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon } from 'lucide-react';
 import Avatar from '../components/Avatar';
@@ -128,7 +129,7 @@ const AdminDashboard: React.FC = () => {
           role: Role.STUDENT,
           classId: addingStudentClassId,
           familyId: familyId,
-          pin: '0000',
+          pin: generateUniquePrime(users.map(u => u.pin)),
           points: 0
         },
         {
@@ -182,6 +183,7 @@ const AdminDashboard: React.FC = () => {
 
       const newUsers: Omit<User, 'id'>[] = [];
       let count = 0;
+      const usedPins = new Set(users.map(u => u.pin));
 
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i];
@@ -208,6 +210,9 @@ const AdminDashboard: React.FC = () => {
         const fullName = `${rawName} ${rawSurname}`;
 
         // Create Student
+        const studentPin = generateUniquePrime(Array.from(usedPins));
+        usedPins.add(studentPin);
+
         newUsers.push({
           name: fullName,
           firstName: rawName,
@@ -215,7 +220,7 @@ const AdminDashboard: React.FC = () => {
           role: Role.STUDENT,
           classId: importingClassId,
           familyId: familyId,
-          pin: '0000',
+          pin: studentPin,
           points: 0
         });
 
@@ -579,6 +584,16 @@ const AdminDashboard: React.FC = () => {
 
   const handleSaveStudent = () => {
     if (editingStudent && editStudentName) {
+      if (!isPrime(parseInt(editStudentPin))) {
+          alert('El PIN debe ser un número primo.');
+          return;
+      }
+      const isDuplicate = users.some(u => u.id !== editingStudent.id && u.pin === editStudentPin);
+      if (isDuplicate) {
+          alert('Este PIN ya está en uso por otro usuario.');
+          return;
+      }
+
       updateUser(editingStudent.id, {
         name: editStudentName,
         pin: editStudentPin
