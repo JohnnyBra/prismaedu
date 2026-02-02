@@ -40,6 +40,14 @@ const AuthView: React.FC = () => {
         setError('PIN Incorrecto');
         setPin('');
       }
+    } else if (selectedClassId && step === 'PIN_ENTRY') {
+      const user = users.find(u => u.classId === selectedClassId && u.pin === pin);
+      if (user) {
+        login(user.id, pin);
+      } else {
+        setError('PIN Incorrecto');
+        setPin('');
+      }
     }
   };
 
@@ -47,8 +55,13 @@ const AuthView: React.FC = () => {
     setError('');
     setPin('');
     if (step === 'PIN_ENTRY') {
-      setStep('USER_SELECT');
-      setSelectedUser(null);
+      if (selectedClassId && !selectedUser) {
+        setStep('CLASS_SELECT');
+        setSelectedClassId(null);
+      } else {
+        setStep('USER_SELECT');
+        setSelectedUser(null);
+      }
     } else if (step === 'USER_SELECT') {
       if (selectedContext === 'ADMIN') {
           setStep('MODE_SELECT'); 
@@ -180,7 +193,8 @@ const AuthView: React.FC = () => {
                     key={cls.id}
                     onClick={() => {
                       setSelectedClassId(cls.id);
-                      setStep('GROUP_SELECT');
+                      setStep('PIN_ENTRY');
+                      setSelectedUser(null);
                     }}
                     className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all border border-white/20 text-center"
                  >
@@ -298,15 +312,23 @@ const AuthView: React.FC = () => {
     <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-sm w-full animate-in zoom-in duration-300">
         <div className="text-center mb-6">
           <div className="mx-auto w-20 h-20 mb-4">
-             {selectedUser?.role === Role.STUDENT ? (
-                <Avatar config={selectedUser.avatarConfig} size={80} />
+             {selectedUser ? (
+                selectedUser.role === Role.STUDENT ? (
+                    <Avatar config={selectedUser.avatarConfig} size={80} />
+                ) : (
+                    <div className={`w-full h-full rounded-full flex items-center justify-center ${selectedUser.role === Role.ADMIN ? 'bg-gray-800 text-white' : 'bg-indigo-100 text-indigo-600'}`}>
+                    {selectedUser.role === Role.ADMIN ? <Shield size={40} /> : <UserIcon size={40} />}
+                    </div>
+                )
              ) : (
-                <div className={`w-full h-full rounded-full flex items-center justify-center ${selectedUser?.role === Role.ADMIN ? 'bg-gray-800 text-white' : 'bg-indigo-100 text-indigo-600'}`}>
-                   {selectedUser?.role === Role.ADMIN ? <Shield size={40} /> : <UserIcon size={40} />}
+                <div className="w-full h-full rounded-full flex items-center justify-center bg-indigo-100 text-indigo-600">
+                    <KeyRound size={40} />
                 </div>
              )}
           </div>
-          <h2 className="text-xl font-bold text-gray-800">Hola, {selectedUser?.name}</h2>
+          <h2 className="text-xl font-bold text-gray-800">
+             {selectedUser ? `Hola, ${selectedUser.name}` : 'Acceso de Alumno'}
+          </h2>
           <p className="text-gray-500 text-sm">Introduce tu PIN</p>
         </div>
 

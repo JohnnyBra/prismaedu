@@ -7,12 +7,55 @@ const SURNAMES = [
   'Morales', 'Suárez', 'Ortega', 'Delgado', 'Castro', 'Ortiz', 'Rubio', 'Marín', 'Sanz', 'Iglesias'
 ];
 
+// --- Prime Utility Logic ---
+const isPrime = (num) => {
+  if (num <= 1) return false;
+  if (num <= 3) return true;
+  if (num % 2 === 0 || num % 3 === 0) return false;
+
+  for (let i = 5; i * i <= num; i += 6) {
+    if (num % i === 0 || num % (i + 2) === 0) return false;
+  }
+  return true;
+};
+
+const generatePrime = (min, max) => {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+    if (isPrime(num)) {
+      return num;
+    }
+  }
+};
+
+const generateUniquePrime = (excludeSet) => {
+  const min = 0;
+  const max = 9999;
+
+  let attempts = 0;
+  const maxAttempts = 10000;
+
+  while (attempts < maxAttempts) {
+    const p = generatePrime(min, max);
+    const pin = p.toString().padStart(4, '0');
+
+    if (!excludeSet.has(pin)) {
+      return pin;
+    }
+    attempts++;
+  }
+
+  throw new Error("Unable to generate unique prime PIN: Search space exhausted.");
+};
+
 const generateSchoolData = async () => {
     console.log('Initializing School Data...');
     await initDB();
 
     const classes = [];
     const users = [];
+    const usedPins = new Set();
 
     // --- 1. Define Hierarchy ---
     const hierarchy = [
@@ -58,6 +101,7 @@ const generateSchoolData = async () => {
         email: 'admin@colegiolahispanidad.es',
         altPin: '2222'
     });
+    usedPins.add('2222');
 
     // Generate 1 Teacher per Class + Students + Parents
 
@@ -76,6 +120,7 @@ const generateSchoolData = async () => {
             email: `tutor.${emailSafeName}@colegiolahispanidad.es`,
             altPin: '0000'
         });
+        usedPins.add('0000');
 
         // Populate '1º Primaria A' and '1º ESO A' fully for demo
         if (cls.name === '1º Primaria A' || cls.name === '1º ESO A') {
@@ -93,6 +138,9 @@ const generateSchoolData = async () => {
                 const studentEmail = `alumno${i}.${emailSafeName}@colegiolahispanidad.es`;
 
                 // Student
+                const studentPin = generateUniquePrime(usedPins);
+                usedPins.add(studentPin);
+
                 users.push({
                     id: studentId,
                     name: `Alumno ${i} ${surname1}`, // Added surname for sorting checks
@@ -102,7 +150,7 @@ const generateSchoolData = async () => {
                     classId: cls.id,
                     familyId: familyId,
                     points: 100,
-                    pin: '0000',
+                    pin: studentPin,
                     altPin: '0000',
                     email: studentEmail,
                     inventory: ['base_1', 'top_1', 'bot_1'],
