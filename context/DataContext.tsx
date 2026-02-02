@@ -44,6 +44,7 @@ interface DataContextType {
   deleteFamily: (familyId: string) => void;
   updateFamilyId: (oldId: string, newId: string) => void;
   setAllUsers: (users: User[]) => void;
+  migratePins: () => Promise<{success: boolean, count: number}>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -351,6 +352,26 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitUsers(newUsersList);
   };
 
+  const migratePins = (): Promise<{success: boolean, count: number}> => {
+    return new Promise((resolve, reject) => {
+      if (!socket) {
+        reject('No socket connection');
+        return;
+      }
+      if (!currentUser) {
+        reject('User not authenticated');
+        return;
+      }
+      socket.emit('migrate_pins', { requesterId: currentUser.id }, (response: any) => {
+        if (response?.success) {
+          resolve(response);
+        } else {
+          reject(response?.error || 'Unknown error');
+        }
+      });
+    });
+  };
+
   return (
     <DataContext.Provider value={{
       currentUser,
@@ -387,7 +408,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       deleteTask,
       deleteFamily,
       updateFamilyId,
-      setAllUsers
+      setAllUsers,
+      migratePins
     }}>
       {children}
     </DataContext.Provider>

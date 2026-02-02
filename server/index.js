@@ -12,6 +12,49 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// --- Prime Utility Logic ---
+
+const isPrime = (num) => {
+  if (num <= 1) return false;
+  if (num <= 3) return true;
+  if (num % 2 === 0 || num % 3 === 0) return false;
+
+  for (let i = 5; i * i <= num; i += 6) {
+    if (num % i === 0 || num % (i + 2) === 0) return false;
+  }
+  return true;
+};
+
+const generatePrime = (min, max) => {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+    if (isPrime(num)) {
+      return num;
+    }
+  }
+};
+
+const generateUniquePrime = (excludeSet) => {
+  const min = 0;
+  const max = 9999;
+
+  let attempts = 0;
+  const maxAttempts = 10000;
+
+  while (attempts < maxAttempts) {
+    const p = generatePrime(min, max);
+    const pin = p.toString().padStart(4, '0');
+
+    if (!excludeSet.has(pin)) {
+      return pin;
+    }
+    attempts++;
+  }
+
+  throw new Error("Unable to generate unique prime PIN: Search space exhausted.");
+};
+
 // Passport Configuration
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -309,6 +352,60 @@ io.on('connection', async (socket) => {
   socket.on('update_redemptions', async (newRedemptions) => {
     await setData('redemptions', newRedemptions);
     io.emit('sync_redemptions', newRedemptions);
+  });
+
+  socket.on('migrate_pins', async (arg1, arg2) => {
+    let data = {};
+    let callback = null;
+
+    if (typeof arg1 === 'function') {
+      callback = arg1;
+    } else {
+      data = arg1 || {};
+      if (typeof arg2 === 'function') callback = arg2;
+    }
+
+    try {
+      const users = await getData('users', []);
+
+      // Authorization Check
+      const { requesterId } = data;
+      const requester = users.find(u => u.id === requesterId);
+      const allowedRoles = ['ADMIN', 'DIRECCION', 'TESORERIA'];
+
+      if (!requester || !allowedRoles.includes(requester.role)) {
+        if (callback) callback({ success: false, error: 'Unauthorized: Access denied.' });
+        return;
+      }
+
+      let updatedCount = 0;
+
+      // Collect PINs from non-student/parent users to preserve them and ensure uniqueness
+      const usedPins = new Set();
+      users.forEach(u => {
+        if (u.role !== 'STUDENT' && u.role !== 'PARENT' && u.pin) {
+          usedPins.add(u.pin);
+        }
+      });
+
+      // Assign new unique prime PINs to Students and Parents
+      for (const user of users) {
+        if (user.role === 'STUDENT' || user.role === 'PARENT') {
+          const newPin = generateUniquePrime(usedPins);
+          user.pin = newPin;
+          usedPins.add(newPin);
+          updatedCount++;
+        }
+      }
+
+      await setData('users', users);
+      io.emit('sync_users', users);
+
+      if (callback) callback({ success: true, count: updatedCount });
+    } catch (error) {
+      console.error('Migration error:', error);
+      if (callback) callback({ success: false, error: error.message });
+    }
   });
 });
 
