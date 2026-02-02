@@ -17,6 +17,7 @@ export interface ClassGroup {
   stage?: string;
   cycle?: string;
   level?: string;
+  pin?: string;
 }
 
 // Avatar System
