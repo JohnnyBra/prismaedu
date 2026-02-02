@@ -33,7 +33,7 @@ interface DataContextType {
   
   // Admin Actions
   addClass: (name: string) => void;
-  updateClass: (id: string, name: string) => void;
+  updateClass: (id: string, updates: Partial<ClassGroup>) => void;
   deleteClass: (id: string) => void;
   addUser: (user: Omit<User, 'id'>) => void;
   addUsers: (users: Omit<User, 'id'>[]) => void;
@@ -290,8 +290,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitClasses([...classes, { id: `class_${Date.now()}`, name }]);
   };
 
-  const updateClass = (id: string, name: string) => {
-    emitClasses(classes.map(c => c.id === id ? { ...c, name } : c));
+  const updateClass = (id: string, updates: Partial<ClassGroup>) => {
+    emitClasses(classes.map(c => c.id === id ? { ...c, ...updates } : c));
   };
 
   const deleteClass = (id: string) => {

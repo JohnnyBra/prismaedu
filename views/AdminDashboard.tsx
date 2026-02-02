@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { Role, User, Task } from '../types';
 import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon } from 'lucide-react';
 import Avatar from '../components/Avatar';
+import PinEntryModal from '../components/PinEntryModal';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
 
@@ -91,6 +92,14 @@ const AdminDashboard: React.FC = () => {
   const [showChangePin, setShowChangePin] = useState(false);
   const [newAdminPin, setNewAdminPin] = useState('');
 
+  // Class PIN Auth State
+  const [targetClassForAuth, setTargetClassForAuth] = useState<any | null>(null);
+  const [showClassPinModal, setShowClassPinModal] = useState(false);
+
+  // Class PIN Edit State
+  const [editingClassPin, setEditingClassPin] = useState(false);
+  const [newClassPinValue, setNewClassPinValue] = useState('');
+
   // Calculated unassigned families (Memoized for performance)
   const unassignedFamilyIds = useMemo(() => {
      const allFamilyIds = Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!)));
@@ -114,6 +123,30 @@ const AdminDashboard: React.FC = () => {
   }, [users]);
 
   // --- HELPERS ---
+
+  const handleClassClick = (cls: any) => {
+    setTargetClassForAuth(cls);
+    setShowClassPinModal(true);
+  };
+
+  const handlePinSuccess = () => {
+    if (targetClassForAuth) {
+        setSelectedClassForDetail(targetClassForAuth);
+        setTargetClassForAuth(null);
+        setShowClassPinModal(false);
+    }
+  };
+
+  const handleUpdateClassPin = () => {
+    if (selectedClassForDetail && newClassPinValue && newClassPinValue.length === 4) {
+      updateClass(selectedClassForDetail.id, { pin: newClassPinValue });
+      setEditingClassPin(false);
+      setNewClassPinValue('');
+      alert('PIN de clase actualizado');
+    } else {
+      alert('El PIN debe tener 4 dígitos');
+    }
+  };
 
   const handleAddStudentToClass = () => {
     if (addingStudentClassId && newStudentName && newStudentSurnames) {
@@ -713,6 +746,40 @@ const AdminDashboard: React.FC = () => {
            )}
         </div>
 
+        {/* Class PIN Security Section */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+           <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600">
+                <Key size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-800 text-lg">Seguridad de la Clase</h3>
+                <p className="text-gray-500 text-sm">PIN de Acceso: <span className="font-mono font-bold bg-gray-100 px-2 py-0.5 rounded">{selectedClassForDetail.pin || '????'}</span></p>
+              </div>
+           </div>
+
+           {editingClassPin ? (
+             <div className="flex items-center gap-2 animate-in fade-in">
+                <input
+                  value={newClassPinValue}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (/^\d*$/.test(val)) setNewClassPinValue(val);
+                  }}
+                  placeholder="Nuevo PIN"
+                  maxLength={4}
+                  className="w-24 px-3 py-2 border rounded-lg text-center font-mono"
+                />
+                <button onClick={handleUpdateClassPin} className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700"><Save size={18}/></button>
+                <button onClick={() => { setEditingClassPin(false); setNewClassPinValue(''); }} className="bg-gray-200 text-gray-600 p-2 rounded-lg hover:bg-gray-300"><X size={18}/></button>
+             </div>
+           ) : (
+             <button onClick={() => { setEditingClassPin(true); setNewClassPinValue(selectedClassForDetail.pin || ''); }} className="text-indigo-600 font-bold hover:underline text-sm flex items-center gap-2">
+               <Edit2 size={16} /> Cambiar PIN
+             </button>
+           )}
+        </div>
+
         {/* Adding Student Form (Contextual) */}
         {addingStudentClassId === selectedClassForDetail.id && (
              <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex items-center gap-3 animate-in slide-in-from-top-2">
@@ -849,7 +916,7 @@ const AdminDashboard: React.FC = () => {
           <React.Fragment key={cls.id}>
           <div
              className="p-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
-             onClick={() => setSelectedClassForDetail(cls)}
+             onClick={() => handleClassClick(cls)}
           >
             {editingId === cls.id ? (
               <div className="flex items-center gap-2 flex-1" onClick={e => e.stopPropagation()}>
@@ -858,7 +925,7 @@ const AdminDashboard: React.FC = () => {
                    onChange={e => setEditName(e.target.value)} 
                    className="flex-1 px-2 py-1 border rounded"
                  />
-                 <button onClick={() => { updateClass(cls.id, editName); setEditingId(null); }} className="text-green-600"><Save size={18} /></button>
+                 <button onClick={() => { updateClass(cls.id, { name: editName }); setEditingId(null); }} className="text-green-600"><Save size={18} /></button>
                  <button onClick={() => setEditingId(null)} className="text-gray-500"><X size={18} /></button>
               </div>
             ) : (
@@ -1538,6 +1605,15 @@ const AdminDashboard: React.FC = () => {
             accept=".csv"
             className="hidden"
           />
+
+         <PinEntryModal
+            isOpen={showClassPinModal}
+            onClose={() => setShowClassPinModal(false)}
+            onSuccess={handlePinSuccess}
+            expectedPin={targetClassForAuth?.pin}
+            title={`Acceso a ${targetClassForAuth?.name}`}
+            subtitle="Introduce el PIN de la clase"
+         />
       </main>
     </div>
   );

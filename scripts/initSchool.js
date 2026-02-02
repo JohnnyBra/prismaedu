@@ -7,6 +7,29 @@ const SURNAMES = [
   'Morales', 'Suárez', 'Ortega', 'Delgado', 'Castro', 'Ortiz', 'Rubio', 'Marín', 'Sanz', 'Iglesias'
 ];
 
+const isPrime = num => {
+    for(let i = 2, s = Math.sqrt(num); i <= s; i++)
+        if(num % i === 0) return false;
+    return num > 1;
+};
+
+const getPrimePin = (n) => {
+    // We want the n-th prime starting from 3.
+    // Primes: 2, 3, 5, 7, 11...
+    // n=1 -> 3 (2nd prime)
+    // n=2 -> 5 (3rd prime)
+    let count = 0;
+    let num = 2;
+    while (true) {
+        if (isPrime(num)) {
+            count++;
+            // We want to skip the first prime (2), so we look for the (n+1)th prime total
+            if (count === n + 1) return num;
+        }
+        num++;
+    }
+};
+
 const generateSchoolData = async () => {
     console.log('Initializing School Data...');
     await initDB();
@@ -31,13 +54,18 @@ const generateSchoolData = async () => {
         h.levels.forEach(level => {
             ['A', 'B'].forEach(group => {
                 const classId = `class_${classIdCounter}`;
+                // Calculate Prime PIN
+                const prime = getPrimePin(classIdCounter);
+                const pin = prime.toString().padStart(4, '0');
+
                 classes.push({
                     id: classId,
                     name: `${level} ${group}`,
                     stage: h.stage,
                     cycle: h.cycle,
                     level: level,
-                    group: group
+                    group: group,
+                    pin: pin
                 });
                 classIdCounter++;
             });
