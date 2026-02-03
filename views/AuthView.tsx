@@ -41,7 +41,25 @@ const AuthView: React.FC = () => {
         setPin('');
       }
     } else if (selectedClassId && step === 'PIN_ENTRY') {
-      const user = users.find(u => u.classId === selectedClassId && u.pin === pin);
+      // Find students in the class to identify valid families
+      const familyIdsInClass = new Set(
+        users
+          .filter(u => u.classId === selectedClassId && u.familyId)
+          .map(u => u.familyId)
+      );
+
+      const user = users.find(u => {
+        if (u.pin !== pin) return false;
+
+        // Direct match (Student)
+        if (u.classId === selectedClassId) return true;
+
+        // Indirect match (Parent in a family associated with this class)
+        if (u.role === Role.PARENT && u.familyId && familyIdsInClass.has(u.familyId)) return true;
+
+        return false;
+      });
+
       if (user) {
         login(user.id, pin);
       } else {
