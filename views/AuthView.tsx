@@ -386,7 +386,7 @@ const AuthView: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen min-h-[100dvh] mesh-auth flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] mesh-auth flex flex-col items-center p-4 relative overflow-x-hidden">
       {/* Animated floating orbs */}
       <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-primary-500/10 blur-3xl animate-float pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[35vw] h-[35vw] max-w-[400px] max-h-[400px] rounded-full bg-accent-500/10 blur-3xl animate-float-delayed pointer-events-none" />
