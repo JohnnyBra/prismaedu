@@ -34,7 +34,9 @@ No test framework is configured.
 | `types.ts` | All TypeScript type definitions |
 | `constants.tsx` | Static data: avatar items, initial seed tasks/rewards |
 | `App.tsx` | Root component — role-based routing to dashboards |
-| `styles/design-system.css` | Prismatic Glass design system — glass utilities, animations, mesh backgrounds, modal styles |
+| `styles/design-system.css` | Prismatic Glass design system — glass utilities, animations, mesh backgrounds, modal styles, light/dark theme overrides |
+| `context/ThemeContext.tsx` | Light/dark theme provider — system detection, manual override, localStorage persistence (`sc_theme`) |
+| `components/ThemeToggle.tsx` | Reusable theme toggle button (auto → light → dark cycle) |
 | `scripts/initSchool.js` | Database seeding script |
 
 ### Views (role-based dashboards)
@@ -61,12 +63,12 @@ No test framework is configured.
 
 ### Design System — "Prismatic Glass"
 
-The UI uses a dark glassmorphism theme defined in `styles/design-system.css` with Tailwind CSS utilities configured in `index.html`.
+The UI uses a glassmorphism theme defined in `styles/design-system.css` with Tailwind CSS utilities configured in `index.html`. Supports automatic light/dark mode.
 
 - **Typography:** `Outfit` (display/headings, class `font-display`) + `Plus Jakarta Sans` (body, class `font-body`), loaded from Google Fonts.
 - **Color palette:** Primary (indigo), Secondary (orange), Accent (purple), Surface (slate), School (blue), Home (orange) — each with 50-900 shades in Tailwind config.
-- **Glass utilities:** `.glass`, `.glass-light`, `.glass-medium`, `.glass-strong` — frosted backgrounds with `backdrop-filter: blur()` and subtle borders. Do NOT change glass transparency values without explicit request — they are intentionally calibrated.
-- **Gradient mesh backgrounds:** Role-specific: `.mesh-auth`, `.mesh-tutor`, `.mesh-parent`, `.mesh-student`, `.mesh-admin`. Mesh base gradients should stay moderately dark but not pitch black — avoid hex values below `#14` per channel.
+- **Glass utilities:** `.glass`, `.glass-light`, `.glass-medium`, `.glass-strong` — frosted backgrounds with `backdrop-filter: blur()` and subtle borders. Do NOT change glass transparency values without explicit request — they are intentionally calibrated. Light mode overrides these to white translucent backgrounds.
+- **Gradient mesh backgrounds:** Role-specific: `.mesh-auth`, `.mesh-tutor`, `.mesh-parent`, `.mesh-student`, `.mesh-admin`. Dark mode uses deep gradients (avoid hex values below `#14` per channel). Light mode uses pastel variants defined via `html[data-theme="light"]` overrides.
 - **Glow borders:** `.glow-border-blue`, `.glow-border-orange`, `.glow-border-green`, `.glow-border-purple`, `.glow-border-candy` (multicolor, student-specific).
 - **Animations:** `slide-up`, `slide-down`, `scale-in`, `fade-in`, `float`, `glow-pulse`, `shimmer`, `bounce-subtle`, `wiggle`, `pop`, `rainbow-glow` — CSS keyframes + Tailwind `animate-*` classes.
 - **Modals:** `.modal-overlay` (blur backdrop) + `.modal-content` (scale-in animation).
@@ -82,6 +84,17 @@ The student dashboard (`views/StudentDashboard.tsx`) uses a deliberately more pl
 - **Emojis over icons:** Tabs, filters, buttons, and empty states use emoji (📋, 🎁, 💬, 🏫, 🏠, ⭐, etc.) to feel friendlier for children.
 - **Playful copy:** Greeting "¡Hola, nombre! 👋", priority tasks as "¡Misión Especial!", empty states with encouraging messages.
 - **Fun interactions:** `hover:scale` on cards, bouncy point pill animation, rainbow-glow on active tabs.
+
+#### Light/Dark Theme System
+
+The app supports automatic and manual light/dark mode switching:
+
+- **CSS-first approach:** All theme overrides live in `styles/design-system.css` under `html[data-theme="light"]` selectors. No Tailwind dark: prefix needed.
+- **ThemeContext (`context/ThemeContext.tsx`):** React context that detects `prefers-color-scheme` via `matchMedia`, listens for real-time changes, and sets `data-theme` attribute on `<html>`. Preference stored in `localStorage` key `sc_theme` (values: `null`/absent = auto, `'light'`, `'dark'`).
+- **ThemeToggle (`components/ThemeToggle.tsx`):** Button that cycles auto → light → dark. Uses Monitor/Sun/Moon icons from lucide-react. Placed in the header bar of every dashboard and AuthView.
+- **Text color overrides:** `text-white` and `text-white/XX` classes are overridden to dark text in light mode via CSS attribute selectors. Buttons with gradient backgrounds (`from-*`, `bg-gradient-to-*`, `btn-primary`, `btn-danger`) are protected to keep white text.
+- **When adding new UI elements:** Use existing glass/mesh classes — they adapt automatically. Avoid hardcoding `text-white` on non-button elements when possible; prefer `text-white/90` etc. which get properly overridden.
+- **Meta theme-color:** `index.html` has two `<meta name="theme-color">` tags with `media` attributes for dark (`#161040`) and light (`#f0f0ff`).
 
 ### Conventions
 

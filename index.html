@@ -4,7 +4,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#161040" />
+    <meta name="theme-color" content="#161040" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f0f0ff" media="(prefers-color-scheme: light)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -86,7 +87,7 @@
 }
 </script>
   </head>
-  <body class="font-body bg-surface-900 text-gray-100 overscroll-none">
+  <body class="font-body overscroll-none">
     <div id="root"></div>
     <!-- Punto de entrada de la aplicación -->
     <script type="module" src="/index.tsx"></script>
