@@ -12,30 +12,32 @@
   --glass-hover-bg: rgba(255, 255, 255, 0.12);
 
   /* Gradient mesh base colors per role */
-  --mesh-auth: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.4) 0%, transparent 50%),
-               radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.35) 0%, transparent 50%),
-               radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.3) 0%, transparent 50%),
-               linear-gradient(135deg, #0f0a2a 0%, #1a1145 50%, #0f172a 100%);
+  --mesh-auth: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.35) 0%, transparent 50%),
+               radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.3) 0%, transparent 50%),
+               radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.25) 0%, transparent 50%),
+               linear-gradient(135deg, #161040 0%, #221855 50%, #151e38 100%);
 
-  --mesh-tutor: radial-gradient(ellipse at 15% 50%, rgba(99,102,241,0.35) 0%, transparent 50%),
+  --mesh-tutor: radial-gradient(ellipse at 15% 50%, rgba(99,102,241,0.38) 0%, transparent 50%),
                 radial-gradient(ellipse at 85% 30%, rgba(79,70,229,0.3) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 90%, rgba(67,56,202,0.2) 0%, transparent 50%),
-                linear-gradient(135deg, #0f0a2a 0%, #1e1b4b 50%, #0f172a 100%);
+                radial-gradient(ellipse at 50% 90%, rgba(67,56,202,0.22) 0%, transparent 50%),
+                linear-gradient(135deg, #1c1452 0%, #2a2370 50%, #1c2548 100%);
 
-  --mesh-parent: radial-gradient(ellipse at 20% 40%, rgba(251,146,60,0.35) 0%, transparent 50%),
-                 radial-gradient(ellipse at 80% 20%, rgba(249,115,22,0.3) 0%, transparent 50%),
-                 radial-gradient(ellipse at 50% 85%, rgba(234,88,12,0.2) 0%, transparent 50%),
-                 linear-gradient(135deg, #1a0f05 0%, #2a1608 50%, #0f172a 100%);
+  --mesh-parent: radial-gradient(ellipse at 20% 40%, rgba(251,146,60,0.3) 0%, transparent 50%),
+                 radial-gradient(ellipse at 80% 20%, rgba(249,115,22,0.25) 0%, transparent 50%),
+                 radial-gradient(ellipse at 50% 85%, rgba(234,88,12,0.18) 0%, transparent 50%),
+                 linear-gradient(135deg, #231810 0%, #2f1e10 50%, #1a2035 100%);
 
-  --mesh-student: radial-gradient(ellipse at 25% 30%, rgba(34,211,238,0.35) 0%, transparent 50%),
-                  radial-gradient(ellipse at 75% 60%, rgba(99,102,241,0.3) 0%, transparent 50%),
-                  radial-gradient(ellipse at 40% 90%, rgba(59,130,246,0.25) 0%, transparent 50%),
-                  linear-gradient(135deg, #0a1628 0%, #0f1d3a 50%, #0f172a 100%);
+  --mesh-student: radial-gradient(ellipse at 20% 20%, rgba(251,191,36,0.28) 0%, transparent 45%),
+                  radial-gradient(ellipse at 80% 30%, rgba(236,72,153,0.25) 0%, transparent 45%),
+                  radial-gradient(ellipse at 30% 80%, rgba(34,211,238,0.28) 0%, transparent 45%),
+                  radial-gradient(ellipse at 70% 70%, rgba(168,85,247,0.22) 0%, transparent 40%),
+                  radial-gradient(ellipse at 50% 50%, rgba(52,211,153,0.15) 0%, transparent 50%),
+                  linear-gradient(135deg, #1a1550 0%, #22185a 40%, #182048 100%);
 
-  --mesh-admin: radial-gradient(ellipse at 20% 50%, rgba(100,116,139,0.3) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 30%, rgba(71,85,105,0.25) 0%, transparent 50%),
+  --mesh-admin: radial-gradient(ellipse at 20% 50%, rgba(100,116,139,0.32) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 30%, rgba(71,85,105,0.28) 0%, transparent 50%),
                 radial-gradient(ellipse at 50% 80%, rgba(51,65,85,0.2) 0%, transparent 50%),
-                linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+                linear-gradient(135deg, #1a2438 0%, #263548 50%, #1a2438 100%);
 
   /* Safe areas for mobile notch */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -364,4 +366,63 @@ body {
   body {
     height: -webkit-fill-available;
   }
+}
+
+/* ============ STUDENT FUN THEME ============ */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-3deg); }
+  30% { transform: rotate(3deg); }
+  45% { transform: rotate(-2deg); }
+  60% { transform: rotate(2deg); }
+  75% { transform: rotate(-1deg); }
+  90% { transform: rotate(1deg); }
+}
+
+@keyframes pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes rainbow-glow {
+  0% { box-shadow: 0 0 15px rgba(251,191,36,0.25), 0 0 30px rgba(251,191,36,0.08); }
+  33% { box-shadow: 0 0 15px rgba(236,72,153,0.25), 0 0 30px rgba(236,72,153,0.08); }
+  66% { box-shadow: 0 0 15px rgba(34,211,238,0.25), 0 0 30px rgba(34,211,238,0.08); }
+  100% { box-shadow: 0 0 15px rgba(251,191,36,0.25), 0 0 30px rgba(251,191,36,0.08); }
+}
+
+@keyframes confetti-float {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-30px) rotate(180deg); opacity: 0; }
+}
+
+.glass-student {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.glass-student-card {
+  background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.07), rgba(236,72,153,0.05));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.student-points-pill {
+  background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15));
+  border: 1px solid rgba(251,191,36,0.3);
+  animation: pop 3s ease-in-out infinite;
+}
+
+.student-tab-active {
+  animation: rainbow-glow 4s ease-in-out infinite;
+}
+
+.glow-border-candy {
+  box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.15),
+              0 0 0 1px rgba(168, 85, 247, 0.1),
+              0 8px 32px rgba(168, 85, 247, 0.08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }

@@ -90,32 +90,35 @@ const StudentDashboard: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'tasks' as const, icon: CheckCircle, label: 'Tareas', color: 'primary' },
-    { id: 'shop' as const, icon: ShoppingBag, label: 'Tienda', color: 'secondary' },
-    { id: 'chat' as const, icon: MessageSquare, label: 'Profe', color: 'accent', badge: unreadMessages },
+    { id: 'tasks' as const, icon: CheckCircle, label: 'Tareas', emoji: '📋', color: 'primary' },
+    { id: 'shop' as const, icon: ShoppingBag, label: 'Tienda', emoji: '🎁', color: 'secondary' },
+    { id: 'chat' as const, icon: MessageSquare, label: 'Profe', emoji: '💬', color: 'accent', badge: unreadMessages },
   ];
 
   return (
     <div className="min-h-screen min-h-[100dvh] mesh-student flex flex-col font-body relative">
 
       {/* Top Bar */}
-      <div className="glass-medium sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
+      <div className="glass-student sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
         <div className="flex justify-between items-center max-w-4xl mx-auto">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setShowSettings(true)}>
-            <Avatar config={currentUser?.avatarConfig} size={44} showRing glowColor="rgba(34,211,238,0.4)" />
+            <Avatar config={currentUser?.avatarConfig} size={48} showRing glowColor="rgba(168,85,247,0.5)" />
             <div>
-              <h1 className="font-display font-bold text-white/90 leading-none text-base">{currentUser?.name?.split(' ')[0]}</h1>
-              <div className="flex items-center gap-1 mt-0.5">
-                <Star size={12} fill="currentColor" className="text-amber-400" />
-                <span className="font-display font-bold text-amber-400 text-sm">{currentUser?.points}</span>
+              <h1 className="font-display font-extrabold text-white leading-none text-base">
+                ¡Hola, {currentUser?.name?.split(' ')[0]}! 👋
+              </h1>
+              <div className="flex items-center gap-1.5 mt-1.5 student-points-pill px-2.5 py-1 rounded-full w-fit">
+                <Star size={13} fill="currentColor" className="text-amber-400" />
+                <span className="font-display font-extrabold text-amber-400 text-sm">{currentUser?.points}</span>
+                <span className="text-amber-400/70 text-[10px] font-bold">puntos</span>
               </div>
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors">
+            <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/50 hover:text-white/90 hover:bg-white/10 transition-all hover:scale-105">
               <Settings size={18} />
             </button>
-            <button onClick={logout} className="glass rounded-xl p-2.5 text-red-400/60 hover:text-red-400 transition-colors">
+            <button onClick={logout} className="glass rounded-xl p-2.5 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 transition-all hover:scale-105">
               <LogOut size={18} />
             </button>
           </div>
@@ -132,7 +135,7 @@ const StudentDashboard: React.FC = () => {
               <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors">
                 <X size={20} />
               </button>
-              <h2 className="font-display text-lg font-bold text-white/90 mb-4 flex items-center gap-2"><Settings size={18} /> Ajustes</h2>
+              <h2 className="font-display text-lg font-bold text-white mb-4 flex items-center gap-2">⚙️ Ajustes</h2>
               <div className="mb-4">
                 <label className="block text-xs font-semibold text-white/50 mb-2">Cambiar mi PIN</label>
                 <input
@@ -159,25 +162,23 @@ const StudentDashboard: React.FC = () => {
         {priorityAck && pendingPriorityTask && (
           <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-6">
             <div className="glass-strong rounded-3xl p-8 max-w-md w-full text-center shadow-glass-lg modal-content">
-              <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-glow-pulse">
-                <Zap size={36} className="text-red-400" fill="currentColor" />
-              </div>
-              <h2 className="font-display text-2xl font-black text-white/90 mb-2">Nueva Tarea Prioritaria</h2>
-              <p className="text-white/40 mb-6 text-sm">Tu profe ha mandado una tarea importante.</p>
+              <div className="text-5xl mb-4 animate-bounce-subtle">⚡</div>
+              <h2 className="font-display text-2xl font-black text-white mb-2">¡Misión Especial!</h2>
+              <p className="text-white/50 mb-6 text-sm">Tu profe te ha enviado una tarea importante 🚀</p>
 
-              <div className="glass rounded-2xl p-4 mb-6 text-left glow-border-blue">
-                <h3 className="font-display font-bold text-white/90">{pendingPriorityTask.title}</h3>
+              <div className="glass-student-card rounded-2xl p-4 mb-6 text-left glow-border-candy">
+                <h3 className="font-display font-bold text-white">{pendingPriorityTask.title}</h3>
                 <div className="flex justify-between items-center mt-2">
-                  <span className="bg-primary-500/20 text-primary-300 text-xs font-bold px-2.5 py-1 rounded-lg">COLEGIO</span>
-                  <span className="font-display font-bold text-amber-400">+{pendingPriorityTask.points} pts</span>
+                  <span className="bg-primary-400/20 text-primary-300 text-xs font-bold px-2.5 py-1 rounded-lg">🏫 COLEGIO</span>
+                  <span className="font-display font-bold text-amber-400">+{pendingPriorityTask.points} ⭐</span>
                 </div>
               </div>
 
               <button
                 onClick={handlePriorityAck}
-                className="btn-primary w-full py-4 text-lg"
+                className="w-full py-4 text-lg font-display font-bold text-white rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-amber-500 shadow-lg hover:shadow-xl transition-all active:scale-95 hover:scale-[1.02]"
               >
-                <Sparkles size={18} className="inline mr-2" /> A ello!
+                <Sparkles size={18} className="inline mr-2" /> ¡Vamos allá!
               </button>
             </div>
           </div>
@@ -187,23 +188,22 @@ const StudentDashboard: React.FC = () => {
         <div className="hidden md:flex gap-3 mb-6 max-w-lg mx-auto">
           {tabs.map(tab => {
             const active = activeTab === tab.id;
-            const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-300 relative ${
                   active
-                    ? `glass-medium text-white shadow-neon-${tab.color === 'primary' ? 'blue' : tab.color === 'secondary' ? 'orange' : 'purple'}`
-                    : 'glass text-white/40 hover:text-white/60 hover:bg-white/8'
+                    ? 'glass-student-card text-white student-tab-active'
+                    : 'glass text-white/40 hover:text-white/70 hover:bg-white/8 hover:scale-[1.02]'
                 }`}
               >
                 {tab.badge && tab.badge > 0 && (
-                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-bounce-subtle">
+                  <div className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-pink-500 to-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-bounce-subtle">
                     {tab.badge}
                   </div>
                 )}
-                <Icon size={18} />
+                <span className="text-lg">{tab.emoji}</span>
                 {tab.label}
               </button>
             );
@@ -215,15 +215,15 @@ const StudentDashboard: React.FC = () => {
           <div className="animate-slide-up">
             <div className="flex gap-2 mb-5 overflow-x-auto pb-2 scrollbar-hide">
               {[
-                { key: 'ALL' as const, label: 'Todas', activeClass: 'bg-white/15 text-white border-white/20' },
-                { key: 'SCHOOL' as const, label: 'Colegio', activeClass: 'bg-primary-500/20 text-primary-300 border-primary-500/30' },
-                { key: 'HOME' as const, label: 'Casa', activeClass: 'bg-secondary-500/20 text-secondary-300 border-secondary-500/30' },
+                { key: 'ALL' as const, label: '✨ Todas', activeClass: 'bg-white/15 text-white border-white/25 shadow-sm' },
+                { key: 'SCHOOL' as const, label: '🏫 Colegio', activeClass: 'bg-primary-400/20 text-primary-300 border-primary-400/30 shadow-sm' },
+                { key: 'HOME' as const, label: '🏠 Casa', activeClass: 'bg-secondary-400/20 text-secondary-300 border-secondary-400/30 shadow-sm' },
               ].map(f => (
                 <button
                   key={f.key}
                   onClick={() => setTaskFilter(f.key)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-200 ${
-                    taskFilter === f.key ? f.activeClass : 'border-white/8 text-white/30 hover:text-white/50 hover:border-white/15'
+                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all duration-200 hover:scale-105 active:scale-95 ${
+                    taskFilter === f.key ? f.activeClass : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
                   }`}
                 >
                   {f.label}
@@ -233,9 +233,10 @@ const StudentDashboard: React.FC = () => {
 
             <div className="space-y-3">
               {filteredTasks.length === 0 && (
-                <div className="text-center py-16">
-                  <CheckCircle size={40} className="mx-auto mb-3 text-white/15" />
-                  <p className="text-white/30 font-medium text-sm">No hay tareas</p>
+                <div className="text-center py-16 animate-fade-in">
+                  <div className="text-5xl mb-4 animate-bounce-subtle">🎉</div>
+                  <p className="text-white/60 font-display font-bold text-base">¡Todo hecho!</p>
+                  <p className="text-white/30 text-sm mt-1">No tienes tareas pendientes. ¡Buen trabajo!</p>
                 </div>
               )}
               {filteredTasks.map((task, i) => (
@@ -258,15 +259,15 @@ const StudentDashboard: React.FC = () => {
             <div className="flex glass rounded-xl p-1 mb-5">
               <button
                 onClick={() => setShopView('CATALOG')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopView === 'CATALOG' ? 'glass-medium text-white' : 'text-white/40'}`}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopView === 'CATALOG' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
               >
-                Catalogo
+                🛍️ Catalogo
               </button>
               <button
                 onClick={() => setShopView('HISTORY')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 ${shopView === 'HISTORY' ? 'glass-medium text-white' : 'text-white/40'}`}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 ${shopView === 'HISTORY' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
               >
-                <History size={12} /> Historial
+                📜 Historial
               </button>
             </div>
 
@@ -274,15 +275,15 @@ const StudentDashboard: React.FC = () => {
               <>
                 <div className="flex gap-1 mb-5 glass rounded-xl p-1">
                   {[
-                    { key: 'AVATAR' as const, label: 'Avatar', color: 'primary' },
-                    { key: 'SCHOOL_REWARDS' as const, label: 'Colegio', color: 'school' },
-                    { key: 'HOME_REWARDS' as const, label: 'Casa', color: 'home' },
+                    { key: 'AVATAR' as const, label: '🧑‍🎨 Avatar' },
+                    { key: 'SCHOOL_REWARDS' as const, label: '🏫 Colegio' },
+                    { key: 'HOME_REWARDS' as const, label: '🏠 Casa' },
                   ].map(cat => (
                     <button
                       key={cat.key}
                       onClick={() => setShopCategory(cat.key)}
                       className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
-                        shopCategory === cat.key ? 'glass-medium text-white' : 'text-white/40'
+                        shopCategory === cat.key ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'
                       }`}
                     >
                       {cat.label}
@@ -296,7 +297,7 @@ const StudentDashboard: React.FC = () => {
                     return (
                       <div
                         key={item.id}
-                        className="glass rounded-2xl p-4 flex flex-col items-center glow-border-purple"
+                        className="glass-student-card rounded-2xl p-4 flex flex-col items-center glow-border-candy hover:scale-[1.03] transition-transform duration-200"
                         style={{ animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s both` }}
                       >
                         <div className="w-16 h-16 relative mb-3">
@@ -304,19 +305,19 @@ const StudentDashboard: React.FC = () => {
                             <g dangerouslySetInnerHTML={{ __html: item.svg }} />
                           </svg>
                         </div>
-                        <h3 className="font-display font-semibold text-xs text-white/80">{item.name}</h3>
+                        <h3 className="font-display font-semibold text-xs text-white/90">{item.name}</h3>
                         <div className="mt-2 w-full">
                           {owned ? (
-                            <button className="w-full py-1.5 glass text-white/30 rounded-lg text-[10px] font-bold cursor-default" disabled>
-                              Tuyo
+                            <button className="w-full py-1.5 glass text-emerald-400/60 rounded-lg text-[10px] font-bold cursor-default" disabled>
+                              ✅ Tuyo
                             </button>
                           ) : (
                             <button
                               onClick={() => buyAvatarItem(item.id)}
                               disabled={currentUser!.points < item.cost}
-                              className="w-full py-1.5 bg-gradient-to-r from-primary-600 to-accent-600 disabled:from-surface-700 disabled:to-surface-700 disabled:text-white/20 text-white rounded-lg text-[10px] font-bold transition-all hover:shadow-neon-purple active:scale-95"
+                              className="w-full py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 disabled:from-surface-700 disabled:to-surface-700 disabled:text-white/20 text-white rounded-lg text-[10px] font-bold transition-all hover:shadow-neon-purple active:scale-95 hover:brightness-110"
                             >
-                              <Star size={10} className="inline mr-1" fill="currentColor" />{item.cost}
+                              ⭐ {item.cost}
                             </button>
                           )}
                         </div>
@@ -338,32 +339,33 @@ const StudentDashboard: React.FC = () => {
             {shopView === 'HISTORY' && (
               <div className="space-y-3 animate-slide-up">
                 {myRedemptions.length === 0 && (
-                  <div className="text-center py-16">
-                    <ShoppingBag size={40} className="mx-auto mb-3 text-white/15" />
-                    <p className="text-white/30 font-medium text-sm">Aun no has canjeado premios.</p>
+                  <div className="text-center py-16 animate-fade-in">
+                    <div className="text-5xl mb-4">🛒</div>
+                    <p className="text-white/50 font-display font-bold text-sm">¡Aun no has canjeado premios!</p>
+                    <p className="text-white/30 text-xs mt-1">Completa tareas para ganar puntos ⭐</p>
                   </div>
                 )}
                 {myRedemptions.map((redemption, i) => (
                   <div
                     key={redemption.id}
-                    className="glass rounded-2xl p-4 flex justify-between items-center"
+                    className="glass-student-card rounded-2xl p-4 flex justify-between items-center"
                     style={{ animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.04}s both` }}
                   >
                     <div>
-                      <h4 className="font-display font-semibold text-white/80 text-sm">{redemption.rewardTitle}</h4>
+                      <h4 className="font-display font-semibold text-white/90 text-sm">{redemption.rewardTitle}</h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                          redemption.context === 'SCHOOL' ? 'bg-primary-500/15 text-primary-300' : 'bg-secondary-500/15 text-secondary-300'
+                          redemption.context === 'SCHOOL' ? 'bg-primary-400/15 text-primary-300' : 'bg-secondary-400/15 text-secondary-300'
                         }`}>
-                          {redemption.context === 'SCHOOL' ? 'Colegio' : 'Casa'}
+                          {redemption.context === 'SCHOOL' ? '🏫 Colegio' : '🏠 Casa'}
                         </span>
-                        <span className="text-[10px] text-white/25 flex items-center gap-1">
+                        <span className="text-[10px] text-white/30 flex items-center gap-1">
                           <Clock size={10} /> {formatDate(redemption.timestamp)}
                         </span>
                       </div>
                     </div>
                     <div className="font-display font-bold text-red-400 text-sm whitespace-nowrap">
-                      -{redemption.cost}
+                      -⭐{redemption.cost}
                     </div>
                   </div>
                 ))}
@@ -374,10 +376,9 @@ const StudentDashboard: React.FC = () => {
 
         {/* CHAT VIEW */}
         {activeTab === 'chat' && (
-          <div className="animate-slide-up h-[calc(100dvh-220px)] md:h-[60vh] flex flex-col glass rounded-2xl overflow-hidden glow-border-purple">
-            <div className="px-4 py-3 glass-medium font-display font-bold text-white/90 text-sm flex items-center gap-2">
-              <MessageSquare size={16} className="text-accent-400" />
-              Chat con {tutor?.name || 'Tutor'}
+          <div className="animate-slide-up h-[calc(100dvh-220px)] md:h-[60vh] flex flex-col glass-student-card rounded-2xl overflow-hidden glow-border-candy">
+            <div className="px-4 py-3 glass-student font-display font-bold text-white text-sm flex items-center gap-2">
+              💬 Chat con {tutor?.name || 'Tutor'}
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hide">
               {conversation.map(msg => {
@@ -386,25 +387,25 @@ const StudentDashboard: React.FC = () => {
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${
                       isMe
-                        ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-br-md'
-                        : 'glass-light text-white/80 rounded-bl-md'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-br-md shadow-lg shadow-purple-500/15'
+                        : 'glass-student text-white/85 rounded-bl-md'
                     }`}>
                       {msg.content}
                     </div>
                   </div>
                 );
               })}
-              {conversation.length === 0 && <p className="text-center text-white/20 text-sm mt-10">Saluda a tu profe!</p>}
+              {conversation.length === 0 && <p className="text-center text-white/30 text-sm mt-10">👋 ¡Saluda a tu profe!</p>}
             </div>
-            <div className="p-3 glass-medium flex gap-2">
+            <div className="p-3 glass-student flex gap-2">
               <input
                 className="input-glass flex-1 rounded-full text-sm py-2"
-                placeholder="Mensaje..."
+                placeholder="Escribe un mensaje... ✏️"
                 value={chatMessage}
                 onChange={e => setChatMessage(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
               />
-              <button onClick={handleSendMessage} className="bg-gradient-to-r from-primary-600 to-accent-600 text-white p-2.5 rounded-full shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40 transition-all active:scale-95">
+              <button onClick={handleSendMessage} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-2.5 rounded-full shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all active:scale-95 hover:scale-105">
                 <Send size={16} />
               </button>
             </div>
@@ -413,28 +414,27 @@ const StudentDashboard: React.FC = () => {
       </main>
 
       {/* Bottom Nav - Mobile Only */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-medium px-2 pt-2" style={{ paddingBottom: 'calc(0.5rem + var(--safe-bottom))' }}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-student px-2 pt-2" style={{ paddingBottom: 'calc(0.5rem + var(--safe-bottom))' }}>
         <div className="flex justify-around">
           {tabs.map(tab => {
             const active = activeTab === tab.id;
-            const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex flex-col items-center py-1.5 px-4 rounded-xl transition-all duration-200 relative ${
-                  active ? 'text-white' : 'text-white/30'
+                  active ? 'text-white scale-110' : 'text-white/35'
                 }`}
               >
                 {tab.badge && tab.badge > 0 && (
-                  <div className="absolute top-0 right-2 bg-red-500 text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                  <div className="absolute top-0 right-2 bg-gradient-to-r from-pink-500 to-red-500 text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-bounce-subtle">
                     {tab.badge}
                   </div>
                 )}
-                <div className={`p-1.5 rounded-xl transition-all duration-200 ${active ? 'bg-white/15' : ''}`}>
-                  <Icon size={20} />
+                <div className={`p-1.5 rounded-xl transition-all duration-200 ${active ? 'bg-white/15 student-tab-active' : ''}`}>
+                  <span className="text-lg">{tab.emoji}</span>
                 </div>
-                <span className="text-[10px] font-semibold mt-0.5">{tab.label}</span>
+                <span className="text-[10px] font-bold mt-0.5">{tab.label}</span>
               </button>
             );
           })}
@@ -451,28 +451,28 @@ const RewardCard: React.FC<{ reward: any, onRedeem: () => void, userPoints: numb
 
   return (
     <div
-      className={`glass rounded-2xl p-4 flex flex-col justify-between h-full ${isSchool ? 'glow-border-blue' : 'glow-border-orange'}`}
+      className={`glass-student-card rounded-2xl p-4 flex flex-col justify-between h-full hover:scale-[1.03] transition-transform duration-200 ${isSchool ? 'glow-border-blue' : 'glow-border-orange'}`}
       style={{ animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.05}s both` }}
     >
       <div className="text-center mb-3">
         <div className={`w-10 h-10 mx-auto mb-2 rounded-xl flex items-center justify-center ${
-          isSchool ? 'bg-primary-500/20 text-primary-400' : 'bg-secondary-500/20 text-secondary-400'
+          isSchool ? 'bg-primary-400/20 text-primary-300' : 'bg-secondary-400/20 text-secondary-300'
         }`}>
           <ShoppingBag size={18} />
         </div>
-        <h3 className="font-display font-semibold text-xs text-white/80 leading-tight">{reward.title}</h3>
-        {reward.stock !== undefined && <p className="text-[10px] text-white/25 mt-1">Quedan {reward.stock}</p>}
+        <h3 className="font-display font-semibold text-xs text-white/90 leading-tight">{reward.title}</h3>
+        {reward.stock !== undefined && <p className="text-[10px] text-white/30 mt-1">Quedan {reward.stock}</p>}
       </div>
       <button
         onClick={onRedeem}
         disabled={!canAfford || !inStock}
         className={`w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 ${
           canAfford && inStock
-            ? `bg-gradient-to-r ${isSchool ? 'from-primary-600 to-primary-500 shadow-primary-500/20' : 'from-secondary-600 to-secondary-500 shadow-secondary-500/20'} text-white shadow-lg hover:shadow-xl`
+            ? `bg-gradient-to-r ${isSchool ? 'from-primary-500 to-primary-400 shadow-primary-500/20' : 'from-secondary-500 to-secondary-400 shadow-secondary-500/20'} text-white shadow-lg hover:shadow-xl hover:brightness-110`
             : 'bg-white/5 text-white/20 cursor-not-allowed'
         }`}
       >
-        <Star size={10} className="inline mr-1" fill="currentColor" />{reward.cost}
+        ⭐ {reward.cost}
       </button>
     </div>
   );

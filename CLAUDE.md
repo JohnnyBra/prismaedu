@@ -65,13 +65,23 @@ The UI uses a dark glassmorphism theme defined in `styles/design-system.css` wit
 
 - **Typography:** `Outfit` (display/headings, class `font-display`) + `Plus Jakarta Sans` (body, class `font-body`), loaded from Google Fonts.
 - **Color palette:** Primary (indigo), Secondary (orange), Accent (purple), Surface (slate), School (blue), Home (orange) — each with 50-900 shades in Tailwind config.
-- **Glass utilities:** `.glass`, `.glass-light`, `.glass-medium`, `.glass-strong` — frosted backgrounds with `backdrop-filter: blur()` and subtle borders.
-- **Gradient mesh backgrounds:** Role-specific: `.mesh-auth`, `.mesh-tutor`, `.mesh-parent`, `.mesh-student`, `.mesh-admin`.
-- **Glow borders:** `.glow-border-blue`, `.glow-border-orange`, `.glow-border-green`, `.glow-border-purple`.
-- **Animations:** `slide-up`, `slide-down`, `scale-in`, `fade-in`, `float`, `glow-pulse`, `shimmer`, `bounce-subtle` — CSS keyframes + Tailwind `animate-*` classes.
+- **Glass utilities:** `.glass`, `.glass-light`, `.glass-medium`, `.glass-strong` — frosted backgrounds with `backdrop-filter: blur()` and subtle borders. Do NOT change glass transparency values without explicit request — they are intentionally calibrated.
+- **Gradient mesh backgrounds:** Role-specific: `.mesh-auth`, `.mesh-tutor`, `.mesh-parent`, `.mesh-student`, `.mesh-admin`. Mesh base gradients should stay moderately dark but not pitch black — avoid hex values below `#14` per channel.
+- **Glow borders:** `.glow-border-blue`, `.glow-border-orange`, `.glow-border-green`, `.glow-border-purple`, `.glow-border-candy` (multicolor, student-specific).
+- **Animations:** `slide-up`, `slide-down`, `scale-in`, `fade-in`, `float`, `glow-pulse`, `shimmer`, `bounce-subtle`, `wiggle`, `pop`, `rainbow-glow` — CSS keyframes + Tailwind `animate-*` classes.
 - **Modals:** `.modal-overlay` (blur backdrop) + `.modal-content` (scale-in animation).
 - **Form elements:** `.input-glass`, `.btn-primary`, `.btn-ghost`, `.btn-danger`.
 - **Mobile:** Bottom nav with safe area insets (`--safe-top`, `--safe-bottom`), `min-h-[100dvh]`, touch-optimized targets.
+
+#### Student-specific theme
+
+The student dashboard (`views/StudentDashboard.tsx`) uses a deliberately more playful, childish visual tone compared to other roles:
+
+- **Student CSS classes:** `.glass-student`, `.glass-student-card`, `.student-points-pill`, `.student-tab-active`, `.glow-border-candy` — defined at the bottom of `design-system.css`.
+- **Student mesh:** Uses candy-like multi-color radial gradients (amber, pink, cyan, purple, emerald) instead of the monochrome palette of other roles.
+- **Emojis over icons:** Tabs, filters, buttons, and empty states use emoji (📋, 🎁, 💬, 🏫, 🏠, ⭐, etc.) to feel friendlier for children.
+- **Playful copy:** Greeting "¡Hola, nombre! 👋", priority tasks as "¡Misión Especial!", empty states with encouraging messages.
+- **Fun interactions:** `hover:scale` on cards, bouncy point pill animation, rainbow-glow on active tabs.
 
 ### Conventions
 
