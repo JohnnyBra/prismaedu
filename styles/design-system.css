@@ -597,6 +597,34 @@ html[data-theme="light"] [class*="bg-emerald-"] {
   color: white !important;
 }
 
+/* --- Surface dark backgrounds → light in light mode --- */
+html[data-theme="light"] [class*="bg-surface-700"] {
+  background-color: #e2e8f0 !important;
+}
+html[data-theme="light"] [class*="bg-surface-600"] {
+  background-color: #cbd5e1 !important;
+}
+/* Keep icon/text inside surface boxes visible (dark on light bg) */
+html[data-theme="light"] [class*="bg-surface-700"] *,
+html[data-theme="light"] [class*="bg-surface-600"] * {
+  color: #475569 !important;
+}
+html[data-theme="light"] [class*="bg-surface-700"]:hover *,
+html[data-theme="light"] [class*="bg-surface-600"]:hover * {
+  color: #334155 !important;
+}
+
+/* --- Red text (logout/danger icons) more visible in light mode --- */
+html[data-theme="light"] [class*="text-red-400\/5"] {
+  color: rgba(220, 38, 38, 0.7) !important;
+}
+html[data-theme="light"] [class*="text-red-400\/6"] {
+  color: rgba(220, 38, 38, 0.75) !important;
+}
+html[data-theme="light"] [class*="text-red-400"]:hover {
+  color: #dc2626 !important;
+}
+
 /* Re-protect gradient text (uses -webkit-text-fill-color) */
 html[data-theme="light"] .gradient-text,
 html[data-theme="light"] .gradient-text-warm {
