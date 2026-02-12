@@ -36,7 +36,7 @@ const AdminDashboard: React.FC = () => {
   const [editingUserGeneric, setEditingUserGeneric] = useState<User | null>(null);
   const [editUserGenericName, setEditUserGenericName] = useState('');
   const [editUserGenericPin, setEditUserGenericPin] = useState('');
-  
+
   // CSV Import State
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importTutorsFileRef = useRef<HTMLInputElement>(null);
@@ -704,18 +704,8 @@ const AdminDashboard: React.FC = () => {
   const handlePrintClassPins = () => {
     if (!selectedFamilyClass) return;
 
-    // Filter Students and Parents for this class
-    // We want to print cards: One for Student, One for Parent(s) linked to that student?
-    // Or just list all users in the class structure?
-
-    // Strategy: List by Family.
-    // Family Header -> Parent Card -> Student Card(s)
-
     let studentsInClass: User[] = [];
     if (selectedFamilyClass.id === 'unassigned') {
-        // Hard to define "class" for unassigned, but we can print them if needed.
-        // Let's focus on real classes for now or just filter by unassigned.
-        // For unassigned, we might pick all unassigned students?
         studentsInClass = users.filter(u => u.role === Role.STUDENT && !u.classId);
     } else {
         studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedFamilyClass.id);
@@ -834,37 +824,37 @@ const AdminDashboard: React.FC = () => {
       .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
 
     return (
-      <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+      <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
            <div className="flex items-center gap-4">
              <button
                onClick={() => setSelectedClassForDetail(null)}
-               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+               className="p-2 rounded-xl glass hover:bg-white/10 transition-colors"
              >
-               <ArrowLeft size={24} className="text-gray-600"/>
+               <ArrowLeft size={24} className="text-white/60"/>
              </button>
              <div>
-               <h2 className="text-2xl font-bold text-gray-800">{selectedClassForDetail.name}</h2>
-               <p className="text-gray-500 text-sm">{classStudents.length} alumnos matriculados</p>
+               <h2 className="text-2xl font-display font-bold text-white/90">{selectedClassForDetail.name}</h2>
+               <p className="text-white/40 text-sm font-body">{classStudents.length} alumnos matriculados</p>
              </div>
            </div>
 
            <div className="flex gap-2">
              <button
                 onClick={() => { setAddingStudentClassId(selectedClassForDetail.id); setNewStudentName(''); setNewStudentSurnames(''); }}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 font-bold text-sm"
+                className="btn-primary flex items-center gap-2 text-sm"
               >
                 <UserPlus size={18} /> Añadir Alumno
               </button>
               <button
                 onClick={() => handleImportCSV(selectedClassForDetail.id)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 font-bold text-sm"
+                className="btn-ghost flex items-center gap-2 text-sm !bg-emerald-500/15 !border-emerald-500/25 !text-emerald-300 hover:!bg-emerald-500/25"
               >
                 <Upload size={18} /> Importar CSV
               </button>
               <button
                 onClick={handleDeleteAllStudents}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 font-bold text-sm"
+                className="btn-ghost flex items-center gap-2 text-sm !bg-red-500/15 !border-red-500/25 !text-red-400 hover:!bg-red-500/25"
                 title="Eliminar todos los alumnos"
               >
                 <Trash2 size={18} />
@@ -873,26 +863,26 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Tutor Section */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+        <div className="glass rounded-2xl glow-border-blue p-6 flex items-center justify-between">
            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+              <div className="w-12 h-12 rounded-xl bg-primary-500/20 flex items-center justify-center text-primary-400">
                 <GraduationCap size={24} />
               </div>
               <div>
-                <h3 className="font-bold text-gray-800 text-lg">Tutor/a del Grupo</h3>
+                <h3 className="font-display font-bold text-white/90 text-lg">Tutor/a del Grupo</h3>
                 {classTutor ? (
-                  <p className="text-gray-600">{classTutor.name} <span className="text-gray-400 text-sm">({classTutor.email})</span></p>
+                  <p className="text-white/60 font-body">{classTutor.name} <span className="text-white/30 text-sm">({classTutor.email})</span></p>
                 ) : (
-                  <p className="text-red-400 italic">Sin tutor asignado</p>
+                  <p className="text-red-400/70 italic font-body">Sin tutor asignado</p>
                 )}
               </div>
            </div>
            {classTutor ? (
-             <button onClick={() => { setActiveTab('TUTORS'); handleEditTutor(classTutor); }} className="text-indigo-600 font-bold hover:underline text-sm">
+             <button onClick={() => { setActiveTab('TUTORS'); handleEditTutor(classTutor); }} className="text-primary-400 font-bold hover:text-primary-300 text-sm transition-colors">
                Gestionar Tutor
              </button>
            ) : (
-             <button onClick={() => setActiveTab('TUTORS')} className="text-indigo-600 font-bold hover:underline text-sm">
+             <button onClick={() => setActiveTab('TUTORS')} className="text-primary-400 font-bold hover:text-primary-300 text-sm transition-colors">
                Asignar Tutor
              </button>
            )}
@@ -900,50 +890,50 @@ const AdminDashboard: React.FC = () => {
 
         {/* Adding Student Form (Contextual) */}
         {addingStudentClassId === selectedClassForDetail.id && (
-             <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex items-center gap-3 animate-in slide-in-from-top-2">
-               <span className="text-sm font-bold text-indigo-800 uppercase mr-2">Nuevo Alumno:</span>
+             <div className="glass-light rounded-2xl glow-border-blue p-6 flex items-center gap-3 animate-slide-up">
+               <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider mr-2">Nuevo Alumno:</span>
                <input
                  value={newStudentName}
                  onChange={e => setNewStudentName(e.target.value)}
                  placeholder="Nombre"
-                 className="flex-1 px-4 py-2 rounded-lg border border-indigo-200"
+                 className="input-glass flex-1"
                />
                <input
                  value={newStudentSurnames}
                  onChange={e => setNewStudentSurnames(e.target.value)}
                  placeholder="Apellidos"
-                 className="flex-1 px-4 py-2 rounded-lg border border-indigo-200"
+                 className="input-glass flex-1"
                />
-               <button onClick={handleAddStudentToClass} className="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700"><CheckSquare size={20}/></button>
-               <button onClick={() => setAddingStudentClassId(null)} className="text-gray-400 hover:text-gray-600 p-2"><X size={20}/></button>
+               <button onClick={handleAddStudentToClass} className="btn-primary !p-2.5"><CheckSquare size={20}/></button>
+               <button onClick={() => setAddingStudentClassId(null)} className="text-white/30 hover:text-white/60 p-2 transition-colors"><X size={20}/></button>
              </div>
         )}
 
         {/* Students List */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-           <div className="p-4 border-b border-gray-50 bg-gray-50 flex justify-between items-center">
-              <h3 className="font-bold text-gray-700">Listado de Alumnos</h3>
-              <span className="text-xs text-gray-400 uppercase font-bold">Pinchar para editar</span>
+        <div className="glass rounded-2xl shadow-glass overflow-hidden">
+           <div className="px-4 py-3 border-b border-white/10 glass-light flex justify-between items-center">
+              <h3 className="font-display font-bold text-white/80">Listado de Alumnos</h3>
+              <span className="text-[10px] text-white/30 uppercase font-bold tracking-wider">Pinchar para editar</span>
            </div>
 
-           <div className="divide-y divide-gray-50">
-             {classStudents.length === 0 && <p className="p-8 text-center text-gray-400">No hay alumnos en esta clase.</p>}
+           <div className="divide-y divide-white/5">
+             {classStudents.length === 0 && <p className="p-8 text-center text-white/30 font-body">No hay alumnos en esta clase.</p>}
              {classStudents.map(student => (
                <div
                  key={student.id}
                  onClick={() => handleEditStudent(student)}
-                 className="p-4 flex items-center justify-between hover:bg-blue-50 cursor-pointer transition-colors group"
+                 className="p-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors group"
                >
                   <div className="flex items-center gap-4">
                      <Avatar config={student.avatarConfig} size={40} />
                      <div>
-                       <p className="font-bold text-gray-800">{student.name}</p>
-                       <p className="text-xs text-gray-400">PIN: {student.pin} | Puntos: {student.points}</p>
+                       <p className="font-bold text-white/90 font-body">{student.name}</p>
+                       <p className="text-xs text-white/30 font-mono">PIN: {student.pin} | Puntos: {student.points}</p>
                      </div>
                   </div>
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                     <span className="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">EDITAR</span>
-                     <ChevronRight size={16} className="text-indigo-400" />
+                     <span className="text-[10px] font-bold text-primary-400 bg-primary-500/15 px-2 py-1 rounded-lg">EDITAR</span>
+                     <ChevronRight size={16} className="text-primary-400/60" />
                   </div>
                </div>
              ))}
@@ -952,33 +942,33 @@ const AdminDashboard: React.FC = () => {
 
         {/* Edit Student Modal */}
         {editingStudent && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+          <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+             <div className="glass-strong rounded-3xl p-6 w-full max-w-md shadow-glass-lg modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
-                   <h3 className="text-lg font-bold text-gray-800">Editar Alumno</h3>
-                   <button onClick={() => setEditingStudent(null)} className="text-gray-400 hover:text-gray-600"><X size={24}/></button>
+                   <h3 className="text-lg font-display font-bold text-white/90">Editar Alumno</h3>
+                   <button onClick={() => setEditingStudent(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={24}/></button>
                 </div>
 
                 <div className="space-y-4 mb-6">
                    <div>
-                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre Completo</label>
+                     <label className="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-1">Nombre Completo</label>
                      <input
                        value={editStudentName}
                        onChange={e => setEditStudentName(e.target.value)}
-                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none"
+                       className="input-glass w-full"
                      />
                    </div>
                    <div>
-                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">PIN de Acceso</label>
+                     <label className="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-1">PIN de Acceso</label>
                      <input
                        value={editStudentPin}
                        onChange={e => setEditStudentPin(e.target.value)}
                        maxLength={4}
-                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none font-mono"
+                       className="input-glass w-full font-mono"
                      />
                    </div>
-                   <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-500">
-                     <p>Familia vinculada: <span className="font-bold text-gray-700">{users.find(u => u.familyId === editingStudent.familyId && u.role === Role.PARENT)?.name || 'Desconocida'}</span></p>
+                   <div className="p-3 glass rounded-xl text-xs text-white/40 font-body">
+                     <p>Familia vinculada: <span className="font-bold text-white/70">{users.find(u => u.familyId === editingStudent.familyId && u.role === Role.PARENT)?.name || 'Desconocida'}</span></p>
                      <p>ID Familia: {editingStudent.familyId}</p>
                    </div>
                 </div>
@@ -986,13 +976,13 @@ const AdminDashboard: React.FC = () => {
                 <div className="flex gap-3">
                    <button
                      onClick={handleDeleteStudent}
-                     className="px-4 py-2 text-red-500 font-bold hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100"
+                     className="btn-ghost !text-red-400 !border-red-500/20 hover:!bg-red-500/15"
                    >
                      Eliminar
                    </button>
                    <div className="flex-1"></div>
-                   <button onClick={() => setEditingStudent(null)} className="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
-                   <button onClick={handleSaveStudent} className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Guardar</button>
+                   <button onClick={() => setEditingStudent(null)} className="btn-ghost">Cancelar</button>
+                   <button onClick={handleSaveStudent} className="btn-primary">Guardar</button>
                 </div>
              </div>
           </div>
@@ -1007,61 +997,61 @@ const AdminDashboard: React.FC = () => {
     }
 
     return (
-    <div className="space-y-4 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">Clases del Colegio</h2>
-        <button onClick={() => setShowAddClass(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700">
+        <h2 className="text-xl font-display font-bold text-white/90">Clases del Colegio</h2>
+        <button onClick={() => setShowAddClass(true)} className="btn-primary flex items-center gap-2">
           <Plus size={18} /> Añadir Clase
         </button>
       </div>
 
       {showAddClass && (
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center gap-2">
-          <input 
-            value={newClassName} 
+        <div className="glass-light rounded-2xl glow-border-blue p-4 flex items-center gap-2 animate-slide-up">
+          <input
+            value={newClassName}
             onChange={e => setNewClassName(e.target.value)}
-            placeholder="Nombre de la clase (ej. 3º A)" 
-            className="flex-1 px-4 py-2 rounded-lg border border-gray-300"
+            placeholder="Nombre de la clase (ej. 3º A)"
+            className="input-glass flex-1"
           />
-          <button onClick={handleCreateClass} className="bg-green-600 text-white p-2 rounded-lg"><Save size={20}/></button>
-          <button onClick={() => setShowAddClass(false)} className="bg-gray-300 text-gray-700 p-2 rounded-lg"><X size={20}/></button>
+          <button onClick={handleCreateClass} className="btn-primary !p-2.5"><Save size={20}/></button>
+          <button onClick={() => setShowAddClass(false)} className="btn-ghost !p-2.5"><X size={20}/></button>
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y">
-        {classes.length === 0 && <p className="p-8 text-center text-gray-400">No hay clases registradas.</p>}
+      <div className="glass rounded-2xl shadow-glass overflow-hidden divide-y divide-white/5">
+        {classes.length === 0 && <p className="p-8 text-center text-white/30 font-body">No hay clases registradas.</p>}
         {classes.map(cls => (
           <React.Fragment key={cls.id}>
           <div
-             className="p-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+             className="p-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors"
              onClick={() => setSelectedClassForDetail(cls)}
           >
             {editingId === cls.id ? (
               <div className="flex items-center gap-2 flex-1" onClick={e => e.stopPropagation()}>
-                 <input 
-                   value={editName} 
-                   onChange={e => setEditName(e.target.value)} 
-                   className="flex-1 px-2 py-1 border rounded"
+                 <input
+                   value={editName}
+                   onChange={e => setEditName(e.target.value)}
+                   className="input-glass flex-1"
                  />
-                 <button onClick={() => { updateClass(cls.id, editName); setEditingId(null); }} className="text-green-600"><Save size={18} /></button>
-                 <button onClick={() => setEditingId(null)} className="text-gray-500"><X size={18} /></button>
+                 <button onClick={() => { updateClass(cls.id, editName); setEditingId(null); }} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save size={18} /></button>
+                 <button onClick={() => setEditingId(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={18} /></button>
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold">
+                 <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center text-primary-400 font-display font-bold">
                     {cls.name.charAt(0)}
                  </div>
                  <div>
-                    <span className="font-bold text-gray-700 block">{cls.name}</span>
-                    <span className="text-xs text-gray-400">{users.filter(u => u.classId === cls.id && u.role === Role.STUDENT).length} alumnos</span>
+                    <span className="font-bold text-white/90 block font-body">{cls.name}</span>
+                    <span className="text-xs text-white/30">{users.filter(u => u.classId === cls.id && u.role === Role.STUDENT).length} alumnos</span>
                  </div>
               </div>
             )}
-            
+
             <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-              <button onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-gray-400 hover:text-blue-600"><Edit2 size={18} /></button>
-              <button onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-gray-400 hover:text-red-600"><Trash2 size={18} /></button>
-              <ChevronRight size={20} className="text-gray-300 ml-2" />
+              <button onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-white/20 hover:text-primary-400 transition-colors"><Edit2 size={18} /></button>
+              <button onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-white/20 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
+              <ChevronRight size={20} className="text-white/15 ml-2" />
             </div>
           </div>
           </React.Fragment>
@@ -1073,67 +1063,67 @@ const AdminDashboard: React.FC = () => {
 
   const renderTutorsTab = () => {
     return (
-      <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="space-y-4 animate-fade-in">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Profesores / Tutores</h2>
+          <h2 className="text-xl font-display font-bold text-white/90">Profesores / Tutores</h2>
           <div className="flex gap-2">
-            <button onClick={() => importTutorsFileRef.current?.click()} className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700">
+            <button onClick={() => importTutorsFileRef.current?.click()} className="btn-ghost flex items-center gap-2 !bg-emerald-500/15 !border-emerald-500/25 !text-emerald-300 hover:!bg-emerald-500/25">
                 <Upload size={18} /> Importar CSV
             </button>
-            <button onClick={() => { setEditingTutorId(null); setNewTutorName(''); setNewTutorClass(''); setNewTutorPin('9999'); setNewTutorEmail(''); setNewTutorAltPin(''); setShowAddTutor(true); }} className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700">
+            <button onClick={() => { setEditingTutorId(null); setNewTutorName(''); setNewTutorClass(''); setNewTutorPin('9999'); setNewTutorEmail(''); setNewTutorAltPin(''); setShowAddTutor(true); }} className="btn-primary flex items-center gap-2">
                 <Plus size={18} /> Añadir Profesor
             </button>
           </div>
         </div>
 
         {showAddTutor && (
-          <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 grid gap-3">
-            <h4 className="font-bold text-indigo-800 text-sm">{editingTutorId ? 'Editar Profesor' : 'Nuevo Profesor'}</h4>
+          <div className="glass-light rounded-2xl glow-border-blue p-4 grid gap-3 animate-slide-up">
+            <h4 className="font-display font-bold text-primary-300 text-sm">{editingTutorId ? 'Editar Profesor' : 'Nuevo Profesor'}</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <input value={newTutorName} onChange={e => setNewTutorName(e.target.value)} placeholder="Nombre" className="px-3 py-2 rounded border" />
-              <input value={newTutorEmail} onChange={e => setNewTutorEmail(e.target.value)} placeholder="Email (Google Auth)" className="px-3 py-2 rounded border" />
-              <select value={newTutorClass} onChange={e => setNewTutorClass(e.target.value)} className="px-3 py-2 rounded border">
+              <input value={newTutorName} onChange={e => setNewTutorName(e.target.value)} placeholder="Nombre" className="input-glass" />
+              <input value={newTutorEmail} onChange={e => setNewTutorEmail(e.target.value)} placeholder="Email (Google Auth)" className="input-glass" />
+              <select value={newTutorClass} onChange={e => setNewTutorClass(e.target.value)} className="input-glass">
                 <option value="">Sin Clase Asignada</option>
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
-              <input value={newTutorPin} onChange={e => setNewTutorPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="px-3 py-2 rounded border" />
-              <input value={newTutorAltPin} onChange={e => setNewTutorAltPin(e.target.value)} placeholder="PIN Alternativo" maxLength={4} className="px-3 py-2 rounded border" />
+              <input value={newTutorPin} onChange={e => setNewTutorPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="input-glass" />
+              <input value={newTutorAltPin} onChange={e => setNewTutorAltPin(e.target.value)} placeholder="PIN Alternativo" maxLength={4} className="input-glass" />
             </div>
             <div className="flex gap-2 justify-end">
-               <button onClick={() => setShowAddTutor(false)} className="px-4 py-2 text-gray-600 text-sm font-bold">Cancelar</button>
-               <button onClick={handleCreateTutor} className="px-4 py-2 bg-indigo-600 text-white rounded text-sm font-bold">Guardar</button>
+               <button onClick={() => setShowAddTutor(false)} className="btn-ghost text-sm">Cancelar</button>
+               <button onClick={handleCreateTutor} className="btn-primary text-sm">Guardar</button>
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass rounded-2xl shadow-glass overflow-hidden">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="glass-light border-b border-white/10">
                <tr>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Nombre</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Clase Asignada</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">PIN</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase text-right">Acciones</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Nombre</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Clase Asignada</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">PIN</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider text-right">Acciones</th>
                </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-white/5">
                {tutors.map(tutor => (
-                 <tr key={tutor.id} className="hover:bg-gray-50">
-                   <td className="p-4 font-bold text-gray-700">{tutor.name}</td>
+                 <tr key={tutor.id} className="hover:bg-white/5 transition-colors">
+                   <td className="p-4 font-bold text-white/90 font-body">{tutor.name}</td>
                    <td className="p-4">
-                      <select 
-                        value={tutor.classId || ''} 
+                      <select
+                        value={tutor.classId || ''}
                         onChange={(e) => updateUser(tutor.id, { classId: e.target.value })}
-                        className="bg-white border border-gray-200 rounded px-2 py-1 text-sm focus:border-indigo-500 outline-none"
+                        className="input-glass text-sm !py-1 !px-2 !rounded-lg"
                       >
                          <option value="">-- Ninguna --</option>
                          {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
                    </td>
-                   <td className="p-4 font-mono text-gray-500">{tutor.pin}</td>
+                   <td className="p-4 font-mono text-white/40">{tutor.pin}</td>
                    <td className="p-4 text-right flex items-center justify-end gap-2">
-                     <button onClick={() => handleEditTutor(tutor)} className="text-gray-400 hover:text-indigo-600"><Edit2 size={18} /></button>
-                     <button onClick={() => { if(confirm('¿Eliminar profesor?')) deleteUser(tutor.id) }} className="text-red-400 hover:text-red-600"><Trash2 size={18} /></button>
+                     <button onClick={() => handleEditTutor(tutor)} className="text-white/20 hover:text-primary-400 transition-colors"><Edit2 size={18} /></button>
+                     <button onClick={() => { if(confirm('¿Eliminar profesor?')) deleteUser(tutor.id) }} className="text-white/20 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
                    </td>
                  </tr>
                ))}
@@ -1157,64 +1147,64 @@ const AdminDashboard: React.FC = () => {
        .sort((a, b) => a.role.localeCompare(b.role) || a.name.localeCompare(b.name));
 
     return (
-      <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="space-y-4 animate-fade-in">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Personal del Centro</h2>
-          <button onClick={() => setShowAddStaff(true)} className="bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-900">
+          <h2 className="text-xl font-display font-bold text-white/90">Personal del Centro</h2>
+          <button onClick={() => setShowAddStaff(true)} className="btn-primary flex items-center gap-2">
             <Plus size={18} /> Añadir Personal
           </button>
         </div>
 
         {showAddStaff && (
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 grid gap-3">
-            <h4 className="font-bold text-gray-800 text-sm">Nuevo Usuario Personal</h4>
+          <div className="glass-light rounded-2xl glow-border-purple p-4 grid gap-3 animate-slide-up">
+            <h4 className="font-display font-bold text-accent-300 text-sm">Nuevo Usuario Personal</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <input value={newStaffName} onChange={e => setNewStaffName(e.target.value)} placeholder="Nombre" className="px-3 py-2 rounded border" />
-              <select value={newStaffRole} onChange={e => setNewStaffRole(e.target.value as Role)} className="px-3 py-2 rounded border">
+              <input value={newStaffName} onChange={e => setNewStaffName(e.target.value)} placeholder="Nombre" className="input-glass" />
+              <select value={newStaffRole} onChange={e => setNewStaffRole(e.target.value as Role)} className="input-glass">
                 <option value={Role.ADMIN}>Administrador</option>
                 <option value={Role.DIRECCION}>Dirección</option>
                 <option value={Role.TESORERIA}>Tesorería</option>
               </select>
-              <input value={newStaffEmail} onChange={e => setNewStaffEmail(e.target.value)} placeholder="Email (Opcional)" className="px-3 py-2 rounded border" />
-              <input value={newStaffPin} onChange={e => setNewStaffPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="px-3 py-2 rounded border" />
-              <input value={newStaffAltPin} onChange={e => setNewStaffAltPin(e.target.value)} placeholder="PIN Alternativo" maxLength={4} className="px-3 py-2 rounded border" />
+              <input value={newStaffEmail} onChange={e => setNewStaffEmail(e.target.value)} placeholder="Email (Opcional)" className="input-glass" />
+              <input value={newStaffPin} onChange={e => setNewStaffPin(e.target.value)} placeholder="PIN (4 dígitos)" maxLength={4} className="input-glass" />
+              <input value={newStaffAltPin} onChange={e => setNewStaffAltPin(e.target.value)} placeholder="PIN Alternativo" maxLength={4} className="input-glass" />
             </div>
             <div className="flex gap-2 justify-end">
-               <button onClick={() => setShowAddStaff(false)} className="px-4 py-2 text-gray-600 text-sm font-bold">Cancelar</button>
-               <button onClick={handleCreateStaff} className="px-4 py-2 bg-gray-800 text-white rounded text-sm font-bold">Guardar</button>
+               <button onClick={() => setShowAddStaff(false)} className="btn-ghost text-sm">Cancelar</button>
+               <button onClick={handleCreateStaff} className="btn-primary text-sm">Guardar</button>
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass rounded-2xl shadow-glass overflow-hidden">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="glass-light border-b border-white/10">
                <tr>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Nombre</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Rol</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Email</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">PIN</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase text-right">Acciones</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Nombre</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Rol</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Email</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">PIN</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider text-right">Acciones</th>
                </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-white/5">
                {staff.map(user => (
-                 <tr key={user.id} className="hover:bg-gray-50">
-                   <td className="p-4 font-bold text-gray-700">{user.name}</td>
+                 <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                   <td className="p-4 font-bold text-white/90 font-body">{user.name}</td>
                    <td className="p-4">
-                     <span className={`text-[10px] font-bold px-2 py-1 rounded border ${
-                       user.role === Role.ADMIN ? 'bg-gray-100 border-gray-300 text-gray-700' :
-                       user.role === Role.DIRECCION ? 'bg-purple-100 border-purple-200 text-purple-700' :
-                       'bg-green-100 border-green-200 text-green-700'
+                     <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
+                       user.role === Role.ADMIN ? 'bg-white/10 text-white/60' :
+                       user.role === Role.DIRECCION ? 'bg-accent-500/15 text-accent-300' :
+                       'bg-emerald-500/15 text-emerald-300'
                      }`}>
                        {user.role}
                      </span>
                    </td>
-                   <td className="p-4 text-sm text-gray-500">{user.email || '-'}</td>
-                   <td className="p-4 font-mono text-gray-500">{user.pin}</td>
+                   <td className="p-4 text-sm text-white/40 font-body">{user.email || '-'}</td>
+                   <td className="p-4 font-mono text-white/40">{user.pin}</td>
                    <td className="p-4 text-right">
                      {user.id !== 'admin' && (
-                       <button onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(user.id) }} className="text-red-400 hover:text-red-600"><Trash2 size={18} /></button>
+                       <button onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(user.id) }} className="text-white/15 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
                      )}
                    </td>
                  </tr>
@@ -1254,53 +1244,53 @@ const AdminDashboard: React.FC = () => {
         const unassignedFamiliesCount = unassignedFamilyIds.length;
 
         return (
-            <div className="space-y-4 animate-in fade-in duration-300">
+            <div className="space-y-4 animate-fade-in">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-gray-800">Familias por Clase</h2>
+                    <h2 className="text-xl font-display font-bold text-white/90">Familias por Clase</h2>
                     <div className="flex gap-2">
-                        <button onClick={handleMigratePins} className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 font-bold text-sm" title="Actualizar PINs a Primos Aleatorios">
+                        <button onClick={handleMigratePins} className="btn-ghost flex items-center gap-2 text-sm !bg-red-500/15 !border-red-500/25 !text-red-400 hover:!bg-red-500/25" title="Actualizar PINs a Primos Aleatorios">
                             <Key size={18} /> Reasignar PINs (Migración)
                         </button>
-                        <button onClick={() => setShowAddFamily(true)} className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-600 font-bold text-sm">
+                        <button onClick={() => setShowAddFamily(true)} className="btn-primary flex items-center gap-2 text-sm !bg-gradient-to-r !from-secondary-500 !to-orange-500 shadow-neon-orange">
                             <Plus size={18} /> Nueva Familia
                         </button>
                     </div>
                 </div>
 
                 {showAddFamily && (
-                   <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col md:flex-row gap-3 items-end mb-4">
+                   <div className="glass-light rounded-2xl glow-border-orange p-4 flex flex-col md:flex-row gap-3 items-end mb-4 animate-slide-up">
                      <div className="flex-1 w-full">
-                       <label className="text-xs font-bold text-orange-800 uppercase">Nombre Primer Progenitor</label>
-                       <input value={newParentName} onChange={e => setNewParentName(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" placeholder="Ej. Juan Pérez" />
+                       <label className="text-[10px] font-bold text-white/30 uppercase tracking-wider">Nombre Primer Progenitor</label>
+                       <input value={newParentName} onChange={e => setNewParentName(e.target.value)} className="input-glass w-full mt-1" placeholder="Ej. Juan Pérez" />
                      </div>
                      <div className="w-24">
-                       <label className="text-xs font-bold text-orange-800 uppercase">PIN</label>
-                       <input value={newParentPin} onChange={e => setNewParentPin(e.target.value)} className="w-full px-3 py-2 rounded border mt-1" maxLength={4} />
+                       <label className="text-[10px] font-bold text-white/30 uppercase tracking-wider">PIN</label>
+                       <input value={newParentPin} onChange={e => setNewParentPin(e.target.value)} className="input-glass w-full mt-1" maxLength={4} />
                      </div>
                      <div className="flex gap-2">
-                       <button onClick={() => setShowAddFamily(false)} className="px-4 py-2 text-gray-500">Cancelar</button>
-                       <button onClick={handleCreateFamily} className="px-4 py-2 bg-orange-600 text-white rounded font-bold">Crear</button>
+                       <button onClick={() => setShowAddFamily(false)} className="btn-ghost text-sm">Cancelar</button>
+                       <button onClick={handleCreateFamily} className="btn-primary text-sm !bg-gradient-to-r !from-secondary-500 !to-orange-500">Crear</button>
                      </div>
                    </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {classes.map(cls => {
+                    {classes.map((cls, idx) => {
                         const studentsCount = users.filter(u => u.classId === cls.id && u.role === Role.STUDENT).length;
                         return (
                             <div
                                 key={cls.id}
                                 onClick={() => setSelectedFamilyClass(cls)}
-                                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
+                                className={`glass rounded-2xl glow-border-orange p-6 cursor-pointer hover:bg-white/10 transition-all group animate-scale-in stagger-${Math.min(idx + 1, 8)}`}
                             >
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                                    <div className="w-12 h-12 rounded-xl bg-secondary-500/20 flex items-center justify-center text-secondary-400 group-hover:bg-secondary-500/30 transition-colors">
                                         <Users size={24} />
                                     </div>
-                                    <ChevronRight size={24} className="text-gray-300 group-hover:text-orange-500" />
+                                    <ChevronRight size={24} className="text-white/15 group-hover:text-secondary-400 transition-colors" />
                                 </div>
-                                <h3 className="font-bold text-xl text-gray-800">{cls.name}</h3>
-                                <p className="text-gray-500 text-sm">{studentsCount} alumnos</p>
+                                <h3 className="font-display font-bold text-xl text-white/90">{cls.name}</h3>
+                                <p className="text-white/40 text-sm font-body">{studentsCount} alumnos</p>
                             </div>
                         );
                     })}
@@ -1308,16 +1298,16 @@ const AdminDashboard: React.FC = () => {
                     {/* Unassigned Families Card */}
                     <div
                         onClick={() => setSelectedFamilyClass({ id: 'unassigned', name: 'Sin Asignar / Otros' })}
-                        className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:border-gray-400 hover:shadow-md transition-all group"
+                        className="glass rounded-2xl p-6 cursor-pointer hover:bg-white/10 transition-all group animate-scale-in"
                     >
                         <div className="flex items-center justify-between mb-2">
-                            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-gray-500 group-hover:text-white transition-colors">
+                            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white/40 group-hover:bg-white/15 transition-colors">
                                 <Users size={24} />
                             </div>
-                            <ChevronRight size={24} className="text-gray-300 group-hover:text-gray-500" />
+                            <ChevronRight size={24} className="text-white/15 group-hover:text-white/40 transition-colors" />
                         </div>
-                        <h3 className="font-bold text-xl text-gray-700">Sin Asignar</h3>
-                        <p className="text-gray-500 text-sm">{unassignedFamiliesCount} familias</p>
+                        <h3 className="font-display font-bold text-xl text-white/70">Sin Asignar</h3>
+                        <p className="text-white/30 text-sm font-body">{unassignedFamiliesCount} familias</p>
                     </div>
                 </div>
             </div>
@@ -1338,24 +1328,24 @@ const AdminDashboard: React.FC = () => {
     familyIds.sort((a, b) => getFamilyName(a).localeCompare(getFamilyName(b)));
 
     return (
-      <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+      <div className="space-y-6 animate-fade-in">
          <div className="flex items-center gap-4">
              <button
                onClick={() => setSelectedFamilyClass(null)}
-               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+               className="p-2 rounded-xl glass hover:bg-white/10 transition-colors"
              >
-               <ArrowLeft size={24} className="text-gray-600"/>
+               <ArrowLeft size={24} className="text-white/60"/>
              </button>
              <div>
-               <h2 className="text-2xl font-bold text-gray-800">Familias - {selectedFamilyClass.name}</h2>
-               <p className="text-gray-500 text-sm">{familyIds.length} familias asociadas</p>
+               <h2 className="text-2xl font-display font-bold text-white/90">Familias - {selectedFamilyClass.name}</h2>
+               <p className="text-white/40 text-sm font-body">{familyIds.length} familias asociadas</p>
              </div>
          </div>
 
          <div className="flex justify-end">
              <button
                 onClick={handlePrintClassPins}
-                className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors font-bold text-sm"
+                className="btn-ghost flex items-center gap-2 text-sm"
              >
                 <Printer size={18} /> Imprimir Claves (PDF)
              </button>
@@ -1363,20 +1353,20 @@ const AdminDashboard: React.FC = () => {
 
         {/* Move User Modal */}
         {userToMove && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
-                <div className="p-4 bg-orange-50 border-b border-orange-100 flex justify-between items-center">
-                   <h3 className="font-bold text-orange-800">Mover Usuario de Familia</h3>
-                   <button onClick={() => setUserToMove(null)}><X size={20} className="text-orange-400" /></button>
+          <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+             <div className="glass-strong rounded-3xl shadow-glass-lg w-full max-w-sm overflow-hidden modal-content">
+                <div className="p-4 glass-light border-b border-white/10 flex justify-between items-center">
+                   <h3 className="font-display font-bold text-secondary-300">Mover Usuario de Familia</h3>
+                   <button onClick={() => setUserToMove(null)}><X size={20} className="text-white/30 hover:text-white/60 transition-colors" /></button>
                 </div>
                 <div className="p-6">
-                   <p className="text-sm text-gray-600 mb-4">
-                     Selecciona la nueva familia para <span className="font-bold">{userToMove.name}</span>:
+                   <p className="text-sm text-white/60 mb-4 font-body">
+                     Selecciona la nueva familia para <span className="font-bold text-white/90">{userToMove.name}</span>:
                    </p>
-                   <select 
+                   <select
                       value={destinationFamilyId}
                       onChange={(e) => setDestinationFamilyId(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg mb-6 bg-white"
+                      className="input-glass w-full mb-6"
                    >
                      <option value="" disabled>Selecciona familia...</option>
                      {/* Show all families here for moving, not just class families */}
@@ -1384,10 +1374,10 @@ const AdminDashboard: React.FC = () => {
                        <option key={fid} value={fid}>{getFamilyName(fid)}</option>
                      ))}
                    </select>
-                   
+
                    <div className="flex gap-3">
-                      <button onClick={() => setUserToMove(null)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
-                      <button onClick={confirmMoveUser} className="flex-1 py-2 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600">
+                      <button onClick={() => setUserToMove(null)} className="btn-ghost flex-1">Cancelar</button>
+                      <button onClick={confirmMoveUser} className="btn-primary flex-1 !bg-gradient-to-r !from-secondary-500 !to-orange-500">
                         Confirmar
                       </button>
                    </div>
@@ -1398,46 +1388,46 @@ const AdminDashboard: React.FC = () => {
 
         {/* Generic User Edit Modal */}
         {editingUserGeneric && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+          <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+             <div className="glass-strong rounded-3xl p-6 w-full max-w-md shadow-glass-lg modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
-                   <h3 className="text-lg font-bold text-gray-800">Editar Usuario</h3>
-                   <button onClick={() => setEditingUserGeneric(null)} className="text-gray-400 hover:text-gray-600"><X size={24}/></button>
+                   <h3 className="text-lg font-display font-bold text-white/90">Editar Usuario</h3>
+                   <button onClick={() => setEditingUserGeneric(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={24}/></button>
                 </div>
 
                 <div className="space-y-4 mb-6">
                    <div>
-                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre</label>
+                     <label className="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-1">Nombre</label>
                      <input
                        value={editUserGenericName}
                        onChange={e => setEditUserGenericName(e.target.value)}
-                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none"
+                       className="input-glass w-full"
                      />
                    </div>
                    <div>
-                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">PIN de Acceso</label>
+                     <label className="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-1">PIN de Acceso</label>
                      <input
                        value={editUserGenericPin}
                        onChange={e => setEditUserGenericPin(e.target.value)}
                        maxLength={4}
-                       className="w-full px-4 py-2 border rounded-lg focus:border-indigo-500 outline-none font-mono"
+                       className="input-glass w-full font-mono"
                      />
                    </div>
-                   <p className="text-xs text-gray-400 italic">
+                   <p className="text-xs text-white/30 italic font-body">
                        * Nota: Se recomienda usar números primos para evitar colisiones, pero puedes asignar cualquier PIN manualmente si lo deseas.
                    </p>
                 </div>
 
                 <div className="flex justify-end gap-3">
-                   <button onClick={() => setEditingUserGeneric(null)} className="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
-                   <button onClick={handleSaveGenericUser} className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Guardar</button>
+                   <button onClick={() => setEditingUserGeneric(null)} className="btn-ghost">Cancelar</button>
+                   <button onClick={handleSaveGenericUser} className="btn-primary">Guardar</button>
                 </div>
              </div>
           </div>
         )}
 
         <div className="grid grid-cols-1 gap-4">
-           {familyIds.length === 0 && <p className="text-center text-gray-400 p-8">No hay familias vinculadas a esta clase.</p>}
+           {familyIds.length === 0 && <p className="text-center text-white/30 p-8 font-body">No hay familias vinculadas a esta clase.</p>}
            {familyIds.map(famId => {
              const members = users.filter(u => u.familyId === famId);
              const parents = members
@@ -1450,158 +1440,158 @@ const AdminDashboard: React.FC = () => {
              const isEditing = editingFamilyId === famId;
 
              return (
-               <div key={famId} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+               <div key={famId} className="glass rounded-2xl shadow-glass overflow-hidden">
+                 <div className="glass-light px-4 py-3 border-b border-white/10 flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-1">
-                       <Home size={18} className="text-orange-500" />
-                       <span className="font-bold text-gray-700">{familyName}</span>
-                       
+                       <Home size={18} className="text-secondary-400" />
+                       <span className="font-bold text-white/80 font-body">{familyName}</span>
+
                        {isEditing ? (
                          <div className="flex items-center gap-2">
-                            <input 
+                            <input
                               value={newFamilyIdString}
                               onChange={e => setNewFamilyIdString(e.target.value)}
-                              className="px-2 py-0.5 text-xs border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                              className="input-glass !py-0.5 !px-2 text-xs"
                             />
-                            <button onClick={() => handleSaveFamily(famId)} className="text-green-600 hover:text-green-800"><Save size={16} /></button>
-                            <button onClick={() => setEditingFamilyId(null)} className="text-gray-500 hover:text-gray-700"><X size={16} /></button>
+                            <button onClick={() => handleSaveFamily(famId)} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save size={16} /></button>
+                            <button onClick={() => setEditingFamilyId(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={16} /></button>
                          </div>
                        ) : (
-                         <span className="text-xs text-gray-400 bg-white px-2 py-0.5 rounded border border-gray-200">{famId}</span>
+                         <span className="text-[10px] text-white/20 glass px-2 py-0.5 rounded-lg font-mono">{famId}</span>
                        )}
                     </div>
 
                     <div className="flex items-center gap-3">
                       {!isEditing && (
                         <>
-                          <button 
+                          <button
                             onClick={() => handleEditFamily(famId)}
-                            className="text-gray-400 hover:text-blue-500 p-1 rounded hover:bg-blue-50"
+                            className="text-white/20 hover:text-primary-400 p-1 rounded transition-colors"
                             title="Editar ID Familia"
                           >
                             <Edit2 size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDeleteFamily(famId)}
-                            className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50"
+                            className="text-white/20 hover:text-red-400 p-1 rounded transition-colors"
                             title="Eliminar Familia Completa"
                           >
                             <Trash2 size={16} />
                           </button>
-                          <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                          <div className="w-px h-4 bg-white/10 mx-1"></div>
                         </>
                       )}
-                      
-                      <button 
+
+                      <button
                         onClick={() => setAddingMemberToFamily(famId)}
-                        className="text-xs bg-white border border-gray-300 px-3 py-1 rounded hover:bg-gray-50 flex items-center gap-1 font-bold text-gray-600"
+                        className="btn-ghost text-xs !px-3 !py-1 flex items-center gap-1"
                       >
                         <UserPlus size={14} /> Añadir Miembro
                       </button>
                     </div>
                  </div>
-                 
+
                  {/* Adding Member Form */}
                  {addingMemberToFamily === famId && (
-                   <div className="bg-blue-50/50 p-4 border-b border-blue-100 animate-in slide-in-from-top-2">
-                      <h5 className="text-xs font-bold text-blue-800 uppercase mb-2">Nuevo Miembro para {familyName}</h5>
+                   <div className="glass-light p-4 border-b border-white/10 animate-slide-up">
+                      <h5 className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Nuevo Miembro para {familyName}</h5>
                       <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-2">
-                        <select 
-                          value={newMemberRole} 
+                        <select
+                          value={newMemberRole}
                           onChange={e => setNewMemberRole(e.target.value as Role)}
-                          className="px-2 py-2 rounded border border-gray-300 text-sm"
+                          className="input-glass text-sm"
                         >
                           <option value={Role.PARENT}>Padre/Madre</option>
                           <option value={Role.STUDENT}>Alumno/Hijo</option>
                         </select>
-                        <input value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Nombre" className="px-2 py-2 rounded border border-gray-300 text-sm" />
-                        <input value={newMemberPin} onChange={e => setNewMemberPin(e.target.value)} placeholder="PIN" maxLength={4} className="px-2 py-2 rounded border border-gray-300 text-sm" />
-                        
+                        <input value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Nombre" className="input-glass text-sm" />
+                        <input value={newMemberPin} onChange={e => setNewMemberPin(e.target.value)} placeholder="PIN" maxLength={4} className="input-glass text-sm" />
+
                         {newMemberRole === Role.STUDENT && (
-                          <select value={newMemberClass} onChange={e => setNewMemberClass(e.target.value)} className="px-2 py-2 rounded border border-gray-300 text-sm">
+                          <select value={newMemberClass} onChange={e => setNewMemberClass(e.target.value)} className="input-glass text-sm">
                              <option value="">Clase...</option>
                              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                           </select>
                         )}
                       </div>
                       <div className="flex justify-end gap-2">
-                         <button onClick={() => setAddingMemberToFamily(null)} className="text-xs text-gray-500 font-bold px-3 py-1">Cancelar</button>
-                         <button onClick={handleAddMember} className="text-xs bg-blue-600 text-white font-bold px-3 py-1 rounded">Guardar Miembro</button>
+                         <button onClick={() => setAddingMemberToFamily(null)} className="btn-ghost text-xs !px-3 !py-1">Cancelar</button>
+                         <button onClick={handleAddMember} className="btn-primary text-xs !px-3 !py-1">Guardar Miembro</button>
                       </div>
                    </div>
                  )}
 
                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                       <h5 className="text-xs font-bold text-gray-400 uppercase mb-2">Padres / Tutores</h5>
+                       <h5 className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Padres / Tutores</h5>
                        <ul className="space-y-2">
                          {parents.map(p => (
-                           <li key={p.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
-                             <span className="text-sm font-medium">{p.name} <span className="text-gray-400 text-xs font-mono ml-1">PIN: {p.pin}</span></span>
+                           <li key={p.id} className="flex items-center justify-between glass rounded-xl px-3 py-2">
+                             <span className="text-sm font-medium text-white/80 font-body">{p.name} <span className="text-white/30 text-xs font-mono ml-1">PIN: {p.pin}</span></span>
                              <div className="flex items-center gap-1">
                                <button
                                   onClick={() => handleEditGenericUser(p)}
-                                  className="text-gray-400 hover:text-blue-500 p-1"
+                                  className="text-white/20 hover:text-primary-400 p-1 transition-colors"
                                   title="Editar PIN/Nombre"
                                >
                                   <Edit2 size={14} />
                                </button>
-                               <button 
+                               <button
                                   onClick={() => initiateMoveUser(p)}
-                                  className="text-gray-400 hover:text-orange-500 p-1"
+                                  className="text-white/20 hover:text-secondary-400 p-1 transition-colors"
                                   title="Mover a otra familia"
                                >
                                   <ArrowRightLeft size={14} />
                                </button>
-                               <button onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(p.id) }} className="text-gray-400 hover:text-red-500 p-1"><X size={14} /></button>
+                               <button onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(p.id) }} className="text-white/15 hover:text-red-400 p-1 transition-colors"><X size={14} /></button>
                              </div>
                            </li>
                          ))}
-                         {parents.length === 0 && <li className="text-xs text-red-300 italic">Sin padres asignados</li>}
+                         {parents.length === 0 && <li className="text-xs text-red-400/50 italic font-body">Sin padres asignados</li>}
                        </ul>
                     </div>
                     <div>
-                       <h5 className="text-xs font-bold text-gray-400 uppercase mb-2">Hijos / Alumnos</h5>
+                       <h5 className="text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Hijos / Alumnos</h5>
                        <ul className="space-y-2">
                          {students.map(s => (
-                           <li key={s.id} className="flex items-center justify-between bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-50">
+                           <li key={s.id} className="flex items-center justify-between glass rounded-xl px-3 py-2 glow-border-blue">
                              <div className="flex items-center gap-2">
                                <Avatar config={s.avatarConfig} size={24} />
                                <div className="flex flex-col">
-                                 <span className="text-sm font-medium leading-none">{s.name}</span>
-                                 <span className="text-[10px] text-gray-500">
+                                 <span className="text-sm font-medium text-white/90 leading-none font-body">{s.name}</span>
+                                 <span className="text-[10px] text-white/30 font-mono">
                                    PIN: {s.pin} | {classes.find(c => c.id === s.classId)?.name || 'Sin Clase'}
                                  </span>
                                </div>
                              </div>
                              <div className="flex gap-2 items-center">
-                                <select 
+                                <select
                                   value={s.classId || ''}
                                   onChange={(e) => updateUser(s.id, { classId: e.target.value })}
-                                  className="text-xs border-none bg-transparent text-gray-500 focus:ring-0 cursor-pointer w-20"
+                                  className="input-glass text-xs !py-0 !px-1 !rounded-lg !border-transparent !bg-transparent text-white/40 w-20"
                                 >
                                    <option value="">Clase?</option>
                                    {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                                 <button
                                   onClick={() => handleEditGenericUser(s)}
-                                  className="text-gray-400 hover:text-blue-500"
+                                  className="text-white/20 hover:text-primary-400 transition-colors"
                                   title="Editar PIN/Nombre"
                                 >
                                   <Edit2 size={14} />
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => initiateMoveUser(s)}
-                                  className="text-gray-400 hover:text-orange-500"
+                                  className="text-white/20 hover:text-secondary-400 transition-colors"
                                   title="Mover a otra familia"
                                 >
                                   <ArrowRightLeft size={14} />
                                 </button>
-                                <button onClick={() => { if(confirm('¿Eliminar alumno?')) deleteUser(s.id) }} className="text-gray-400 hover:text-red-500"><X size={14} /></button>
+                                <button onClick={() => { if(confirm('¿Eliminar alumno?')) deleteUser(s.id) }} className="text-white/15 hover:text-red-400 transition-colors"><X size={14} /></button>
                              </div>
                            </li>
                          ))}
-                         {students.length === 0 && <li className="text-xs text-gray-300 italic">Sin alumnos asignados</li>}
+                         {students.length === 0 && <li className="text-xs text-white/20 italic font-body">Sin alumnos asignados</li>}
                        </ul>
                     </div>
                  </div>
@@ -1611,8 +1601,8 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <footer className="mt-8 text-center text-gray-400 text-xs py-4">
-           <p className="font-semibold text-gray-500">Cooperativa de Enseñanza La Hispanidad</p>
+        <footer className="mt-8 text-center text-white/20 text-xs py-4">
+           <p className="font-semibold text-white/30">Cooperativa de Enseñanza La Hispanidad</p>
            <p className="mt-1">Creado por Javi Barrero</p>
         </footer>
       </div>
@@ -1622,30 +1612,30 @@ const AdminDashboard: React.FC = () => {
   const renderTasksTab = () => {
     // Show only school tasks
     const schoolTasks = tasks.filter(t => t.context === 'SCHOOL');
-    
+
     return (
-      <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="space-y-4 animate-fade-in">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">Tareas Escolares</h2>
-          {/* Note: Tasks are usually created by Tutors, but we could add an Admin Create button if needed. 
+          <h2 className="text-xl font-display font-bold text-white/90">Tareas Escolares</h2>
+          {/* Note: Tasks are usually created by Tutors, but we could add an Admin Create button if needed.
               For now, we focus on editing existing ones as requested. */}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass rounded-2xl shadow-glass overflow-hidden">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="glass-light border-b border-white/10">
                <tr>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Título de la Tarea</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Creada Por</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Puntos</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase">Estado</th>
-                 <th className="p-4 text-xs font-bold text-gray-500 uppercase text-right">Acciones</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Título de la Tarea</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Creada Por</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Puntos</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider">Estado</th>
+                 <th className="p-4 text-[10px] font-bold text-white/30 uppercase tracking-wider text-right">Acciones</th>
                </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-white/5">
                {schoolTasks.length === 0 && (
                  <tr>
-                   <td colSpan={5} className="p-8 text-center text-gray-400">No hay tareas escolares activas.</td>
+                   <td colSpan={5} className="p-8 text-center text-white/30 font-body">No hay tareas escolares activas.</td>
                  </tr>
                )}
                {schoolTasks.map(task => {
@@ -1654,55 +1644,55 @@ const AdminDashboard: React.FC = () => {
 
                  if (isEditing) {
                    return (
-                     <tr key={task.id} className="bg-blue-50">
+                     <tr key={task.id} className="bg-primary-500/10">
                        <td className="p-4">
-                         <input 
+                         <input
                            value={editTaskTitle}
                            onChange={e => setEditTaskTitle(e.target.value)}
-                           className="w-full px-2 py-1 border rounded"
+                           className="input-glass w-full"
                            placeholder="Título"
                          />
                        </td>
-                       <td className="p-4 text-xs text-gray-500">{creator?.name || task.createdBy}</td>
+                       <td className="p-4 text-xs text-white/40 font-body">{creator?.name || task.createdBy}</td>
                        <td className="p-4">
-                         <input 
+                         <input
                            type="number"
                            value={editTaskPoints}
                            onChange={e => setEditTaskPoints(Number(e.target.value))}
-                           className="w-20 px-2 py-1 border rounded"
+                           className="input-glass w-20"
                          />
                        </td>
                        <td className="p-4">
-                         <button 
+                         <button
                            onClick={() => setEditTaskPriority(!editTaskPriority)}
-                           className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded border ${editTaskPriority ? 'bg-red-100 border-red-200 text-red-600' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
+                           className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg ${editTaskPriority ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white/40'}`}
                          >
                            {editTaskPriority ? 'PRIORIDAD' : 'Normal'}
                          </button>
                        </td>
                        <td className="p-4 text-right flex gap-2 justify-end">
-                         <button onClick={saveTask} className="text-green-600 p-1 hover:bg-green-100 rounded"><Save size={18} /></button>
-                         <button onClick={() => setEditingTaskId(null)} className="text-gray-500 p-1 hover:bg-gray-200 rounded"><X size={18} /></button>
+                         <button onClick={saveTask} className="text-emerald-400 p-1 hover:bg-emerald-500/15 rounded-lg transition-colors"><Save size={18} /></button>
+                         <button onClick={() => setEditingTaskId(null)} className="text-white/30 p-1 hover:bg-white/10 rounded-lg transition-colors"><X size={18} /></button>
                        </td>
                      </tr>
                    )
                  }
 
                  return (
-                   <tr key={task.id} className="hover:bg-gray-50">
-                     <td className="p-4 font-bold text-gray-700">{task.title}</td>
-                     <td className="p-4 text-sm text-gray-500">{creator?.name || 'Desconocido'}</td>
-                     <td className="p-4 font-mono text-blue-600 font-bold">+{task.points}</td>
+                   <tr key={task.id} className="hover:bg-white/5 transition-colors">
+                     <td className="p-4 font-bold text-white/90 font-body">{task.title}</td>
+                     <td className="p-4 text-sm text-white/40 font-body">{creator?.name || 'Desconocido'}</td>
+                     <td className="p-4 font-mono text-primary-400 font-bold">+{task.points}</td>
                      <td className="p-4">
                        {task.isPriority ? (
-                         <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full border border-red-200">PRIORIDAD</span>
+                         <span className="bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-1 rounded-lg">PRIORIDAD</span>
                        ) : (
-                         <span className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-1 rounded-full border border-gray-200">NORMAL</span>
+                         <span className="bg-white/10 text-white/40 text-[10px] font-bold px-2 py-1 rounded-lg">NORMAL</span>
                        )}
                      </td>
                      <td className="p-4 text-right">
-                       <button onClick={() => startEditingTask(task)} className="text-blue-500 hover:text-blue-700 mr-2"><Edit2 size={18} /></button>
-                       <button onClick={() => { if(confirm('¿Eliminar esta tarea para todos los alumnos?')) deleteTask(task.id) }} className="text-red-400 hover:text-red-600"><Trash2 size={18} /></button>
+                       <button onClick={() => startEditingTask(task)} className="text-white/20 hover:text-primary-400 mr-2 transition-colors"><Edit2 size={18} /></button>
+                       <button onClick={() => { if(confirm('¿Eliminar esta tarea para todos los alumnos?')) deleteTask(task.id) }} className="text-white/15 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
                      </td>
                    </tr>
                  );
@@ -1715,30 +1705,26 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex flex-col relative">
-      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
-          <img src="/watermark.png" className="opacity-5 w-[60%] max-w-[500px] object-contain" />
-      </div>
-
+    <div className="min-h-screen min-h-[100dvh] mesh-admin flex flex-col font-body relative">
       {/* Admin Header */}
-      <header className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+      <header className="glass-medium sticky top-0 z-50 px-4 py-3 flex justify-between items-center" style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))' }}>
          <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Logo" className="h-12 w-auto object-contain bg-gray-800 rounded p-1" onError={(e) => e.currentTarget.style.display = 'none'} />
+            <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain rounded-lg opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
             <div className="flex items-center gap-3">
-              <div className="bg-gray-700 p-2 rounded-lg">
+              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/60">
                  <ShieldIcon />
               </div>
               <div>
-                <h1 className="font-bold text-lg">Panel de Administración</h1>
-                <p className="text-xs text-gray-400">Prisma System</p>
+                <h1 className="font-display font-bold text-lg text-white/90">Panel de Administración</h1>
+                <p className="text-xs text-white/30">Prisma System</p>
               </div>
            </div>
          </div>
          <div className="flex items-center gap-4">
-             <button onClick={() => setShowChangePin(true)} className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold">
+             <button onClick={() => setShowChangePin(true)} className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
                 <Key size={18} /> Cambiar PIN
              </button>
-             <button onClick={logout} className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold">
+             <button onClick={logout} className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
                 <LogOut size={18} /> Salir
              </button>
          </div>
@@ -1746,27 +1732,27 @@ const AdminDashboard: React.FC = () => {
 
       {/* Change PIN Modal */}
       {showChangePin && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm animate-in zoom-in duration-200">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Cambiar PIN de Administrador</h3>
+          <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+             <div className="glass-strong rounded-3xl shadow-glass-lg p-6 w-full max-w-sm modal-content">
+                <h3 className="text-lg font-display font-bold text-white/90 mb-4">Cambiar PIN de Administrador</h3>
                 <input
                   type="text"
                   value={newAdminPin}
                   onChange={e => setNewAdminPin(e.target.value)}
                   maxLength={4}
                   placeholder="Nuevo PIN (4 dígitos)"
-                  className="w-full px-4 py-2 border rounded-lg mb-4 text-center font-mono text-xl tracking-widest"
+                  className="input-glass w-full mb-4 text-center font-mono text-xl tracking-widest"
                 />
                 <div className="flex gap-2">
-                   <button onClick={() => setShowChangePin(false)} className="flex-1 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-lg">Cancelar</button>
-                   <button onClick={handleChangePin} className="flex-1 py-2 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800">Guardar</button>
+                   <button onClick={() => setShowChangePin(false)} className="btn-ghost flex-1">Cancelar</button>
+                   <button onClick={handleChangePin} className="btn-primary flex-1">Guardar</button>
                 </div>
              </div>
           </div>
       )}
-      
-      {/* Tabs */}
-      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-40">
+
+      {/* Desktop Tabs */}
+      <div className="hidden md:flex glass sticky top-[64px] z-40 px-6 border-b border-white/10">
         <div className="flex gap-6 overflow-x-auto">
           <TabButton active={activeTab === 'CLASSES'} onClick={() => setActiveTab('CLASSES')} icon={<School size={18}/>} label="Gestión Clases" />
           <TabButton active={activeTab === 'TUTORS'} onClick={() => setActiveTab('TUTORS')} icon={<GraduationCap size={18}/>} label="Gestión Profesores" />
@@ -1776,8 +1762,19 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Bottom Nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 glass-medium z-40 bottom-nav-safe" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
+        <div className="flex justify-around px-2 pt-2">
+          <MobileTabButton active={activeTab === 'CLASSES'} onClick={() => setActiveTab('CLASSES')} icon={<School size={20}/>} label="Clases" />
+          <MobileTabButton active={activeTab === 'TUTORS'} onClick={() => setActiveTab('TUTORS')} icon={<GraduationCap size={20}/>} label="Profes" />
+          <MobileTabButton active={activeTab === 'FAMILIES'} onClick={() => setActiveTab('FAMILIES')} icon={<Users size={20}/>} label="Familias" />
+          <MobileTabButton active={activeTab === 'TASKS'} onClick={() => setActiveTab('TASKS')} icon={<BookOpen size={20}/>} label="Tareas" />
+          <MobileTabButton active={activeTab === 'STAFF'} onClick={() => setActiveTab('STAFF')} icon={<Briefcase size={20}/>} label="Staff" />
+        </div>
+      </div>
+
       {/* Content */}
-      <main className="flex-1 p-6 max-w-6xl mx-auto w-full flex flex-col relative z-10">
+      <main className="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full flex flex-col relative z-10 pb-safe md:pb-6">
          {activeTab === 'CLASSES' && renderClassesTab()}
          {activeTab === 'TUTORS' && renderTutorsTab()}
          {activeTab === 'FAMILIES' && renderFamiliesTab()}
@@ -1798,11 +1795,21 @@ const AdminDashboard: React.FC = () => {
 
 // Subcomponents
 const TabButton: React.FC<{ active: boolean, onClick: () => void, icon: React.ReactNode, label: string }> = ({ active, onClick, icon, label }) => (
-  <button 
+  <button
     onClick={onClick}
-    className={`flex items-center gap-2 py-4 border-b-2 font-bold text-sm transition-colors whitespace-nowrap ${active ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+    className={`flex items-center gap-2 py-4 border-b-2 font-bold text-sm transition-colors whitespace-nowrap font-body ${active ? 'border-primary-400 text-white/90' : 'border-transparent text-white/30 hover:text-white/60'}`}
   >
     {icon} {label}
+  </button>
+);
+
+const MobileTabButton: React.FC<{ active: boolean, onClick: () => void, icon: React.ReactNode, label: string }> = ({ active, onClick, icon, label }) => (
+  <button
+    onClick={onClick}
+    className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${active ? 'text-primary-400' : 'text-white/30'}`}
+  >
+    {icon}
+    <span className="text-[10px] font-bold">{label}</span>
   </button>
 );
 

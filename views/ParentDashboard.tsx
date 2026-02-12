@@ -9,35 +9,22 @@ const ParentDashboard: React.FC = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskPoints, setTaskPoints] = useState(10);
-
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [rewardTitle, setRewardTitle] = useState('');
   const [rewardCost, setRewardCost] = useState(50);
-
   const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'REWARDS'>('DASHBOARD');
-
   const [showSettings, setShowSettings] = useState(false);
   const [newPin, setNewPin] = useState('');
-  
-  // Messaging
   const [showChat, setShowChat] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
-  
-  // Filter only my kids
-  const myKids = users.filter(u => u.role === Role.STUDENT && u.familyId === currentUser?.familyId);
 
-  // Filter Rewards
-  // Only show rewards created for this family (or by this parent, or generic home rewards without familyId if any)
-  // Logic: context === 'HOME' AND (familyId matches OR familyId is missing)
+  const myKids = users.filter(u => u.role === Role.STUDENT && u.familyId === currentUser?.familyId);
   const myRewards = rewards.filter(r =>
-      r.context === 'HOME' &&
-      (r.familyId === currentUser?.familyId || !r.familyId)
+    r.context === 'HOME' &&
+    (r.familyId === currentUser?.familyId || !r.familyId)
   );
-  // Find Tutor (Assuming first kid's class tutor)
   const classId = myKids[0]?.classId;
   const tutor = users.find(u => u.role === Role.TUTOR && u.classId === classId);
-
-  // Unread messages
   const unreadMessages = tutor && currentUser ? messages.filter(m => m.fromId === tutor.id && m.toId === currentUser.id && !m.read).length : 0;
 
   const handleCreateChore = () => {
@@ -47,7 +34,7 @@ const ParentDashboard: React.FC = () => {
       points: Number(taskPoints),
       icon: 'Home',
       context: 'HOME',
-      assignedTo: myKids.map(k => k.id), // Assign to all kids for now
+      assignedTo: myKids.map(k => k.id),
       createdBy: currentUser!.id,
     });
     setTaskTitle('');
@@ -74,9 +61,9 @@ const ParentDashboard: React.FC = () => {
       updatePin(newPin);
       setNewPin('');
       setShowSettings(false);
-      alert('¡PIN actualizado!');
+      alert('PIN actualizado!');
     } else {
-      alert('El PIN debe tener 4 números');
+      alert('El PIN debe tener 4 numeros');
     }
   };
 
@@ -87,228 +74,244 @@ const ParentDashboard: React.FC = () => {
     }
   };
 
-  const conversation = tutor ? messages.filter(m => 
-    (m.fromId === currentUser?.id && m.toId === tutor.id) || 
+  const conversation = tutor ? messages.filter(m =>
+    (m.fromId === currentUser?.id && m.toId === tutor.id) ||
     (m.fromId === tutor.id && m.toId === currentUser?.id)
   ).sort((a, b) => a.timestamp - b.timestamp) : [];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-amber-100 flex flex-col relative">
-      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
-          <img src="/watermark.png" className="opacity-5 w-[60%] max-w-[500px] object-contain" />
-      </div>
+  const tabs = [
+    { id: 'DASHBOARD' as const, icon: ListChecks, label: 'Dashboard' },
+    { id: 'REWARDS' as const, icon: Gift, label: 'Premios' },
+  ];
 
-       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
+  return (
+    <div className="min-h-screen min-h-[100dvh] mesh-parent flex flex-col font-body relative">
+
+      {/* Top Bar */}
+      <header className="glass-medium sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
+        <div className="flex justify-between items-center max-w-5xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="bg-orange-500 p-2 rounded-lg text-white">
-              <Home size={24} />
+            <div className="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center text-secondary-400">
+              <Home size={20} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">Panel Familiar</h1>
-              <p className="text-sm text-gray-500">{currentUser?.name}</p>
+              <h1 className="font-display font-bold text-white/90 text-base leading-none">Panel Familiar</h1>
+              <p className="text-xs text-white/40 mt-0.5">{currentUser?.name}</p>
             </div>
           </div>
-        </div>
-        <div className="flex gap-3">
-           <button onClick={() => {
-               setShowChat(true);
-               if (tutor && currentUser) markMessagesRead(tutor.id, currentUser.id);
-             }} className="text-gray-500 hover:text-indigo-600 p-2 relative">
-             <MessageSquare size={24} />
-             {unreadMessages > 0 && (
-                <div className="absolute top-1 right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
-                    {unreadMessages}
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setShowChat(true);
+                if (tutor && currentUser) markMessagesRead(tutor.id, currentUser.id);
+              }}
+              className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors relative"
+            >
+              <MessageSquare size={18} />
+              {unreadMessages > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                  {unreadMessages}
                 </div>
-             )}
-           </button>
-           {activeTab === 'DASHBOARD' && (
+              )}
+            </button>
+            {activeTab === 'DASHBOARD' && (
               <button
                 onClick={() => setShowTaskModal(true)}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="bg-gradient-to-r from-secondary-600 to-secondary-500 text-white px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-secondary-500/25 hover:shadow-secondary-500/40 transition-all active:scale-95"
               >
-                <Plus size={18} /> Añadir Tarea
+                <Plus size={14} /> Tarea
               </button>
-           )}
-           {activeTab === 'REWARDS' && (
+            )}
+            {activeTab === 'REWARDS' && (
               <button
                 onClick={() => setShowRewardModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all active:scale-95"
               >
-                <Plus size={18} /> Crear Premio
+                <Plus size={14} /> Premio
               </button>
-           )}
-          <button onClick={() => setShowSettings(true)} className="text-gray-500 hover:text-orange-500 p-2">
-            <Settings size={24} />
-          </button>
-          <button onClick={logout} className="text-gray-500 hover:text-red-500 p-2">
-            <LogOut size={24} />
-          </button>
+            )}
+            <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors">
+              <Settings size={18} />
+            </button>
+            <button onClick={logout} className="glass rounded-xl p-2.5 text-red-400/60 hover:text-red-400 transition-colors">
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <div className="bg-white shadow-sm px-6 border-b border-gray-200 sticky top-[72px] z-40 mb-6 flex justify-center">
-         <div className="flex gap-8">
+      {/* Tabs - Desktop inline, Mobile bottom nav */}
+      <div className="hidden md:flex glass sticky top-[60px] z-30 justify-center gap-6 px-6 py-0">
+        {tabs.map(tab => {
+          const active = activeTab === tab.id;
+          const Icon = tab.icon;
+          return (
             <button
-              onClick={() => setActiveTab('DASHBOARD')}
-              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'DASHBOARD' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-400'}`}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`py-3 border-b-2 font-display font-bold text-sm flex items-center gap-2 transition-all duration-200 ${
+                active
+                  ? tab.id === 'DASHBOARD' ? 'border-secondary-500 text-secondary-400' : 'border-emerald-500 text-emerald-400'
+                  : 'border-transparent text-white/30 hover:text-white/50'
+              }`}
             >
-               <ListChecks size={20} /> Dashboard y Tareas
+              <Icon size={16} /> {tab.label}
             </button>
-            <button
-              onClick={() => setActiveTab('REWARDS')}
-              className={`py-4 border-b-2 font-bold text-sm flex items-center gap-2 ${activeTab === 'REWARDS' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-400'}`}
-            >
-               <Gift size={20} /> Premios de Casa
-            </button>
-         </div>
+          );
+        })}
       </div>
 
-      <main className="flex-1 p-6 flex flex-col relative z-10">
-        
+      <main className="flex-1 p-4 md:p-6 relative z-10 pb-24 md:pb-6">
+
         {/* Settings Modal */}
         {showSettings && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
-                <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                  <X size={24} />
-                </button>
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Settings size={20}/> Ajustes</h2>
-                
-                <div className="mb-4">
-                   <label className="block text-sm font-bold text-gray-700 mb-2">Cambiar mi PIN</label>
-                   <input 
-                      type="text" 
-                      maxLength={4}
-                      value={newPin}
-                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))}
-                      className="w-full text-center text-2xl tracking-widest border-2 border-orange-100 rounded-xl py-3 focus:border-orange-500 outline-none transition-colors"
-                      placeholder="0000"
-                   />
-                   <p className="text-xs text-gray-400 mt-2">Introduce 4 números nuevos</p>
-                </div>
-
-                <button 
-                  onClick={handleUpdatePin}
-                  className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-colors"
-                >
-                  Guardar Nuevo PIN
-                </button>
-             </div>
+          <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+            <div className="glass-strong rounded-3xl p-6 w-full max-w-sm shadow-glass-lg modal-content relative">
+              <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors">
+                <X size={20} />
+              </button>
+              <h2 className="font-display text-lg font-bold text-white/90 mb-4 flex items-center gap-2"><Settings size={18} /> Ajustes</h2>
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-white/50 mb-2">Cambiar mi PIN</label>
+                <input
+                  type="text"
+                  maxLength={4}
+                  value={newPin}
+                  onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
+                  className="input-glass w-full text-center text-2xl tracking-[0.5em] font-display"
+                  placeholder="0000"
+                />
+              </div>
+              <button onClick={handleUpdatePin} className="w-full bg-gradient-to-r from-secondary-600 to-secondary-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-secondary-500/25 transition-all active:scale-[0.98]">
+                Guardar Nuevo PIN
+              </button>
+            </div>
           </div>
         )}
 
         {/* Chat Modal */}
         {showChat && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl flex flex-col h-[500px] overflow-hidden">
-                <div className="p-4 bg-indigo-600 text-white flex justify-between items-center">
-                   <div className="font-bold">Chat con Profesor ({tutor?.name || 'No asignado'})</div>
-                   <button onClick={() => setShowChat(false)}><X size={20}/></button>
+          <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+            <div className="glass-strong rounded-3xl w-full max-w-md shadow-glass-lg flex flex-col h-[500px] overflow-hidden modal-content">
+              <div className="px-4 py-3 glass-medium flex justify-between items-center">
+                <div className="font-display font-bold text-white/90 text-sm flex items-center gap-2">
+                  <MessageSquare size={16} className="text-accent-400" />
+                  Chat con {tutor?.name || 'Tutor'}
                 </div>
-                <div className="flex-1 bg-gray-50 p-4 overflow-y-auto space-y-3">
-                   {conversation.map(msg => {
-                      const isMe = msg.fromId === currentUser?.id;
-                      return (
-                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                           <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${isMe ? 'bg-indigo-500 text-white' : 'bg-white border text-gray-800'}`}>
-                             {msg.content}
-                           </div>
-                        </div>
-                      )
-                   })}
-                   {conversation.length === 0 && <p className="text-center text-gray-400 text-sm mt-10">Inicia una conversación con el tutor.</p>}
-                </div>
-                <div className="p-3 bg-white border-t flex gap-2">
-                   <input 
-                     className="flex-1 border rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-500" 
-                     placeholder="Mensaje..."
-                     value={chatMessage}
-                     onChange={e => setChatMessage(e.target.value)}
-                     onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                   />
-                   <button onClick={handleSendMessage} className="bg-indigo-600 text-white p-2 rounded-full"><Send size={18}/></button>
-                </div>
-             </div>
+                <button onClick={() => setShowChat(false)} className="text-white/30 hover:text-white/70 transition-colors"><X size={18} /></button>
+              </div>
+              <div className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide">
+                {conversation.map(msg => {
+                  const isMe = msg.fromId === currentUser?.id;
+                  return (
+                    <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${
+                        isMe
+                          ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-br-md'
+                          : 'glass-light text-white/80 rounded-bl-md'
+                      }`}>
+                        {msg.content}
+                      </div>
+                    </div>
+                  );
+                })}
+                {conversation.length === 0 && <p className="text-center text-white/20 text-sm mt-10">Inicia una conversacion con el tutor.</p>}
+              </div>
+              <div className="p-3 glass-medium flex gap-2">
+                <input
+                  className="input-glass flex-1 rounded-full text-sm py-2"
+                  placeholder="Mensaje..."
+                  value={chatMessage}
+                  onChange={e => setChatMessage(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                />
+                <button onClick={handleSendMessage} className="bg-gradient-to-r from-primary-600 to-accent-600 text-white p-2.5 rounded-full shadow-lg shadow-primary-500/20 transition-all active:scale-95">
+                  <Send size={16} />
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
+        {/* DASHBOARD TAB */}
         {activeTab === 'DASHBOARD' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto w-full mb-8 animate-in fade-in duration-300">
-            {myKids.map(kid => (
-              <div key={kid.id} className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col border border-orange-100">
-                <div className="p-6 flex items-center gap-4 border-b border-gray-50">
-                  <Avatar config={kid.avatarConfig} size={70} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto w-full animate-slide-up">
+            {myKids.map((kid, kidIndex) => (
+              <div
+                key={kid.id}
+                className="glass rounded-2xl overflow-hidden flex flex-col glow-border-orange"
+                style={{ animation: `slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${kidIndex * 0.1}s both` }}
+              >
+                <div className="p-5 flex items-center gap-4">
+                  <Avatar config={kid.avatarConfig} size={56} showRing glowColor="rgba(249,115,22,0.3)" />
                   <div>
-                    <h3 className="font-bold text-lg text-gray-800">{kid.name}</h3>
-                    <div className="flex items-center gap-1 text-yellow-600 font-bold bg-yellow-50 px-2 py-0.5 rounded-md text-sm mt-1 w-fit">
-                      <Star size={14} fill="currentColor" /> {kid.points}
+                    <h3 className="font-display font-bold text-white/90">{kid.name}</h3>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Star size={12} fill="currentColor" className="text-amber-400" />
+                      <span className="font-display font-bold text-amber-400 text-sm">{kid.points}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 bg-orange-50/50 flex-1">
-                  <h4 className="text-xs font-bold text-gray-400 uppercase mb-3">Acciones Rápidas</h4>
-                  <div className="flex gap-3 mb-6">
-                      <button onClick={() => assignPoints(kid.id, -5)} className="flex-1 py-3 rounded-xl border border-red-100 bg-white text-red-500 font-bold hover:bg-red-50 transition-colors">
-                        Mal Comportamiento
-                      </button>
-                      <button onClick={() => assignPoints(kid.id, 5)} className="flex-1 py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-colors shadow-green-200 shadow-lg">
-                        Buen Trabajo
-                      </button>
+                <div className="px-5 pb-5 flex-1">
+                  <h4 className="text-[10px] font-bold text-white/30 uppercase mb-3 tracking-wider">Acciones Rapidas</h4>
+                  <div className="flex gap-2 mb-5">
+                    <button
+                      onClick={() => assignPoints(kid.id, -5)}
+                      className="flex-1 py-2.5 rounded-xl glass text-red-400 font-bold text-xs hover:bg-red-500/10 transition-all active:scale-95"
+                    >
+                      <Minus size={14} className="inline mr-1" /> Mal
+                    </button>
+                    <button
+                      onClick={() => assignPoints(kid.id, 5)}
+                      className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all active:scale-95"
+                    >
+                      <Plus size={14} className="inline mr-1" /> Bien
+                    </button>
                   </div>
 
-                  <h4 className="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2">
-                    <ListChecks size={14}/> Tareas Pendientes
+                  <h4 className="text-[10px] font-bold text-white/30 uppercase mb-3 tracking-wider flex items-center gap-1.5">
+                    <ListChecks size={12} /> Tareas Pendientes
                   </h4>
                   <div className="space-y-2">
                     {tasks
-                        .filter(t => (t.assignedTo.length === 0 || t.assignedTo.includes(kid.id)))
-                        .filter(t => !completions.some(c => c.taskId === t.id && c.userId === kid.id))
-                        .map(task => {
-                            let icon = <School size={16} className="text-blue-500"/>;
-                            let label = 'Clase';
-                            let bgColor = 'bg-blue-50';
-                            let borderColor = 'border-blue-100';
+                      .filter(t => (t.assignedTo.length === 0 || t.assignedTo.includes(kid.id)))
+                      .filter(t => !completions.some(c => c.taskId === t.id && c.userId === kid.id))
+                      .map(task => {
+                        let iconEl = <School size={14} className="text-primary-400" />;
+                        let label = 'Clase';
+                        let accentClass = 'bg-primary-500/10 border-primary-500/15';
 
-                            if (task.context === 'SCHOOL' && task.workType === 'HOMEWORK') {
-                                icon = <BookOpen size={16} className="text-indigo-500"/>;
-                                label = 'Deberes';
-                                bgColor = 'bg-indigo-50';
-                                borderColor = 'border-indigo-100';
-                            } else if (task.context === 'HOME') {
-                                icon = <Home size={16} className="text-orange-500"/>;
-                                label = 'Casa';
-                                bgColor = 'bg-orange-50';
-                                borderColor = 'border-orange-100';
-                            }
+                        if (task.context === 'SCHOOL' && task.workType === 'HOMEWORK') {
+                          iconEl = <BookOpen size={14} className="text-accent-400" />;
+                          label = 'Deberes';
+                          accentClass = 'bg-accent-500/10 border-accent-500/15';
+                        } else if (task.context === 'HOME') {
+                          iconEl = <Home size={14} className="text-secondary-400" />;
+                          label = 'Casa';
+                          accentClass = 'bg-secondary-500/10 border-secondary-500/15';
+                        }
 
-                            return (
-                                <div key={task.id} className={`p-3 rounded-xl border ${borderColor} ${bgColor} flex items-center justify-between`}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-white p-1.5 rounded-lg shadow-sm">
-                                            {icon}
-                                        </div>
-                                        <div>
-                                            <h5 className="font-bold text-gray-800 text-sm">{task.title}</h5>
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase">{label}</span>
-                                        </div>
-                                    </div>
-                                    <span className="text-xs font-bold text-yellow-600 bg-yellow-100/50 px-2 py-1 rounded">
-                                        +{task.points}
-                                    </span>
-                                </div>
-                            );
-                        })
+                        return (
+                          <div key={task.id} className={`p-2.5 rounded-xl border ${accentClass} flex items-center justify-between`}>
+                            <div className="flex items-center gap-2.5">
+                              <div className="glass p-1.5 rounded-lg">{iconEl}</div>
+                              <div>
+                                <h5 className="font-semibold text-white/80 text-xs">{task.title}</h5>
+                                <span className="text-[9px] font-bold text-white/25 uppercase">{label}</span>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-display font-bold text-amber-400">+{task.points}</span>
+                          </div>
+                        );
+                      })
                     }
                     {tasks
-                        .filter(t => (t.assignedTo.length === 0 || t.assignedTo.includes(kid.id)))
-                        .filter(t => !completions.some(c => c.taskId === t.id && c.userId === kid.id))
-                        .length === 0 && (
-                            <p className="text-center text-gray-400 text-xs py-4 italic">¡Todo al día!</p>
-                        )
+                      .filter(t => (t.assignedTo.length === 0 || t.assignedTo.includes(kid.id)))
+                      .filter(t => !completions.some(c => c.taskId === t.id && c.userId === kid.id))
+                      .length === 0 && (
+                        <p className="text-center text-white/20 text-xs py-4">Todo al dia!</p>
+                      )
                     }
                   </div>
                 </div>
@@ -317,105 +320,131 @@ const ParentDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* REWARDS TAB */}
         {activeTab === 'REWARDS' && (
-           <div className="max-w-5xl mx-auto w-full mb-8 animate-in fade-in duration-300">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                 {myRewards.length === 0 && (
-                    <div className="col-span-3 text-center py-12 text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
-                       <Gift size={48} className="mx-auto mb-2 opacity-50"/>
-                       <p>No has creado premios para casa.</p>
-                       <button onClick={() => setShowRewardModal(true)} className="mt-4 text-orange-500 font-bold hover:underline">Crear el primero</button>
+          <div className="max-w-5xl mx-auto w-full animate-slide-up">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {myRewards.length === 0 && (
+                <div className="col-span-3 text-center py-16 glass rounded-2xl">
+                  <Gift size={40} className="mx-auto mb-3 text-white/15" />
+                  <p className="text-white/30 text-sm">No has creado premios para casa.</p>
+                  <button onClick={() => setShowRewardModal(true)} className="mt-3 text-secondary-400 font-bold text-sm hover:text-secondary-300 transition-colors">
+                    Crear el primero
+                  </button>
+                </div>
+              )}
+              {myRewards.map((reward, i) => (
+                <div
+                  key={reward.id}
+                  className="group glass rounded-2xl p-4 flex items-center justify-between glow-border-green"
+                  style={{ animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s both` }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                      <Gift size={18} />
                     </div>
-                 )}
-                 {myRewards.map(reward => (
-                    <div key={reward.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between group">
-                       <div className="flex items-center gap-4">
-                          <div className="bg-green-100 p-3 rounded-full text-green-600">
-                            <Gift size={24} />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-gray-800 text-lg">{reward.title}</h4>
-                            <span className="text-sm text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded">{reward.cost} pts</span>
-                          </div>
-                       </div>
-                       <button
-                         onClick={() => deleteReward(reward.id)}
-                         className="text-gray-300 hover:text-red-500 p-2 transition-colors"
-                         title="Borrar Premio"
-                       >
-                         <Trash2 size={20} />
-                       </button>
+                    <div>
+                      <h4 className="font-display font-semibold text-white/80 text-sm">{reward.title}</h4>
+                      <span className="text-xs text-white/30 font-bold">{reward.cost} pts</span>
                     </div>
-                 ))}
-              </div>
-           </div>
+                  </div>
+                  <button
+                    onClick={() => deleteReward(reward.id)}
+                    className="text-white/15 hover:text-red-400 p-2 transition-colors"
+                    title="Borrar Premio"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
-
-        {/* Footer */}
-        <footer className="mt-auto py-4 text-center text-gray-400 text-xs">
-          <p className="font-semibold text-gray-500">Cooperativa de Enseñanza La Hispanidad</p>
-          <p className="mt-1">Creado por Javi Barrero</p>
-        </footer>
       </main>
 
+      {/* Mobile Bottom Nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-medium px-2 pt-2" style={{ paddingBottom: 'calc(0.5rem + var(--safe-bottom))' }}>
+        <div className="flex justify-around">
+          {tabs.map(tab => {
+            const active = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center py-1.5 px-6 rounded-xl transition-all duration-200 ${
+                  active ? 'text-white' : 'text-white/30'
+                }`}
+              >
+                <div className={`p-1.5 rounded-xl transition-all duration-200 ${active ? 'bg-white/15' : ''}`}>
+                  <Icon size={20} />
+                </div>
+                <span className="text-[10px] font-semibold mt-0.5">{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* Task Creation Modal */}
       {showTaskModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-             <div className="p-6">
-               <h3 className="text-lg font-bold text-gray-800 mb-4">Asignar Tarea de Casa</h3>
-               <input 
-                  type="text" 
-                  value={taskTitle}
-                  onChange={(e) => setTaskTitle(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 outline-none mb-3"
-                  placeholder="ej. Poner el lavavajillas"
-                />
-                <input 
-                  type="number" 
-                  value={taskPoints}
-                  onChange={(e) => setTaskPoints(Number(e.target.value))}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 outline-none mb-6"
-                  placeholder="Puntos"
-                />
-                <div className="flex gap-3">
-                  <button onClick={() => setShowTaskModal(false)} className="flex-1 py-2 text-gray-500">Cancelar</button>
-                  <button onClick={handleCreateChore} className="flex-1 py-2 bg-orange-500 text-white rounded-lg font-bold">Asignar</button>
-                </div>
-             </div>
-           </div>
+        <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+          <div className="glass-strong rounded-3xl shadow-glass-lg w-full max-w-sm overflow-hidden modal-content">
+            <div className="p-6">
+              <h3 className="font-display text-lg font-bold text-white/90 mb-4">Asignar Tarea de Casa</h3>
+              <input
+                type="text"
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                className="input-glass w-full mb-3"
+                placeholder="ej. Poner el lavavajillas"
+              />
+              <input
+                type="number"
+                value={taskPoints}
+                onChange={(e) => setTaskPoints(Number(e.target.value))}
+                className="input-glass w-full mb-6"
+                placeholder="Puntos"
+              />
+              <div className="flex gap-3">
+                <button onClick={() => setShowTaskModal(false)} className="btn-ghost flex-1">Cancelar</button>
+                <button onClick={handleCreateChore} className="flex-1 py-2.5 bg-gradient-to-r from-secondary-600 to-secondary-500 text-white rounded-xl font-bold shadow-lg shadow-secondary-500/25 transition-all active:scale-[0.98]">Asignar</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
+      {/* Reward Creation Modal */}
       {showRewardModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
-             <div className="p-6">
-               <h3 className="text-lg font-bold text-gray-800 mb-4">Crear Premio de Casa</h3>
-               <input
-                  type="text"
-                  value={rewardTitle}
-                  onChange={(e) => setRewardTitle(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none mb-3"
-                  placeholder="ej. Ver una peli"
+        <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+          <div className="glass-strong rounded-3xl shadow-glass-lg w-full max-w-sm overflow-hidden modal-content">
+            <div className="p-6">
+              <h3 className="font-display text-lg font-bold text-white/90 mb-4">Crear Premio de Casa</h3>
+              <input
+                type="text"
+                value={rewardTitle}
+                onChange={(e) => setRewardTitle(e.target.value)}
+                className="input-glass w-full mb-3"
+                placeholder="ej. Ver una peli"
+              />
+              <div className="mb-6">
+                <label className="text-[10px] font-bold text-white/30 uppercase tracking-wider">Coste (Pts)</label>
+                <input
+                  type="number"
+                  value={rewardCost}
+                  onChange={(e) => setRewardCost(Number(e.target.value))}
+                  className="input-glass w-full mt-1"
                 />
-                <div className="mb-6">
-                    <label className="text-xs font-bold text-gray-500">Coste (Pts)</label>
-                    <input
-                      type="number"
-                      value={rewardCost}
-                      onChange={(e) => setRewardCost(Number(e.target.value))}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 outline-none"
-                    />
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setShowRewardModal(false)} className="flex-1 py-2 text-gray-500 font-bold">Cancelar</button>
-                  <button onClick={handleCreateReward} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700">Crear</button>
-                </div>
-             </div>
-           </div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setShowRewardModal(false)} className="btn-ghost flex-1">Cancelar</button>
+                <button onClick={handleCreateReward} className="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98]">Crear</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
-
     </div>
   );
 };

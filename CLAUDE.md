@@ -34,6 +34,7 @@ No test framework is configured.
 | `types.ts` | All TypeScript type definitions |
 | `constants.tsx` | Static data: avatar items, initial seed tasks/rewards |
 | `App.tsx` | Root component — role-based routing to dashboards |
+| `styles/design-system.css` | Prismatic Glass design system — glass utilities, animations, mesh backgrounds, modal styles |
 | `scripts/initSchool.js` | Database seeding script |
 
 ### Views (role-based dashboards)
@@ -57,6 +58,20 @@ No test framework is configured.
 - **Google OAuth:** For teachers only, restricted to `@colegiolahispanidad.es` domain.
 - **Session:** User ID stored in `localStorage` key `sc_session_user`.
 - **Roles:** `ADMIN`, `DIRECCION`, `TESORERIA`, `TUTOR`, `PARENT`, `STUDENT`
+
+### Design System — "Prismatic Glass"
+
+The UI uses a dark glassmorphism theme defined in `styles/design-system.css` with Tailwind CSS utilities configured in `index.html`.
+
+- **Typography:** `Outfit` (display/headings, class `font-display`) + `Plus Jakarta Sans` (body, class `font-body`), loaded from Google Fonts.
+- **Color palette:** Primary (indigo), Secondary (orange), Accent (purple), Surface (slate), School (blue), Home (orange) — each with 50-900 shades in Tailwind config.
+- **Glass utilities:** `.glass`, `.glass-light`, `.glass-medium`, `.glass-strong` — frosted backgrounds with `backdrop-filter: blur()` and subtle borders.
+- **Gradient mesh backgrounds:** Role-specific: `.mesh-auth`, `.mesh-tutor`, `.mesh-parent`, `.mesh-student`, `.mesh-admin`.
+- **Glow borders:** `.glow-border-blue`, `.glow-border-orange`, `.glow-border-green`, `.glow-border-purple`.
+- **Animations:** `slide-up`, `slide-down`, `scale-in`, `fade-in`, `float`, `glow-pulse`, `shimmer`, `bounce-subtle` — CSS keyframes + Tailwind `animate-*` classes.
+- **Modals:** `.modal-overlay` (blur backdrop) + `.modal-content` (scale-in animation).
+- **Form elements:** `.input-glass`, `.btn-primary`, `.btn-ghost`, `.btn-danger`.
+- **Mobile:** Bottom nav with safe area insets (`--safe-top`, `--safe-bottom`), `min-h-[100dvh]`, touch-optimized targets.
 
 ### Conventions
 
