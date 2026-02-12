@@ -5,6 +5,7 @@ import TaskCard from '../components/TaskCard';
 import { Role, Task } from '../types';
 import { AVATAR_ITEMS } from '../constants';
 import { ShoppingBag, Star, LogOut, CheckCircle, Settings, X, MessageSquare, Send, History, Clock, Zap, Sparkles } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 const StudentDashboard: React.FC = () => {
   const { users, currentUser, tasks, completions, completeTask, logout, buyAvatarItem, redeemReward, rewards, updatePin, messages, sendMessage, redemptions, markMessagesRead } = useData();
@@ -115,6 +116,7 @@ const StudentDashboard: React.FC = () => {
             </div>
           </div>
           <div className="flex gap-2">
+            <ThemeToggle className="glass rounded-xl text-white/50 hover:text-white/90 hover:bg-white/10" />
             <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/50 hover:text-white/90 hover:bg-white/10 transition-all hover:scale-105">
               <Settings size={18} />
             </button>

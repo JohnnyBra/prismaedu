@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeProvider } from './context/ThemeContext';
 import { DataProvider, useData } from './context/DataContext';
 import AuthView from './views/AuthView';
 import TutorDashboard from './views/TutorDashboard';
@@ -32,9 +33,11 @@ const Main: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <DataProvider>
-      <Main />
-    </DataProvider>
+    <ThemeProvider>
+      <DataProvider>
+        <Main />
+      </DataProvider>
+    </ThemeProvider>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { GraduationCap, Home, User as UserIcon, Delete, ArrowRight, ArrowLeft, School, Shield, KeyRound, Sparkles } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 import { Role, User } from '../types';
 import Avatar from '../components/Avatar';
 
@@ -391,6 +392,11 @@ const AuthView: React.FC = () => {
       <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-primary-500/10 blur-3xl animate-float pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[35vw] h-[35vw] max-w-[400px] max-h-[400px] rounded-full bg-accent-500/10 blur-3xl animate-float-delayed pointer-events-none" />
       <div className="absolute top-[40%] right-[20%] w-[20vw] h-[20vw] max-w-[250px] max-h-[250px] rounded-full bg-pink-500/8 blur-3xl animate-float pointer-events-none" />
+
+      {/* Theme toggle — top right */}
+      <div className="fixed top-4 right-4 z-50" style={{ paddingTop: 'var(--safe-top)' }}>
+        <ThemeToggle className="glass rounded-full text-white/60 hover:text-white hover:bg-white/15" />
+      </div>
 
       {step !== 'MODE_SELECT' && (
         <button

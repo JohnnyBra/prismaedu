@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
 import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, LayoutDashboard, ListChecks, ChevronRight, ChevronDown } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 import { Role, User, Task } from '../types';
 
 type Tab = 'CLASSROOM' | 'REWARDS' | 'MESSAGES';
@@ -665,6 +666,7 @@ const TutorDashboard: React.FC = () => {
             >
               <Send size={14} /> Nueva Tarea
             </button>
+            <ThemeToggle className="glass rounded-xl text-white/40 hover:text-white/80" />
             <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors">
               <Settings size={18} />
             </button>

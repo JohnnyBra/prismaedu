@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
 import { Plus, Minus, LogOut, Home, Star, Settings, X, MessageSquare, Send, Gift, ListChecks, Trash2, CheckCircle, School, BookOpen } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 import { Role } from '../types';
 
 const ParentDashboard: React.FC = () => {
@@ -130,6 +131,7 @@ const ParentDashboard: React.FC = () => {
                 <Plus size={14} /> Premio
               </button>
             )}
+            <ThemeToggle className="glass rounded-xl text-white/40 hover:text-white/80" />
             <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors">
               <Settings size={18} />
             </button>

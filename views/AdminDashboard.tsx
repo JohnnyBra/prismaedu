@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { isPrime, generateUniquePrime } from '../utils/primes';
 import { Role, User, Task } from '../types';
 import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon, Printer } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 import Avatar from '../components/Avatar';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
@@ -1721,6 +1722,7 @@ const AdminDashboard: React.FC = () => {
            </div>
          </div>
          <div className="flex items-center gap-4">
+             <ThemeToggle className="text-white/30 hover:text-white/70" />
              <button onClick={() => setShowChangePin(true)} className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
                 <Key size={18} /> Cambiar PIN
              </button>
