@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
-import { GraduationCap, Home, User as UserIcon, Delete, ArrowRight, ArrowLeft, School, Shield, KeyRound, Sparkles } from 'lucide-react';
+import { GraduationCap, Home, User as UserIcon, Delete, ArrowRight, ArrowLeft, School, Shield, KeyRound, Sparkles, Mail } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import { Role, User } from '../types';
 import Avatar from '../components/Avatar';
 
-type LoginStep = 'MODE_SELECT' | 'TEACHER_METHOD_SELECT' | 'CLASS_SELECT' | 'GROUP_SELECT' | 'USER_SELECT' | 'PIN_ENTRY';
+type LoginStep = 'MODE_SELECT' | 'TEACHER_METHOD_SELECT' | 'CLASS_SELECT' | 'GROUP_SELECT' | 'USER_SELECT' | 'PIN_ENTRY' | 'EMAIL_ENTRY';
 
 const AuthView: React.FC = () => {
   const { login, users, classes } = useData();
@@ -15,6 +15,7 @@ const AuthView: React.FC = () => {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [emailInput, setEmailInput] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
 
@@ -63,13 +64,19 @@ const AuthView: React.FC = () => {
     setError('');
     setPin('');
     if (step === 'PIN_ENTRY') {
-      if (selectedClassId && !selectedUser) {
+      if (selectedContext === 'SCHOOL' && !selectedClassId) {
+        setStep('EMAIL_ENTRY');
+        setSelectedUser(null);
+      } else if (selectedClassId && !selectedUser) {
         setStep('CLASS_SELECT');
         setSelectedClassId(null);
       } else {
         setStep('USER_SELECT');
         setSelectedUser(null);
       }
+    } else if (step === 'EMAIL_ENTRY') {
+      setStep('TEACHER_METHOD_SELECT');
+      setEmailInput('');
     } else if (step === 'USER_SELECT') {
       if (selectedContext === 'ADMIN') {
           setStep('MODE_SELECT');
@@ -94,6 +101,83 @@ const AuthView: React.FC = () => {
   };
 
   // --- Views ---
+
+  const renderEmailEntry = () => (
+    <div className="w-full max-w-md px-4 animate-slide-up">
+      <div className="glass-medium rounded-3xl p-8 shadow-glass-lg">
+        <h2 className="font-display text-2xl font-bold text-center text-white/90 mb-6">
+          Acceso Profesorado
+        </h2>
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-white/60 mb-2 ml-1">
+              Correo Corporativo
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
+              <input
+                type="email"
+                value={emailInput}
+                onChange={(e) => {
+                  setEmailInput(e.target.value);
+                  setError('');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const normalizedEmail = emailInput.trim().toLowerCase();
+                    const user = users.find(u =>
+                      u.email?.toLowerCase() === normalizedEmail &&
+                      u.role === Role.TUTOR
+                    );
+
+                    if (user) {
+                      setSelectedUser(user);
+                      setStep('PIN_ENTRY');
+                      setError('');
+                    } else {
+                      setError('No se encontró un profesor con este email.');
+                    }
+                  }
+                }}
+                placeholder="nombre@colegio.com"
+                className="w-full pl-12 pr-4 py-4 rounded-xl input-glass bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-primary-400 focus:ring-1 focus:ring-primary-400/50 transition-all"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm font-medium text-center animate-pulse">
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={() => {
+              const normalizedEmail = emailInput.trim().toLowerCase();
+              const user = users.find(u =>
+                u.email?.toLowerCase() === normalizedEmail &&
+                u.role === Role.TUTOR
+              );
+
+              if (user) {
+                setSelectedUser(user);
+                setStep('PIN_ENTRY');
+                setError('');
+              } else {
+                setError('No se encontró un profesor con este email.');
+              }
+            }}
+            disabled={!emailInput.trim()}
+            className="w-full py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-display font-bold text-lg shadow-lg shadow-primary-500/25 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Continuar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   const renderModeSelect = () => (
     <div className="space-y-8 animate-slide-up w-full max-w-md px-4">
@@ -153,7 +237,7 @@ const AuthView: React.FC = () => {
       <h2 className="font-display text-2xl font-bold text-center text-white/90 mb-8">Elige Método de Acceso</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button
-          onClick={() => setStep('USER_SELECT')}
+          onClick={() => setStep('EMAIL_ENTRY')}
           className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 hover:shadow-neon-blue flex flex-col items-center gap-4"
         >
           <div className="w-16 h-16 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all duration-300 group-hover:scale-110">
@@ -305,7 +389,9 @@ const AuthView: React.FC = () => {
   };
 
   const renderPinEntry = () => (
-    <div className="glass-medium rounded-3xl shadow-glass-lg p-8 max-w-sm w-full mx-4 animate-scale-in">
+    <div className={`glass-medium rounded-3xl shadow-glass-lg p-8 max-w-sm w-full mx-4 ${
+      selectedContext === 'SCHOOL' && !selectedClassId ? 'animate-zoom-in-bouncy' : 'animate-scale-in'
+    }`}>
       <div className="text-center mb-6">
         <div className="mx-auto w-20 h-20 mb-4">
           {selectedUser ? (
@@ -411,6 +497,7 @@ const AuthView: React.FC = () => {
       <div className="flex-1 flex flex-col items-center justify-center w-full z-10">
         {step === 'MODE_SELECT' && renderModeSelect()}
         {step === 'TEACHER_METHOD_SELECT' && renderTeacherMethodSelect()}
+        {step === 'EMAIL_ENTRY' && renderEmailEntry()}
         {step === 'CLASS_SELECT' && renderClassSelect()}
         {step === 'GROUP_SELECT' && renderGroupSelect()}
         {step === 'USER_SELECT' && renderUserSelect()}

@@ -798,3 +798,14 @@ html[data-theme="dark"] {
   color: #f1f5f9;
   background-color: #0f172a;
 }
+
+/* ============ CUSTOM ANIMATION FOR TEACHER LOGIN ============ */
+@keyframes zoom-in-bouncy {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.animate-zoom-in-bouncy {
+  animation: zoom-in-bouncy 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
