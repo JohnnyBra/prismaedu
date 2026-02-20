@@ -9,6 +9,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -71,11 +72,11 @@ passport.deserializeUser(async (id, done) => {
 });
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || 'dummy_id', // Needs to be provided in env
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy_secret',
-    callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3020/auth/google/callback'
-  },
-  async function(accessToken, refreshToken, profile, cb) {
+  clientID: process.env.GOOGLE_CLIENT_ID || 'dummy_id', // Needs to be provided in env
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy_secret',
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3020/auth/google/callback'
+},
+  async function (accessToken, refreshToken, profile, cb) {
     try {
       const email = profile.emails?.[0]?.value;
       if (!email || !email.endsWith('@colegiolahispanidad.es')) {
@@ -111,10 +112,10 @@ passport.use(new GoogleStrategy({
       const user = users.find(u => u.email === email);
 
       if (!user) {
-         // Fallback for demo purposes if no user matches email strictly:
-         // If we are testing and have no real emails in DB, this will block everyone.
-         // But I must follow instructions.
-         return cb(null, false, { message: 'Usuario no encontrado en el sistema local' });
+        // Fallback for demo purposes if no user matches email strictly:
+        // If we are testing and have no real emails in DB, this will block everyone.
+        // But I must follow instructions.
+        return cb(null, false, { message: 'Usuario no encontrado en el sistema local' });
       }
 
       if (user.role !== 'TUTOR' && user.role !== 'ADMIN') {
@@ -168,6 +169,23 @@ app.get('/auth/google/callback',
   (req, res) => {
     // Successful authentication, redirect to dashboard.
     // In a real app we might redirect to a specific dashboard URL or set a cookie.
+    if (process.env.ENABLE_GLOBAL_SSO === 'true') {
+      const roleStr = req.user.role === 'TUTOR' ? 'TEACHER' : req.user.role;
+      const payload = {
+        userId: req.user.id,
+        email: req.user.email,
+        role: roleStr,
+        profileId: req.user.id
+      };
+      const token = jwt.sign(payload, process.env.JWT_SSO_SECRET || 'fallback-secret', { expiresIn: '8h' });
+      res.cookie('BIBLIO_SSO_TOKEN', token, {
+        domain: process.env.COOKIE_DOMAIN || '.bibliohispa.es',
+        path: '/',
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Lax'
+      });
+    }
     res.redirect(`/?user_id=${req.user.id}`);
   }
 );
@@ -194,6 +212,23 @@ app.post('/api/auth/external-check', async (req, res) => {
     );
 
     if (user) {
+      if (process.env.ENABLE_GLOBAL_SSO === 'true') {
+        const roleStr = user.role === 'PARENT' ? 'FAMILY' : (user.role === 'TUTOR' ? 'TEACHER' : user.role);
+        const payload = {
+          userId: user.id,
+          email: user.email,
+          role: roleStr,
+          profileId: user.id
+        };
+        const token = jwt.sign(payload, process.env.JWT_SSO_SECRET || 'fallback-secret', { expiresIn: '8h' });
+        res.cookie('BIBLIO_SSO_TOKEN', token, {
+          domain: process.env.COOKIE_DOMAIN || '.bibliohispa.es',
+          path: '/',
+          httpOnly: true,
+          secure: true,
+          sameSite: 'Lax'
+        });
+      }
       return res.json({
         success: true,
         role: user.role,
@@ -212,61 +247,61 @@ app.post('/api/auth/external-check', async (req, res) => {
 
 // Middleware for Export API
 const checkApiSecret = (req, res, next) => {
-    const secret = req.headers['api_secret'];
-    if (!secret || secret !== process.env.API_SECRET) {
-      // If no env var set, fallback or fail. Secure by default: fail.
-      // But for demo, if process.env.API_SECRET is not set, maybe allow or strictly fail?
-      // Strict:
-      if (!process.env.API_SECRET) {
-         console.warn("API_SECRET not set in env, blocking export access.");
-         return res.status(403).json({ error: 'Server configuration error' });
-      }
-      return res.status(403).json({ error: 'Unauthorized' });
+  const secret = req.headers['api_secret'];
+  if (!secret || secret !== process.env.API_SECRET) {
+    // If no env var set, fallback or fail. Secure by default: fail.
+    // But for demo, if process.env.API_SECRET is not set, maybe allow or strictly fail?
+    // Strict:
+    if (!process.env.API_SECRET) {
+      console.warn("API_SECRET not set in env, blocking export access.");
+      return res.status(403).json({ error: 'Server configuration error' });
     }
-    next();
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+  next();
 };
 
 // Export APIs
 app.get('/api/export/classes', checkApiSecret, async (req, res) => {
-    try {
-        const classes = await getData('classes', []);
-        res.json(classes);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+  try {
+    const classes = await getData('classes', []);
+    res.json(classes);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get('/api/export/students', checkApiSecret, async (req, res) => {
-    try {
-        const users = await getData('users', []);
-        const students = users.filter(u => u.role === 'STUDENT').map(u => ({
-            id: u.id,
-            name: u.name,
-            classId: u.classId,
-            familyId: u.familyId,
-            email: u.email
-        }));
-        res.json(students);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+  try {
+    const users = await getData('users', []);
+    const students = users.filter(u => u.role === 'STUDENT').map(u => ({
+      id: u.id,
+      name: u.name,
+      classId: u.classId,
+      familyId: u.familyId,
+      email: u.email
+    }));
+    res.json(students);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get('/api/export/users', checkApiSecret, async (req, res) => {
-    try {
-        const users = await getData('users', []);
-        // Active teachers (TUTOR)
-        const teachers = users.filter(u => u.role === 'TUTOR').map(u => ({
-            id: u.id,
-            name: u.name,
-            classId: u.classId,
-            role: u.role,
-            email: u.email
-        }));
-        res.json(teachers);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+  try {
+    const users = await getData('users', []);
+    // Active teachers (TUTOR)
+    const teachers = users.filter(u => u.role === 'TUTOR').map(u => ({
+      id: u.id,
+      name: u.name,
+      classId: u.classId,
+      role: u.role,
+      email: u.email
+    }));
+    res.json(teachers);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Serve Static Files (The built React App)
@@ -343,7 +378,7 @@ io.on('connection', async (socket) => {
     await setData('completions', newCompletions);
     io.emit('sync_completions', newCompletions);
   });
-  
+
   socket.on('update_messages', async (newMessages) => {
     await setData('messages', newMessages);
     io.emit('sync_messages', newMessages);
@@ -421,13 +456,13 @@ initDB().then(async () => {
   if (!adminExists) {
     console.log('Admin user missing. Creating default admin user...');
     users.push({
-        id: 'admin',
-        name: 'Administrador',
-        role: 'ADMIN',
-        points: 0,
-        pin: '2222',
-        email: 'admin@colegiolahispanidad.es',
-        altPin: '2222'
+      id: 'admin',
+      name: 'Administrador',
+      role: 'ADMIN',
+      points: 0,
+      pin: '2222',
+      email: 'admin@colegiolahispanidad.es',
+      altPin: '2222'
     });
     await setData('users', users);
     console.log('Default admin user created.');
