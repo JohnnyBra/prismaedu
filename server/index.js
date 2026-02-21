@@ -174,6 +174,7 @@ app.get('/auth/google/callback',
       const payload = {
         userId: req.user.id,
         email: req.user.email,
+        name: req.user.name,
         role: roleStr,
         profileId: req.user.id
       };
@@ -217,6 +218,7 @@ app.post('/api/auth/external-check', async (req, res) => {
         const payload = {
           userId: user.id,
           email: user.email,
+          name: user.name,
           role: roleStr,
           profileId: user.id
         };
