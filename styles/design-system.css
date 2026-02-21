@@ -12,32 +12,32 @@
   --glass-hover-bg: rgba(255, 255, 255, 0.12);
 
   /* Gradient mesh base colors per role */
-  --mesh-auth: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.35) 0%, transparent 50%),
-               radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.3) 0%, transparent 50%),
-               radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.25) 0%, transparent 50%),
-               linear-gradient(135deg, #161040 0%, #221855 50%, #151e38 100%);
+  --mesh-auth: radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
+    linear-gradient(135deg, #161040 0%, #221855 50%, #151e38 100%);
 
-  --mesh-tutor: radial-gradient(ellipse at 15% 50%, rgba(99,102,241,0.38) 0%, transparent 50%),
-                radial-gradient(ellipse at 85% 30%, rgba(79,70,229,0.3) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 90%, rgba(67,56,202,0.22) 0%, transparent 50%),
-                linear-gradient(135deg, #1c1452 0%, #2a2370 50%, #1c2548 100%);
+  --mesh-tutor: radial-gradient(ellipse at 15% 50%, rgba(99, 102, 241, 0.38) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 30%, rgba(79, 70, 229, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(67, 56, 202, 0.22) 0%, transparent 50%),
+    linear-gradient(135deg, #1c1452 0%, #2a2370 50%, #1c2548 100%);
 
-  --mesh-parent: radial-gradient(ellipse at 20% 40%, rgba(251,146,60,0.3) 0%, transparent 50%),
-                 radial-gradient(ellipse at 80% 20%, rgba(249,115,22,0.25) 0%, transparent 50%),
-                 radial-gradient(ellipse at 50% 85%, rgba(234,88,12,0.18) 0%, transparent 50%),
-                 linear-gradient(135deg, #231810 0%, #2f1e10 50%, #1a2035 100%);
+  --mesh-parent: radial-gradient(ellipse at 20% 40%, rgba(251, 146, 60, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(249, 115, 22, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 85%, rgba(234, 88, 12, 0.18) 0%, transparent 50%),
+    linear-gradient(135deg, #231810 0%, #2f1e10 50%, #1a2035 100%);
 
-  --mesh-student: radial-gradient(ellipse at 20% 20%, rgba(251,191,36,0.28) 0%, transparent 45%),
-                  radial-gradient(ellipse at 80% 30%, rgba(236,72,153,0.25) 0%, transparent 45%),
-                  radial-gradient(ellipse at 30% 80%, rgba(34,211,238,0.28) 0%, transparent 45%),
-                  radial-gradient(ellipse at 70% 70%, rgba(168,85,247,0.22) 0%, transparent 40%),
-                  radial-gradient(ellipse at 50% 50%, rgba(52,211,153,0.15) 0%, transparent 50%),
-                  linear-gradient(135deg, #1a1550 0%, #22185a 40%, #182048 100%);
+  --mesh-student: radial-gradient(ellipse at 20% 20%, rgba(251, 191, 36, 0.28) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 30%, rgba(236, 72, 153, 0.25) 0%, transparent 45%),
+    radial-gradient(ellipse at 30% 80%, rgba(34, 211, 238, 0.28) 0%, transparent 45%),
+    radial-gradient(ellipse at 70% 70%, rgba(168, 85, 247, 0.22) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(52, 211, 153, 0.15) 0%, transparent 50%),
+    linear-gradient(135deg, #1a1550 0%, #22185a 40%, #182048 100%);
 
-  --mesh-admin: radial-gradient(ellipse at 20% 50%, rgba(100,116,139,0.32) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 30%, rgba(71,85,105,0.28) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 80%, rgba(51,65,85,0.2) 0%, transparent 50%),
-                linear-gradient(135deg, #1a2438 0%, #263548 50%, #1a2438 100%);
+  --mesh-admin: radial-gradient(ellipse at 20% 50%, rgba(100, 116, 139, 0.32) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 30%, rgba(71, 85, 105, 0.28) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(51, 65, 85, 0.2) 0%, transparent 50%),
+    linear-gradient(135deg, #1a2438 0%, #263548 50%, #1a2438 100%);
 
   /* Safe areas for mobile notch */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -48,70 +48,163 @@
 
 /* ============ KEYFRAMES ============ */
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-12px) rotate(1deg); }
-  66% { transform: translateY(6px) rotate(-1deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+
+  66% {
+    transform: translateY(6px) rotate(-1deg);
+  }
 }
 
 @keyframes glow-pulse {
-  0%, 100% { opacity: 0.5; filter: blur(20px); }
-  50% { opacity: 0.8; filter: blur(25px); }
+
+  0%,
+  100% {
+    opacity: 0.5;
+    filter: blur(20px);
+  }
+
+  50% {
+    opacity: 0.8;
+    filter: blur(25px);
+  }
 }
 
 @keyframes slide-up {
-  from { transform: translateY(24px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slide-down {
-  from { transform: translateY(-24px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slide-in-right {
-  from { transform: translateX(32px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(32px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes scale-in {
-  from { transform: scale(0.92); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 @keyframes modal-in {
-  from { transform: scale(0.95) translateY(10px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+  from {
+    transform: scale(0.95) translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes modal-overlay-in {
-  from { opacity: 0; backdrop-filter: blur(0); }
-  to { opacity: 1; backdrop-filter: blur(12px); }
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    backdrop-filter: blur(12px);
+  }
 }
 
 /* ============ BASE ============ */
@@ -139,6 +232,7 @@ html[data-theme="light"] body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -149,13 +243,16 @@ html[data-theme="light"] body {
     width: 6px;
     height: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.03);
   }
+
   ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.12);
     border-radius: 3px;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
   }
@@ -197,35 +294,49 @@ html[data-theme="light"] body {
 }
 
 /* ============ GRADIENT MESH BACKGROUNDS ============ */
-.mesh-auth { background: var(--mesh-auth); }
-.mesh-tutor { background: var(--mesh-tutor); }
-.mesh-parent { background: var(--mesh-parent); }
-.mesh-student { background: var(--mesh-student); }
-.mesh-admin { background: var(--mesh-admin); }
+.mesh-auth {
+  background: var(--mesh-auth);
+}
+
+.mesh-tutor {
+  background: var(--mesh-tutor);
+}
+
+.mesh-parent {
+  background: var(--mesh-parent);
+}
+
+.mesh-student {
+  background: var(--mesh-student);
+}
+
+.mesh-admin {
+  background: var(--mesh-admin);
+}
 
 /* ============ CARD GLOW BORDERS ============ */
 .glow-border-blue {
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2),
-              0 8px 32px rgba(99, 102, 241, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .glow-border-orange {
   box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.2),
-              0 8px 32px rgba(249, 115, 22, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(249, 115, 22, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .glow-border-green {
   box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2),
-              0 8px 32px rgba(34, 197, 94, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(34, 197, 94, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .glow-border-purple {
   box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.2),
-              0 8px 32px rgba(168, 85, 247, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(168, 85, 247, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* ============ MODAL OVERLAY ============ */
@@ -262,9 +373,9 @@ html[data-theme="light"] body {
 /* ============ SHIMMER LOADING ============ */
 .shimmer {
   background: linear-gradient(90deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0) 100%);
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0) 100%);
   background-size: 200% 100%;
   animation: shimmer 2s linear infinite;
 }
@@ -351,14 +462,45 @@ html[data-theme="light"] body {
 }
 
 /* ============ STAGGERED ANIMATION DELAYS ============ */
-.stagger-1 { animation-delay: 0.05s; animation-fill-mode: both; }
-.stagger-2 { animation-delay: 0.1s; animation-fill-mode: both; }
-.stagger-3 { animation-delay: 0.15s; animation-fill-mode: both; }
-.stagger-4 { animation-delay: 0.2s; animation-fill-mode: both; }
-.stagger-5 { animation-delay: 0.25s; animation-fill-mode: both; }
-.stagger-6 { animation-delay: 0.3s; animation-fill-mode: both; }
-.stagger-7 { animation-delay: 0.35s; animation-fill-mode: both; }
-.stagger-8 { animation-delay: 0.4s; animation-fill-mode: both; }
+.stagger-1 {
+  animation-delay: 0.05s;
+  animation-fill-mode: both;
+}
+
+.stagger-2 {
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+  animation-fill-mode: both;
+}
+
+.stagger-4 {
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+.stagger-5 {
+  animation-delay: 0.25s;
+  animation-fill-mode: both;
+}
+
+.stagger-6 {
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
+}
+
+.stagger-7 {
+  animation-delay: 0.35s;
+  animation-fill-mode: both;
+}
+
+.stagger-8 {
+  animation-delay: 0.4s;
+  animation-fill-mode: both;
+}
 
 /* ============ RESPONSIVE UTILITIES ============ */
 @media (max-width: 767px) {
@@ -377,30 +519,77 @@ html[data-theme="light"] body {
 
 /* ============ STUDENT FUN THEME ============ */
 @keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  15% { transform: rotate(-3deg); }
-  30% { transform: rotate(3deg); }
-  45% { transform: rotate(-2deg); }
-  60% { transform: rotate(2deg); }
-  75% { transform: rotate(-1deg); }
-  90% { transform: rotate(1deg); }
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  15% {
+    transform: rotate(-3deg);
+  }
+
+  30% {
+    transform: rotate(3deg);
+  }
+
+  45% {
+    transform: rotate(-2deg);
+  }
+
+  60% {
+    transform: rotate(2deg);
+  }
+
+  75% {
+    transform: rotate(-1deg);
+  }
+
+  90% {
+    transform: rotate(1deg);
+  }
 }
 
 @keyframes pop {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
 }
 
 @keyframes rainbow-glow {
-  0% { box-shadow: 0 0 15px rgba(251,191,36,0.25), 0 0 30px rgba(251,191,36,0.08); }
-  33% { box-shadow: 0 0 15px rgba(236,72,153,0.25), 0 0 30px rgba(236,72,153,0.08); }
-  66% { box-shadow: 0 0 15px rgba(34,211,238,0.25), 0 0 30px rgba(34,211,238,0.08); }
-  100% { box-shadow: 0 0 15px rgba(251,191,36,0.25), 0 0 30px rgba(251,191,36,0.08); }
+  0% {
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.25), 0 0 30px rgba(251, 191, 36, 0.08);
+  }
+
+  33% {
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.25), 0 0 30px rgba(236, 72, 153, 0.08);
+  }
+
+  66% {
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.25), 0 0 30px rgba(34, 211, 238, 0.08);
+  }
+
+  100% {
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.25), 0 0 30px rgba(251, 191, 36, 0.08);
+  }
 }
 
 @keyframes confetti-float {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(-30px) rotate(180deg); opacity: 0; }
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-30px) rotate(180deg);
+    opacity: 0;
+  }
 }
 
 .glass-student {
@@ -411,15 +600,15 @@ html[data-theme="light"] body {
 }
 
 .glass-student-card {
-  background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.07), rgba(236,72,153,0.05));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.07), rgba(236, 72, 153, 0.05));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .student-points-pill {
-  background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15));
-  border: 1px solid rgba(251,191,36,0.3);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15));
+  border: 1px solid rgba(251, 191, 36, 0.3);
   animation: pop 3s ease-in-out infinite;
 }
 
@@ -429,9 +618,9 @@ html[data-theme="light"] body {
 
 .glow-border-candy {
   box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.15),
-              0 0 0 1px rgba(168, 85, 247, 0.1),
-              0 8px 32px rgba(168, 85, 247, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 0 0 1px rgba(168, 85, 247, 0.1),
+    0 8px 32px rgba(168, 85, 247, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* ============================================================
@@ -443,11 +632,14 @@ html[data-theme="light"] body {
 html {
   transition: background-color 0.35s ease, color 0.35s ease;
 }
+
 html * {
   transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.15s ease;
 }
+
 /* Exclude animations from transition bloat */
-html [class*="animate-"], html [class*="transition-"] {
+html [class*="animate-"],
+html [class*="transition-"] {
   transition: unset;
 }
 
@@ -462,39 +654,43 @@ html[data-theme="light"] {
 /* --- Mesh backgrounds (pastel) --- */
 html[data-theme="light"] .mesh-auth {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
     linear-gradient(135deg, #ede8ff 0%, #f3eeff 50%, #eef2ff 100%);
 }
+
 html[data-theme="light"] .mesh-tutor {
   background:
-    radial-gradient(ellipse at 15% 50%, rgba(99,102,241,0.14) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 30%, rgba(79,70,229,0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 90%, rgba(67,56,202,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 15% 50%, rgba(99, 102, 241, 0.14) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 30%, rgba(79, 70, 229, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(67, 56, 202, 0.08) 0%, transparent 50%),
     linear-gradient(135deg, #eef2ff 0%, #e8edfe 50%, #f0f4ff 100%);
 }
+
 html[data-theme="light"] .mesh-parent {
   background:
-    radial-gradient(ellipse at 20% 40%, rgba(251,146,60,0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(249,115,22,0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 85%, rgba(234,88,12,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 40%, rgba(251, 146, 60, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(249, 115, 22, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 85%, rgba(234, 88, 12, 0.07) 0%, transparent 50%),
     linear-gradient(135deg, #fff8f0 0%, #fff5eb 50%, #fef7f0 100%);
 }
+
 html[data-theme="light"] .mesh-student {
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(251,191,36,0.12) 0%, transparent 45%),
-    radial-gradient(ellipse at 80% 30%, rgba(236,72,153,0.10) 0%, transparent 45%),
-    radial-gradient(ellipse at 30% 80%, rgba(34,211,238,0.12) 0%, transparent 45%),
-    radial-gradient(ellipse at 70% 70%, rgba(168,85,247,0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 50%, rgba(52,211,153,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 20%, rgba(251, 191, 36, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 30%, rgba(236, 72, 153, 0.10) 0%, transparent 45%),
+    radial-gradient(ellipse at 30% 80%, rgba(34, 211, 238, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 70% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(52, 211, 153, 0.06) 0%, transparent 50%),
     linear-gradient(135deg, #f5f0ff 0%, #fef0f5 40%, #f0faff 100%);
 }
+
 html[data-theme="light"] .mesh-admin {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(100,116,139,0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 30%, rgba(71,85,105,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(51,65,85,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 50%, rgba(100, 116, 139, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 30%, rgba(71, 85, 105, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(51, 65, 85, 0.06) 0%, transparent 50%),
     linear-gradient(135deg, #f1f5f9 0%, #e8edf5 50%, #f1f5f9 100%);
 }
 
@@ -504,28 +700,33 @@ html[data-theme="light"] .glass {
   border-color: rgba(0, 0, 0, 0.06);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
+
 html[data-theme="light"] .glass-light {
   background: rgba(255, 255, 255, 0.5);
   border-color: rgba(0, 0, 0, 0.05);
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.03);
 }
+
 html[data-theme="light"] .glass-medium {
   background: rgba(255, 255, 255, 0.75);
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
+
 html[data-theme="light"] .glass-strong {
   background: rgba(255, 255, 255, 0.88);
   border-color: rgba(0, 0, 0, 0.10);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
+
 html[data-theme="light"] .glass-student {
   background: rgba(255, 255, 255, 0.6);
   border-color: rgba(168, 85, 247, 0.1);
   box-shadow: 0 4px 24px rgba(168, 85, 247, 0.04);
 }
+
 html[data-theme="light"] .glass-student-card {
-  background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(168,85,247,0.04), rgba(236,72,153,0.03));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(168, 85, 247, 0.04), rgba(236, 72, 153, 0.03));
   border-color: rgba(99, 102, 241, 0.1);
 }
 
@@ -540,16 +741,20 @@ html[data-theme="light"] [class*="text-white\/9"],
 html[data-theme="light"] [class*="text-white\/8"] {
   color: var(--text-light-primary) !important;
 }
+
 html[data-theme="light"] [class*="text-white\/7"] {
   color: rgba(15, 23, 42, 0.75) !important;
 }
+
 html[data-theme="light"] [class*="text-white\/6"] {
   color: var(--text-light-secondary) !important;
 }
+
 html[data-theme="light"] [class*="text-white\/5"],
 html[data-theme="light"] [class*="text-white\/4"] {
   color: var(--text-light-muted) !important;
 }
+
 html[data-theme="light"] [class*="text-white\/3"],
 html[data-theme="light"] [class*="text-white\/2"] {
   color: rgba(15, 23, 42, 0.3) !important;
@@ -559,6 +764,7 @@ html[data-theme="light"] [class*="text-white\/2"] {
 html[data-theme="light"] .text-white {
   color: var(--text-light-primary) !important;
 }
+
 html[data-theme="light"] [class~="text-white"] {
   color: var(--text-light-primary) !important;
 }
@@ -568,10 +774,12 @@ html[data-theme="light"] .text-gray-100,
 html[data-theme="light"] [class~="text-gray-100"] {
   color: #1e293b !important;
 }
+
 html[data-theme="light"] .text-gray-200,
 html[data-theme="light"] [class~="text-gray-200"] {
   color: #334155 !important;
 }
+
 html[data-theme="light"] .text-gray-300,
 html[data-theme="light"] [class~="text-gray-300"] {
   color: #475569 !important;
@@ -601,14 +809,17 @@ html[data-theme="light"] [class*="bg-emerald-"] {
 html[data-theme="light"] [class*="bg-surface-700"] {
   background-color: #e2e8f0 !important;
 }
+
 html[data-theme="light"] [class*="bg-surface-600"] {
   background-color: #cbd5e1 !important;
 }
+
 /* Keep icon/text inside surface boxes visible (dark on light bg) */
 html[data-theme="light"] [class*="bg-surface-700"] *,
 html[data-theme="light"] [class*="bg-surface-600"] * {
   color: #475569 !important;
 }
+
 html[data-theme="light"] [class*="bg-surface-700"]:hover *,
 html[data-theme="light"] [class*="bg-surface-600"]:hover * {
   color: #334155 !important;
@@ -618,9 +829,11 @@ html[data-theme="light"] [class*="bg-surface-600"]:hover * {
 html[data-theme="light"] [class*="text-red-400\/5"] {
   color: rgba(220, 38, 38, 0.7) !important;
 }
+
 html[data-theme="light"] [class*="text-red-400\/6"] {
   color: rgba(220, 38, 38, 0.75) !important;
 }
+
 html[data-theme="light"] [class*="text-red-400"]:hover {
   color: #dc2626 !important;
 }
@@ -638,11 +851,13 @@ html[data-theme="light"] .input-glass {
   border-color: rgba(0, 0, 0, 0.12);
   color: #1e293b;
 }
+
 html[data-theme="light"] .input-glass:focus {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(99, 102, 241, 0.5);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
+
 html[data-theme="light"] .input-glass::placeholder {
   color: rgba(15, 23, 42, 0.35);
 }
@@ -651,6 +866,7 @@ html[data-theme="light"] .input-glass::placeholder {
 html[data-theme="light"] .modal-overlay {
   background: rgba(0, 0, 0, 0.25);
 }
+
 html[data-theme="light"] .modal-content {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -663,6 +879,7 @@ html[data-theme="light"] .btn-ghost {
   border-color: rgba(0, 0, 0, 0.1);
   color: #334155;
 }
+
 html[data-theme="light"] .btn-ghost:hover {
   background: rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 0, 0, 0.15);
@@ -672,38 +889,44 @@ html[data-theme="light"] .btn-ghost:hover {
 /* --- Glow borders softer --- */
 html[data-theme="light"] .glow-border-blue {
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.12),
-              0 4px 16px rgba(99, 102, 241, 0.06),
-              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 4px 16px rgba(99, 102, 241, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
+
 html[data-theme="light"] .glow-border-orange {
   box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.12),
-              0 4px 16px rgba(249, 115, 22, 0.06),
-              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 4px 16px rgba(249, 115, 22, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
+
 html[data-theme="light"] .glow-border-green {
   box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.12),
-              0 4px 16px rgba(34, 197, 94, 0.06),
-              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 4px 16px rgba(34, 197, 94, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
+
 html[data-theme="light"] .glow-border-purple {
   box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.12),
-              0 4px 16px rgba(168, 85, 247, 0.06),
-              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 4px 16px rgba(168, 85, 247, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
+
 html[data-theme="light"] .glow-border-candy {
   box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.1),
-              0 0 0 1px rgba(168, 85, 247, 0.06),
-              0 4px 16px rgba(168, 85, 247, 0.04),
-              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 0 0 1px rgba(168, 85, 247, 0.06),
+    0 4px 16px rgba(168, 85, 247, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 /* --- Scrollbar (light) --- */
 html[data-theme="light"] ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.03);
 }
+
 html[data-theme="light"] ::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.12);
 }
+
 html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.2);
 }
@@ -719,10 +942,12 @@ html[data-theme="light"] .bg-surface-900,
 html[data-theme="light"] [class~="bg-surface-900"] {
   background-color: #f0f0ff !important;
 }
+
 html[data-theme="light"] .bg-surface-800,
 html[data-theme="light"] [class~="bg-surface-800"] {
   background-color: #f5f5ff !important;
 }
+
 html[data-theme="light"] [class*="bg-white\/5"],
 html[data-theme="light"] [class*="bg-white\/6"],
 html[data-theme="light"] [class*="bg-white\/8"],
@@ -731,6 +956,7 @@ html[data-theme="light"] [class*="bg-white\/12"],
 html[data-theme="light"] [class*="bg-white\/15"] {
   background-color: rgba(0, 0, 0, 0.04) !important;
 }
+
 html[data-theme="light"] [class*="bg-black\/20"],
 html[data-theme="light"] [class*="bg-black\/30"],
 html[data-theme="light"] [class*="bg-black\/40"] {
@@ -749,9 +975,10 @@ html[data-theme="light"] [class*="border-white\/20"] {
 
 /* --- Student points pill (amber text must stay visible) --- */
 html[data-theme="light"] .student-points-pill {
-  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.10));
-  border-color: rgba(245,158,11,0.25);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.10));
+  border-color: rgba(245, 158, 11, 0.25);
 }
+
 html[data-theme="light"] .student-points-pill * {
   color: #92400e !important;
 }
@@ -759,9 +986,9 @@ html[data-theme="light"] .student-points-pill * {
 /* --- Shimmer (inverted for light bg) --- */
 html[data-theme="light"] .shimmer {
   background: linear-gradient(90deg,
-    rgba(0,0,0,0) 0%,
-    rgba(0,0,0,0.04) 50%,
-    rgba(0,0,0,0) 100%);
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.04) 50%,
+      rgba(0, 0, 0, 0) 100%);
   background-size: 200% 100%;
 }
 
@@ -801,11 +1028,45 @@ html[data-theme="dark"] {
 
 /* ============ CUSTOM ANIMATION FOR TEACHER LOGIN ============ */
 @keyframes zoom-in-bouncy {
-  0% { transform: scale(0.8); opacity: 0; }
-  60% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .animate-zoom-in-bouncy {
   animation: zoom-in-bouncy 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+/* ============ WATERMARK LOGO ============ */
+body::after {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vmin;
+  height: 80vmin;
+  background-image: url('/logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.03;
+  filter: grayscale(1) invert(1) brightness(2);
+  pointer-events: none;
+  z-index: -1;
+}
+
+html[data-theme="light"] body::after {
+  opacity: 0.05;
+  filter: none;
 }
