@@ -245,6 +245,15 @@ app.post('/api/auth/external-check', async (req, res) => {
   }
 });
 
+// SSO Logout — clears the shared SSO cookie
+app.post('/api/auth/logout', (req, res) => {
+  res.clearCookie('BIBLIO_SSO_TOKEN', {
+    domain: process.env.COOKIE_DOMAIN || '.bibliohispa.es',
+    path: '/'
+  });
+  res.json({ success: true });
+});
+
 // Middleware for Export API
 const checkApiSecret = (req, res, next) => {
   const secret = req.headers['api_secret'];
