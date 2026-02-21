@@ -138,6 +138,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (user && user.pin === pin) {
       setCurrentUserId(user.id);
       localStorage.setItem('sc_session_user', user.id);
+      // Trigger server-side SSO cookie creation (fire-and-forget)
+      fetch('/api/auth/external-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: userId, password: pin })
+      }).catch(() => {});
       return true;
     }
     return false;
@@ -146,6 +152,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
       setCurrentUserId(null);
       localStorage.removeItem('sc_session_user');
+      // Clear SSO cookie (fire-and-forget)
+      fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
   };
 
   const updatePin = (newPin: string) => {

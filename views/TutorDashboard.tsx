@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
-import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, LayoutDashboard, ListChecks, ChevronRight, ChevronDown } from 'lucide-react';
+import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, Newspaper, LayoutDashboard, ListChecks, ChevronRight, ChevronDown } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import { Role, User, Task } from '../types';
 
@@ -228,11 +228,25 @@ const TutorDashboard: React.FC = () => {
             <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors" />
           </a>
 
+          <a href="https://intranet.bibliohispa.es/"
+            className="glass rounded-2xl p-5 glow-border-purple hover:bg-white/10 transition-all group flex items-center gap-4"
+            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both' }}
+          >
+            <div className="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 group-hover:bg-violet-500/30 transition-colors shrink-0">
+              <Newspaper size={24} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-display font-bold text-white/90 text-lg">Intranet</h3>
+              <p className="text-sm text-white/40">Portal del profesorado.</p>
+            </div>
+            <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors" />
+          </a>
+
           {/* Internal App */}
           <button
             onClick={() => setShowHub(false)}
             className="glass rounded-2xl p-5 glow-border-blue hover:bg-white/10 transition-all group flex items-center gap-4 text-left"
-            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both' }}
+            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}
           >
             <div className="w-12 h-12 bg-primary-500/20 rounded-xl flex items-center justify-center text-primary-400 group-hover:bg-primary-500/30 transition-colors shrink-0">
               <School size={24} />
