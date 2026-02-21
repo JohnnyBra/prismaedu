@@ -1061,9 +1061,9 @@ body::after {
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.03;
-  filter: grayscale(1) invert(1) brightness(2);
   pointer-events: none;
-  z-index: -1;
+  filter: grayscale(1) invert(1) brightness(2);
+  z-index: 9999;
 }
 
 html[data-theme="light"] body::after {
