@@ -4,11 +4,11 @@
 #
 #  Actualiza una o todas las aplicaciones del ecosistema educativo.
 #  Uso:
-#    sudo bash update-all.sh          # Menú interactivo
-#    sudo bash update-all.sh --all    # Actualizar todo sin preguntar
-#    sudo bash update-all.sh 1 3 5    # Actualizar apps específicas por número
+#    bash update-all.sh          # Menú interactivo
+#    bash update-all.sh --all    # Actualizar todo sin preguntar
+#    bash update-all.sh 1 3 5    # Actualizar apps específicas por número
 #
-#  Requiere sudo porque Intranet necesita permisos de root.
+#  Nota: La actualización de Intranet pedirá contraseña de sudo.
 # =============================================================================
 set -uo pipefail
 
@@ -83,13 +83,18 @@ update_app() {
 
   cd "$dir"
 
+  local sudo_prefix=""
+  if [[ "$pm2name" == "intranet-hispa" ]]; then
+    sudo_prefix="sudo "
+  fi
+
   # 1. Git pull
   info "Descargando últimos cambios..."
-  if git pull origin main 2>/dev/null; then
-    ok "Código actualizado: $(git log -1 --format='%h %s' 2>/dev/null || echo 'OK')"
+  if ${sudo_prefix}git pull origin main 2>/dev/null; then
+    ok "Código actualizado: $(${sudo_prefix}git log -1 --format='%h %s' 2>/dev/null || echo 'OK')"
   else
     # Intentar sin especificar remote/branch
-    if git pull 2>/dev/null; then
+    if ${sudo_prefix}git pull 2>/dev/null; then
       ok "Código actualizado"
     else
       fail "Error en git pull"
@@ -99,7 +104,7 @@ update_app() {
 
   # 2. Instalar dependencias
   info "Instalando dependencias..."
-  if eval "$install_cmd" --silent 2>/dev/null || eval "$install_cmd" 2>/dev/null; then
+  if eval "${sudo_prefix}$install_cmd" --silent 2>/dev/null || eval "${sudo_prefix}$install_cmd" 2>/dev/null; then
     ok "Dependencias OK"
   else
     fail "Error instalando dependencias"
@@ -108,7 +113,7 @@ update_app() {
 
   # 3. Build
   info "Compilando..."
-  if eval "$build_cmd" 2>&1 | tail -5; then
+  if eval "${sudo_prefix}$build_cmd" 2>&1 | tail -5; then
     ok "Build completado"
   else
     fail "Error en build"
@@ -117,27 +122,27 @@ update_app() {
 
   # 4. Reiniciar PM2
   info "Reiniciando PM2 (${pm2name})..."
-  if pm2 describe "$pm2name" &>/dev/null; then
-    eval "$post_cmd" 2>/dev/null
+  if ${sudo_prefix}pm2 describe "$pm2name" &>/dev/null; then
+    eval "${sudo_prefix}$post_cmd" 2>/dev/null
     ok "Proceso reiniciado"
   else
     warn "Proceso '${pm2name}' no encontrado en PM2. Intentando arrancar..."
     if [ -f "$dir/ecosystem.config.cjs" ]; then
-      pm2 start "$dir/ecosystem.config.cjs"
+      ${sudo_prefix}pm2 start "$dir/ecosystem.config.cjs"
     else
       # Buscar el script principal
       if [ -f "$dir/server.js" ]; then
-        pm2 start "$dir/server.js" --name "$pm2name"
+        ${sudo_prefix}pm2 start "$dir/server.js" --name "$pm2name"
       elif [ -f "$dir/server/index.js" ]; then
-        pm2 start "$dir/server/index.js" --name "$pm2name"
+        ${sudo_prefix}pm2 start "$dir/server/index.js" --name "$pm2name"
       elif [ -f "$dir/backend/server.js" ]; then
-        pm2 start "$dir/backend/server.js" --name "$pm2name"
+        ${sudo_prefix}pm2 start "$dir/backend/server.js" --name "$pm2name"
       else
         fail "No se encontró script para arrancar"
         return 1
       fi
     fi
-    pm2 save
+    ${sudo_prefix}pm2 save
     ok "Proceso arrancado y guardado"
   fi
 
@@ -146,11 +151,6 @@ update_app() {
 }
 
 # ── Verificaciones previas ───────────────────────────────────
-
-if [ "$EUID" -ne 0 ]; then
-  echo -e "${RED}[✗] Este script requiere root. Ejecuta: sudo bash update-all.sh${NC}"
-  exit 1
-fi
 
 if ! command -v pm2 &>/dev/null; then
   echo -e "${RED}[✗] PM2 no encontrado. Instala con: npm install -g pm2${NC}"
@@ -208,10 +208,28 @@ run_updates() {
   # Guardar estado PM2
   pm2 save --force 2>/dev/null
   ok "Estado PM2 guardado"
+  
+  # Verificar si se actualizó intranet para guardar su PM2 también
+  local includes_intranet=0
+  for name in "${UPDATED_NAMES[@]}"; do
+    if [[ "$name" == *"Intranet"* ]]; then
+      includes_intranet=1
+    fi
+  done
+
+  if [ "$includes_intranet" -eq 1 ]; then
+    sudo pm2 save --force 2>/dev/null
+    ok "Estado PM2 (root) guardado"
+  fi
   echo ""
 
   # Mostrar estado PM2
   pm2 status
+  if [ "$includes_intranet" -eq 1 ]; then
+    echo ""
+    info "Estado de PM2 (root):"
+    sudo pm2 status
+  fi
   echo ""
 }
 
