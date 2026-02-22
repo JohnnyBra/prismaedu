@@ -31,7 +31,7 @@ APPS=(
   "/home/javier/prisma/prismaedu|prismaedu|npm run build|npm install|pm2 restart prismaedu|PrismaEdu (Central)"
   "/home/javier/aulas/aulas|hispanidad-reservas|npm run build|npm install|pm2 restart hispanidad-reservas|Aulas (Reservas)"
   "/var/www/BiblioHispaApp|biblioteca|npm run build|npm install|pm2 restart biblioteca|BiblioHispa (Biblioteca)"
-  "/home/javier/excursiones/excursionesv2|excursiones|npm run build|npm run install:all|pm2 restart excursiones|Excursiones (Viajes)"
+  "/home/javier/excursiones/excursionesv2|schooltrip-api|npm run build|npm run install:all|pm2 restart schooltrip-api && pm2 restart schooltrip-web"
   "/home/javier/intranet/intranet|intranet-hispa|npm run build|npm install|pm2 reload ecosystem.config.cjs --update-env|Intranet (Docentes)"
 )
 
