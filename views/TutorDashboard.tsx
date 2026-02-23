@@ -43,12 +43,12 @@ const TutorDashboard: React.FC = () => {
   const { markMessagesRead } = useData();
 
   const students = users
-      .filter(u => u.role === Role.STUDENT && u.classId === currentUser?.classId)
-      .sort((a, b) => {
-         const nameA = a.lastName || a.name;
-         const nameB = b.lastName || b.name;
-         return nameA.localeCompare(nameB);
-      });
+    .filter(u => u.role === Role.STUDENT && u.classId === currentUser?.classId)
+    .sort((a, b) => {
+      const nameA = a.lastName || a.name;
+      const nameB = b.lastName || b.name;
+      return nameA.localeCompare(nameB);
+    });
   const parents = users.filter(u => u.role === Role.PARENT && u.familyId && students.some(s => s.familyId === u.familyId)); // Only parents of my students
 
   // --- HELPERS ---
@@ -115,7 +115,7 @@ const TutorDashboard: React.FC = () => {
     const msg = `${emoji} Hola. Se le han ${action} ${Math.abs(amount)} puntos a su hijo/a ${student.name} en clase.`;
 
     studentParents.forEach(p => {
-        sendMessage(p.id, msg);
+      sendMessage(p.id, msg);
     });
   };
 
@@ -145,7 +145,7 @@ const TutorDashboard: React.FC = () => {
           <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors">
             <X size={20} />
           </button>
-          <h2 className="font-display text-lg font-bold text-white/90 mb-4 flex items-center gap-2"><Settings size={18}/> Ajustes</h2>
+          <h2 className="font-display text-lg font-bold text-white/90 mb-4 flex items-center gap-2"><Settings size={18} /> Ajustes</h2>
 
           <div className="mb-4">
             <label className="block text-xs font-semibold text-white/50 mb-2">Cambiar mi PIN</label>
@@ -153,7 +153,7 @@ const TutorDashboard: React.FC = () => {
               type="text"
               maxLength={4}
               value={newPin}
-              onChange={(e) => setNewPin(e.target.value.replace(/\D/g,''))}
+              onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
               className="input-glass w-full text-center text-2xl tracking-[0.5em] font-display"
               placeholder="0000"
             />
@@ -179,7 +179,10 @@ const TutorDashboard: React.FC = () => {
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" style={{ animation: 'float 10s ease-in-out infinite 2s' }}></div>
 
       <div className="w-full max-w-4xl z-10 flex flex-col items-center animate-fade-in">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 flex justify-center w-full mb-4">
+            <img src="/logo.png" alt="Logo Prisma" className="h-20 w-auto object-contain drop-shadow-2xl" onError={(e) => e.currentTarget.style.display = 'none'} />
+          </div>
           <h2 className="font-display text-3xl font-bold text-white/90 drop-shadow-md">Hola, {currentUser?.name}</h2>
           <p className="text-white/40 text-lg font-body">Portal del Profesorado - La Hispanidad</p>
         </div>
@@ -309,7 +312,7 @@ const TutorDashboard: React.FC = () => {
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-3">
                     <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-500/30 transition-colors">
-                      <ListChecks size={20}/>
+                      <ListChecks size={20} />
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${percentage === 100 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/40'}`}>
                       {percentage}%
@@ -496,7 +499,7 @@ const TutorDashboard: React.FC = () => {
     });
 
     const toggleFamily = (fid: string) => {
-        setExpandedFamilies(prev => ({...prev, [fid]: !prev[fid]}));
+      setExpandedFamilies(prev => ({ ...prev, [fid]: !prev[fid] }));
     };
 
     return (
@@ -525,7 +528,7 @@ const TutorDashboard: React.FC = () => {
                         <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{familyUnreadCount}</span>
                       )}
                     </div>
-                    {isExpanded ? <ChevronDown size={16} className="text-white/30"/> : <ChevronRight size={16} className="text-white/30"/>}
+                    {isExpanded ? <ChevronDown size={16} className="text-white/30" /> : <ChevronRight size={16} className="text-white/30" />}
                   </button>
 
                   {isExpanded && (
@@ -536,13 +539,13 @@ const TutorDashboard: React.FC = () => {
                           <button
                             key={u.id}
                             onClick={() => {
-                                setChatUser(u);
-                                if (currentUser) markMessagesRead(u.id, currentUser.id);
+                              setChatUser(u);
+                              if (currentUser) markMessagesRead(u.id, currentUser.id);
                             }}
                             className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-primary-500/20 text-primary-300' : 'hover:bg-white/8'}`}
                           >
                             <div className="w-8 h-8 rounded-full glass flex items-center justify-center overflow-hidden shrink-0 relative">
-                              {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16} className="text-white/50"/>}
+                              {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32} /> : <Users size={16} className="text-white/50" />}
                               {unreadCount > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                                   {unreadCount}
@@ -571,13 +574,13 @@ const TutorDashboard: React.FC = () => {
                     <button
                       key={u.id}
                       onClick={() => {
-                          setChatUser(u);
-                          if (currentUser) markMessagesRead(u.id, currentUser.id);
+                        setChatUser(u);
+                        if (currentUser) markMessagesRead(u.id, currentUser.id);
                       }}
                       className={`w-full text-left p-2 rounded-lg flex items-center gap-3 transition-colors ${chatUser?.id === u.id ? 'bg-primary-500/20 text-primary-300' : 'hover:bg-white/8'}`}
                     >
                       <div className="w-8 h-8 rounded-full glass flex items-center justify-center overflow-hidden shrink-0 relative">
-                        {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32}/> : <Users size={16} className="text-white/50"/>}
+                        {u.role === Role.STUDENT ? <Avatar config={u.avatarConfig} size={32} /> : <Users size={16} className="text-white/50" />}
                         {unreadCount > 0 && (
                           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                             {unreadCount}
@@ -700,11 +703,10 @@ const TutorDashboard: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-3 border-b-2 font-display font-bold text-sm flex items-center gap-2 transition-all duration-200 relative ${
-                active
+              className={`py-3 border-b-2 font-display font-bold text-sm flex items-center gap-2 transition-all duration-200 relative ${active
                   ? `${tab.borderColor} ${tab.textColor}`
                   : 'border-transparent text-white/30 hover:text-white/50'
-              }`}
+                }`}
             >
               <Icon size={16} /> {tab.label}
               {tab.id === 'MESSAGES' && getTotalUnreadCount() > 0 && (
@@ -749,7 +751,7 @@ const TutorDashboard: React.FC = () => {
                   {/* Completed Column */}
                   <div>
                     <h3 className="text-[10px] font-bold text-emerald-400 uppercase mb-3 flex items-center gap-2 tracking-wider glass rounded-xl p-2.5">
-                      <CheckCircle size={14}/> Completado
+                      <CheckCircle size={14} /> Completado
                     </h3>
                     <div className="space-y-2">
                       {students.filter(s => {
@@ -773,7 +775,7 @@ const TutorDashboard: React.FC = () => {
                   {/* Pending Column */}
                   <div>
                     <h3 className="text-[10px] font-bold text-secondary-400 uppercase mb-3 flex items-center gap-2 tracking-wider glass rounded-xl p-2.5">
-                      <Circle size={14}/> Pendiente
+                      <Circle size={14} /> Pendiente
                     </h3>
                     <div className="space-y-2">
                       {students.filter(s => {
@@ -822,7 +824,7 @@ const TutorDashboard: React.FC = () => {
               {/* Body */}
               <div className="flex-1 overflow-y-auto p-5 scrollbar-hide">
                 <h3 className="font-display font-bold text-white/80 mb-4 flex items-center gap-2 text-sm">
-                  <School size={18} className="text-primary-400"/> Tareas Escolares Asignadas
+                  <School size={18} className="text-primary-400" /> Tareas Escolares Asignadas
                 </h3>
                 <div className="space-y-2">
                   {tasks.filter(t => t.context === 'SCHOOL' && (t.assignedTo.length === 0 || t.assignedTo.includes(selectedStudent.id))).map(task => {
@@ -838,9 +840,9 @@ const TutorDashboard: React.FC = () => {
                           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${isCompleted ? 'glass text-emerald-400 hover:text-red-400' : 'glass text-white/40 hover:bg-emerald-500/20 hover:text-emerald-400'}`}
                         >
                           {isCompleted ? (
-                            <><CheckCircle size={14}/> Hecho</>
+                            <><CheckCircle size={14} /> Hecho</>
                           ) : (
-                            <><Circle size={14}/> Pendiente</>
+                            <><Circle size={14} /> Pendiente</>
                           )}
                         </button>
                       </div>
@@ -883,9 +885,8 @@ const TutorDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-4 rounded-xl transition-all duration-200 relative ${
-                  active ? 'text-white' : 'text-white/30'
-                }`}
+                className={`flex flex-col items-center py-1.5 px-4 rounded-xl transition-all duration-200 relative ${active ? 'text-white' : 'text-white/30'
+                  }`}
               >
                 {tab.id === 'MESSAGES' && getTotalUnreadCount() > 0 && (
                   <div className="absolute top-0 right-2 bg-red-500 text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
