@@ -193,7 +193,7 @@ const TutorDashboard: React.FC = () => {
         icon: <Monitor size={24} />,
         color: "bg-accent-500/20 text-accent-400 group-hover:bg-accent-500/30",
         border: "glow-border-purple",
-        pos: { x: 250, y: -70 }
+        pos: { x: 265, y: -40 }
       },
       {
         type: 'link' as const,
@@ -203,7 +203,7 @@ const TutorDashboard: React.FC = () => {
         icon: <Map size={24} />,
         color: "bg-secondary-500/20 text-secondary-400 group-hover:bg-secondary-500/30",
         border: "glow-border-orange",
-        pos: { x: 155, y: 160 }
+        pos: { x: 195, y: 190 }
       },
       {
         type: 'link' as const,
@@ -213,7 +213,7 @@ const TutorDashboard: React.FC = () => {
         icon: <Newspaper size={24} />,
         color: "bg-violet-500/20 text-violet-400 group-hover:bg-violet-500/30",
         border: "glow-border-purple",
-        pos: { x: -155, y: 160 }
+        pos: { x: -195, y: 190 }
       },
       {
         type: 'button' as const,
@@ -223,7 +223,7 @@ const TutorDashboard: React.FC = () => {
         icon: <School size={24} />,
         color: "bg-primary-500/20 text-primary-400 group-hover:bg-primary-500/30",
         border: "glow-border-blue",
-        pos: { x: -250, y: -70 }
+        pos: { x: -265, y: -40 }
       }
     ];
 
@@ -383,7 +383,8 @@ const TutorDashboard: React.FC = () => {
                 border: 2px solid rgba(59, 130, 246, 0.4);
                 background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02));
                 backdrop-filter: blur(4px);
-                transform-origin: bottom center;
+                /* Al hacer la caja más alta (300px), el origen de rotación para que se abra bien como los pétalos de una flor larga debe ajustarse desde donde tocan la junta base. */
+                transform-origin: 50% 75%;
                 animation: face-open 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
                 backface-visibility: hidden;
               }
