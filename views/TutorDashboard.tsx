@@ -312,8 +312,8 @@ const TutorDashboard: React.FC = () => {
 
               /* La tapa superior es inicialmente un polígono, luego se vuelve el logo plano */
               @keyframes lid-transform {
-                0% { transform: translateY(-75px) rotateX(90deg) scale(0.9); opacity: 1; }
-                60% { transform: translateY(-75px) rotateX(90deg) scale(1.1); opacity: 1; }
+                0% { transform: translateY(-150px) rotateX(90deg) scale(0.9); opacity: 1; }
+                60% { transform: translateY(-150px) rotateX(90deg) scale(1.1); opacity: 1; }
                 70% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
                 100% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
               }
