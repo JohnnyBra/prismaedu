@@ -242,15 +242,7 @@ const TutorDashboard: React.FC = () => {
 
           {/* Greeting */}
           <div className="text-center mb-8 relative z-30">
-            {/* Ocultamos el logo estático en desktop ya que tenemos el central */}
-            <div className="md:hidden absolute bottom-full left-1/2 -translate-x-1/2 flex justify-center w-full mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-auto drop-shadow-2xl text-slate-800 dark:text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="7" height="7" x="3" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
-                <rect width="7" height="7" x="14" y="14" rx="1" />
-                <rect width="7" height="7" x="3" y="14" rx="1" />
-              </svg>
-            </div>
+            {/* Ocultamos el logo estático en desktop y en mobile ya que tenemos la nueva animación central */}
             <h2 className="font-display text-3xl font-bold text-white/90 drop-shadow-md">Hola, {currentUser?.name}</h2>
             <p className="text-white/40 text-lg font-body">Prisma Educación - La Hispanidad</p>
           </div>
@@ -281,12 +273,12 @@ const TutorDashboard: React.FC = () => {
                 100% { opacity: 1; transform: scale(1) translateZ(0px); pointer-events: auto; }
               }
 
-              /* El logo vuela desde el cilindro hacia arriba */
+              /* El logo vuela desde el cilindro hacia arriba para clavarse en la parte superior donde antes estaba el estático */
               @keyframes logo-fly {
                 0% { transform: translateY(0px) translateZ(85px) scale(0.2); opacity: 0; }
                 5% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
-                22% { transform: translateY(-130px) translateZ(0px) scale(0.9); opacity: 1; }
-                100% { transform: translateY(-130px) translateZ(0px) scale(0.9); opacity: 1; }
+                22% { transform: translateY(-190px) translateZ(0px) scale(0.9); opacity: 1; }
+                100% { transform: translateY(-190px) translateZ(0px) scale(0.9); opacity: 1; }
               }
 
               .mobile-stamp-scene {
