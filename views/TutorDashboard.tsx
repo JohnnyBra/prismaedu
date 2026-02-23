@@ -203,7 +203,7 @@ const TutorDashboard: React.FC = () => {
         icon: <Map size={24} />,
         color: "bg-secondary-500/20 text-secondary-400 group-hover:bg-secondary-500/30",
         border: "glow-border-orange",
-        pos: { x: 155, y: 190 }
+        pos: { x: 155, y: 160 }
       },
       {
         type: 'link' as const,
@@ -213,7 +213,7 @@ const TutorDashboard: React.FC = () => {
         icon: <Newspaper size={24} />,
         color: "bg-violet-500/20 text-violet-400 group-hover:bg-violet-500/30",
         border: "glow-border-purple",
-        pos: { x: -155, y: 190 }
+        pos: { x: -155, y: 160 }
       },
       {
         type: 'button' as const,
@@ -377,9 +377,9 @@ const TutorDashboard: React.FC = () => {
               .prism-face {
                 position: absolute;
                 width: 100px;
-                height: 150px;
+                height: 300px;
                 margin-left: -50px; /* Centrado en 0,0 */
-                margin-top: -75px; 
+                margin-top: -150px; 
                 border: 2px solid rgba(59, 130, 246, 0.4);
                 background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02));
                 backdrop-filter: blur(4px);
@@ -458,15 +458,7 @@ const TutorDashboard: React.FC = () => {
               ))}
             </div>
 
-            {/* Glowing Ring for the logo (appears when animation finishes) */}
-            <div
-              className="absolute z-0 w-36 h-36 rounded-full opacity-0 pointer-events-none"
-              style={{
-                left: 'calc(50% - 72px)', top: 'calc(50% - 72px)',
-                background: 'conic-gradient(from 0deg, transparent 0 340deg, #3b82f6 360deg)',
-                animation: 'glow-spin 4s linear infinite, final-card-fade 3.5s forwards'
-              }}
-            />
+            {/* Glowing Ring deleted by user request */}
 
             {/* THE FINAL INTERACTIVE CARDS (Fade in exactly when flying icons disappear) */}
             {hubItems.map((item, i) => {
