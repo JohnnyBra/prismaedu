@@ -172,119 +172,278 @@ const TutorDashboard: React.FC = () => {
   );
 
   // Hub Renderer
-  const renderHub = () => (
-    <div className="min-h-screen min-h-[100dvh] mesh-tutor flex flex-col items-center justify-center p-4 relative overflow-hidden font-body">
-      {/* Decorative Background Glow Orbs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500/15 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ animation: 'float 8s ease-in-out infinite' }}></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" style={{ animation: 'float 10s ease-in-out infinite 2s' }}></div>
+  const renderHub = () => {
+    // Definimos los enlaces y sus propiedades
+    const hubItems = [
+      {
+        type: 'link' as const,
+        href: "https://bibliohispa.es/",
+        title: "Biblioteca",
+        desc: "Gestión de préstamos y catálogo.",
+        icon: <BookOpen size={24} />,
+        color: "bg-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/30",
+        border: "glow-border-green",
+        pos: { x: 0, y: -230 }
+      },
+      {
+        type: 'link' as const,
+        href: "https://aulas.bibliohispa.es/",
+        title: "Reservas Aulas",
+        desc: "Gestión de aulas digitales.",
+        icon: <Monitor size={24} />,
+        color: "bg-accent-500/20 text-accent-400 group-hover:bg-accent-500/30",
+        border: "glow-border-purple",
+        pos: { x: 250, y: -70 }
+      },
+      {
+        type: 'link' as const,
+        href: "https://excursiones.bibliohispa.es/",
+        title: "Excursiones",
+        desc: "Planificación y gestión de salidas.",
+        icon: <Map size={24} />,
+        color: "bg-secondary-500/20 text-secondary-400 group-hover:bg-secondary-500/30",
+        border: "glow-border-orange",
+        pos: { x: 155, y: 190 }
+      },
+      {
+        type: 'link' as const,
+        href: "https://intranet.bibliohispa.es/",
+        title: "Intranet",
+        desc: "Portal del profesorado.",
+        icon: <Newspaper size={24} />,
+        color: "bg-violet-500/20 text-violet-400 group-hover:bg-violet-500/30",
+        border: "glow-border-purple",
+        pos: { x: -155, y: 190 }
+      },
+      {
+        type: 'button' as const,
+        onClick: () => setShowHub(false),
+        title: "Prisma Aula",
+        desc: "Gestión gamificada del aula.",
+        icon: <School size={24} />,
+        color: "bg-primary-500/20 text-primary-400 group-hover:bg-primary-500/30",
+        border: "glow-border-blue",
+        pos: { x: -250, y: -70 }
+      }
+    ];
 
-      {/* Theme Toggle */}
-      <div className="absolute top-4 right-4 z-20">
-        <ThemeToggle className="glass text-white/70 hover:text-white" />
-      </div>
+    return (
+      <div className="min-h-screen min-h-[100dvh] mesh-tutor flex flex-col items-center justify-center p-4 relative overflow-hidden font-body">
+        {/* Decorative Background Glow Orbs */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500/15 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ animation: 'float 8s ease-in-out infinite' }}></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" style={{ animation: 'float 10s ease-in-out infinite 2s' }}></div>
 
-      <div className="w-full max-w-4xl z-10 flex flex-col items-center animate-fade-in">
-        <div className="text-center mb-8 relative">
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 flex justify-center w-full mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-auto drop-shadow-2xl text-slate-800 dark:text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect width="7" height="7" x="3" y="3" rx="1" />
-              <rect width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
-              <rect width="7" height="7" x="14" y="14" rx="1" />
-              <rect width="7" height="7" x="3" y="14" rx="1" />
-            </svg>
+        {/* Theme Toggle */}
+        <div className="absolute top-4 right-4 z-20">
+          <ThemeToggle className="glass text-white/70 hover:text-white" />
+        </div>
+
+        <div className="w-full max-w-5xl z-10 flex flex-col items-center animate-fade-in relative mt-8">
+
+          {/* Greeting */}
+          <div className="text-center mb-8 relative z-30">
+            {/* Ocultamos el logo estático en desktop ya que tenemos el central */}
+            <div className="md:hidden absolute bottom-full left-1/2 -translate-x-1/2 flex justify-center w-full mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-auto drop-shadow-2xl text-slate-800 dark:text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="7" height="7" x="3" y="3" rx="1" />
+                <rect width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
+                <rect width="7" height="7" x="14" y="14" rx="1" />
+                <rect width="7" height="7" x="3" y="14" rx="1" />
+              </svg>
+            </div>
+            <h2 className="font-display text-3xl font-bold text-white/90 drop-shadow-md">Hola, {currentUser?.name}</h2>
+            <p className="text-white/40 text-lg font-body">Prisma Educación - La Hispanidad</p>
           </div>
-          <h2 className="font-display text-3xl font-bold text-white/90 drop-shadow-md">Hola, {currentUser?.name}</h2>
-          <p className="text-white/40 text-lg font-body">Prisma Educación - La Hispanidad</p>
+
+          {/* MOBILE VIEW (Grid Layout) */}
+          <div className="flex flex-col gap-4 px-4 w-full md:hidden">
+            {hubItems.map((item, i) => {
+              const content = (
+                <>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${item.color}`}>
+                    {item.icon}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1">{item.title}</h3>
+                    <p className="text-sm text-white/40 leading-snug">{item.desc}</p>
+                  </div>
+                  <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
+                </>
+              );
+              const className = `glass rounded-2xl p-5 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4`;
+              const animStyle = { animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s both` };
+
+              if (item.type === 'button') {
+                return (
+                  <button key={i} onClick={item.onClick} className={className} style={animStyle}>
+                    {content}
+                  </button>
+                );
+              }
+              return (
+                <a key={i} href={item.href} className={className} style={animStyle}>
+                  {content}
+                </a>
+              );
+            })}
+          </div>
+
+          {/* DESKTOP VIEW (Pentagon Layout with SVG Prism Animation) */}
+          <div className="hidden md:flex relative w-full h-[600px] mt-4 mx-auto justify-center items-center">
+            {/* Scoped Animations */}
+            <style>{`
+              @keyframes prism-draw {
+                0% { stroke-dashoffset: 1500; fill: transparent; }
+                50% { stroke-dashoffset: 0; fill: transparent; }
+                100% { stroke-dashoffset: 0; fill: rgba(59, 130, 246, 0.04); }
+              }
+              @keyframes line-shoot {
+                0% { stroke-dashoffset: 600; opacity: 1; }
+                80% { stroke-dashoffset: 0; opacity: 1; }
+                100% { stroke-dashoffset: 0; opacity: 0; }
+              }
+              @keyframes card-fly {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.1); }
+                40% { opacity: 1; transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(0.6); }
+                100% { opacity: 1; transform: translate(var(--tx), var(--ty)) scale(1); }
+              }
+              @keyframes logo-pulse {
+                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+                50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+              }
+              @keyframes prism-fade {
+                0% { opacity: 0; transform: scale(0.8); }
+                100% { opacity: 1; transform: scale(1); }
+              }
+              @keyframes glow-spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+
+            {/* SVG Prism Background */}
+            <svg className="absolute w-full h-full z-10 pointer-events-none" viewBox="-450 -300 900 600" style={{ animation: 'prism-fade 0.6s ease-out' }}>
+              {/* Inner Back Pentagon */}
+              <polygon points="0,-60 38,-7.6 23.5,12.3 -23.5,12.3 -38,-7.6" fill="rgba(0,0,0,0.2)" stroke="#3b82f6" strokeOpacity="0.3" strokeWidth="1" />
+
+              {/* Connecting edges from back to front */}
+              <line x1="0" y1="-90" x2="0" y2="-60" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
+              <line x1="85.6" y1="-27.8" x2="38" y2="-7.6" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
+              <line x1="52.9" y1="72.8" x2="23.5" y2="12.3" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
+              <line x1="-52.9" y1="72.8" x2="-23.5" y2="12.3" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
+              <line x1="-85.6" y1="-27.8" x2="-38" y2="-7.6" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
+
+              {/* Outer Front Pentagon (Prism Face) */}
+              <polygon
+                points="0,-90 85.6,-27.8 52.9,72.8 -52.9,72.8 -85.6,-27.8"
+                stroke="#3b82f6"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+                strokeDasharray="1500"
+                style={{ animation: 'prism-draw 2s ease-out forwards' }}
+              />
+
+              {/* Beams shooting from prism vertices to final card positions */}
+              {hubItems.map((item, i) => {
+                const startX = [0, 85.6, 52.9, -52.9, -85.6][i];
+                const startY = [-90, -27.8, 72.8, 72.8, -27.8][i];
+                return (
+                  <line
+                    key={i}
+                    x1={startX} y1={startY}
+                    x2={item.pos.x} y2={item.pos.y}
+                    stroke="#3b82f6"
+                    strokeOpacity="0.6"
+                    strokeWidth="2"
+                    strokeDasharray="600"
+                    strokeDashoffset="600"
+                    style={{ animation: `line-shoot 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) ${1 + i * 0.15}s forwards` }}
+                  />
+                );
+              })}
+            </svg>
+
+            {/* Center Logo */}
+            <div
+              className="absolute z-20 w-28 h-28 bg-slate-900/60 rounded-3xl border border-primary-500/40 flex items-center justify-center backdrop-blur-xl shadow-[0_0_40px_rgba(59,130,246,0.25)] ring-4 ring-primary-500/10"
+              style={{
+                left: '50%', top: '50%',
+                animation: 'logo-pulse 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+              }}
+            >
+              {/* Rotating glow ring in background */}
+              <div className="absolute w-[150%] h-[150%] rounded-full opacity-30 select-none pointer-events-none" style={{ background: 'conic-gradient(from 0deg, transparent 0 340deg, #3b82f6 360deg)', animation: 'glow-spin 4s linear infinite' }} />
+
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-white drop-shadow-lg relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="7" height="7" x="3" y="3" rx="1.5" />
+                <rect width="7" height="7" x="14" y="3" rx="1.5" fill="#3b82f6" stroke="#3b82f6" />
+                <rect width="7" height="7" x="14" y="14" rx="1.5" />
+                <rect width="7" height="7" x="3" y="14" rx="1.5" />
+              </svg>
+            </div>
+
+            {/* Positioned Cards */}
+            {hubItems.map((item, i) => {
+              const content = (
+                <>
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-colors ${item.color}`}>
+                    {item.icon}
+                  </div>
+                  <div className="flex-1 text-left min-w-0 pr-2">
+                    <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1 truncate">{item.title}</h3>
+                    <p className="text-xs text-white/40 leading-snug line-clamp-2">{item.desc}</p>
+                  </div>
+                  <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
+                </>
+              );
+
+              const className = `absolute z-30 glass rounded-[20px] p-4 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4 w-[280px] shadow-2xl shadow-black/20 hover:scale-105 active:scale-[0.98]`;
+
+              const delay = 1.3 + (i * 0.15);
+              const style = {
+                '--tx': `${item.pos.x}px`,
+                '--ty': `${item.pos.y}px`,
+                animation: `card-fly 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards`,
+                opacity: 0,
+                // Start offset by its own size and animated tx/ty relative to center
+                marginLeft: '-140px', // half of 280px
+                marginTop: '-45px', // half of 90px (approx height)
+                left: '50%',
+                top: '50%',
+              } as React.CSSProperties;
+
+              if (item.type === 'button') {
+                return (
+                  <button key={i} onClick={item.onClick} className={className} style={style}>
+                    {content}
+                  </button>
+                );
+              }
+              return (
+                <a key={i} href={item.href} className={className} style={style}>
+                  {content}
+                </a>
+              );
+            })}
+          </div>
+
+          {/* User actions */}
+          <div className="flex gap-3 mt-10 relative z-30 md:mt-4">
+            <button onClick={() => setShowSettings(true)} className="glass rounded-xl px-4 py-2 text-white/40 hover:text-white/80 flex items-center gap-2 text-sm font-semibold transition-colors">
+              <Settings size={16} /> Cambiar PIN
+            </button>
+            <button onClick={logout} className="glass rounded-xl px-4 py-2 text-red-400/60 hover:text-red-400 flex items-center gap-2 text-sm font-semibold transition-colors">
+              <LogOut size={16} /> Cerrar Sesión
+            </button>
+          </div>
+
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 w-full">
-          {/* External Tools */}
-          <a href="https://bibliohispa.es/"
-            className="glass rounded-2xl p-5 glow-border-green hover:bg-white/10 transition-all group flex items-center gap-4"
-            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0s both' }}
-          >
-            <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/30 transition-colors shrink-0">
-              <BookOpen size={24} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-white/90 text-lg">Biblioteca</h3>
-              <p className="text-sm text-white/40">Gestión de préstamos y catálogo.</p>
-            </div>
-            <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors" />
-          </a>
-
-          <a href="https://aulas.bibliohispa.es/"
-            className="glass rounded-2xl p-5 glow-border-purple hover:bg-white/10 transition-all group flex items-center gap-4"
-            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both' }}
-          >
-            <div className="w-12 h-12 bg-accent-500/20 rounded-xl flex items-center justify-center text-accent-400 group-hover:bg-accent-500/30 transition-colors shrink-0">
-              <Monitor size={24} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-white/90 text-lg">Reservas Aulas</h3>
-              <p className="text-sm text-white/40">Gestión de aulas digitales.</p>
-            </div>
-            <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors" />
-          </a>
-
-          <a href="https://excursiones.bibliohispa.es/"
-            className="glass rounded-2xl p-5 glow-border-orange hover:bg-white/10 transition-all group flex items-center gap-4"
-            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}
-          >
-            <div className="w-12 h-12 bg-secondary-500/20 rounded-xl flex items-center justify-center text-secondary-400 group-hover:bg-secondary-500/30 transition-colors shrink-0">
-              <Map size={24} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-white/90 text-lg">Excursiones</h3>
-              <p className="text-sm text-white/40">Planificación y gestión de salidas.</p>
-            </div>
-            <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors" />
-          </a>
-
-          <a href="https://intranet.bibliohispa.es/"
-            className="glass rounded-2xl p-5 glow-border-purple hover:bg-white/10 transition-all group flex items-center gap-4"
-            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both' }}
-          >
-            <div className="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 group-hover:bg-violet-500/30 transition-colors shrink-0">
-              <Newspaper size={24} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-white/90 text-lg">Intranet</h3>
-              <p className="text-sm text-white/40">Portal del profesorado.</p>
-            </div>
-            <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors" />
-          </a>
-
-          {/* Internal App */}
-          <button
-            onClick={() => setShowHub(false)}
-            className="glass rounded-2xl p-5 glow-border-blue hover:bg-white/10 transition-all group flex items-center gap-4 text-left"
-            style={{ animation: 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}
-          >
-            <div className="w-12 h-12 bg-primary-500/20 rounded-xl flex items-center justify-center text-primary-400 group-hover:bg-primary-500/30 transition-colors shrink-0">
-              <School size={24} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display font-bold text-white/90 text-lg">Prisma Aula</h3>
-              <p className="text-sm text-white/40">Gestión gamificada del aula.</p>
-            </div>
-            <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors" />
-          </button>
-        </div>
-
-        <div className="flex gap-3 mt-8">
-          <button onClick={() => setShowSettings(true)} className="glass rounded-xl px-4 py-2 text-white/40 hover:text-white/80 flex items-center gap-2 text-sm font-semibold transition-colors">
-            <Settings size={16} /> Cambiar PIN
-          </button>
-          <button onClick={logout} className="glass rounded-xl px-4 py-2 text-red-400/60 hover:text-red-400 flex items-center gap-2 text-sm font-semibold transition-colors">
-            <LogOut size={16} /> Cerrar Sesión
-          </button>
-        </div>
+        {renderSettingsModal()}
       </div>
-
-      {renderSettingsModal()}
-    </div>
-  );
+    );
+  };
 
   // If in Hub Mode, render that
   if (showHub) {
