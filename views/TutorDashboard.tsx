@@ -273,14 +273,48 @@ const TutorDashboard: React.FC = () => {
                 100% { opacity: 1; transform: scale(1) translateZ(0px); pointer-events: auto; }
               }
 
-              /* El logo vuela desde fuera, baja a su posición base y vuela de nuevo para clavarse arriba */
+              /* El contenedor principal solo espera la fusión de los cuadrados y luego vuela hacia arriba */
               @keyframes logo-fly {
-                0% { transform: translateY(-50px) translateZ(300px) scale(4); opacity: 0; }
-                8% { opacity: 1; }
+                0% { transform: translateY(0px) translateZ(85px) scale(1); opacity: 1; }
                 23% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
                 80% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
                 100% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
               }
+
+              /* Animación para integrar los 4 cuadrados del logo desde las esquinas y bastante más grandes */
+              @keyframes rect-tl-in {
+                0% { transform: translate(-300px, -300px) scale(6) rotate(-90deg); opacity: 0; }
+                10% { opacity: 1; }
+                23% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+                100% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+              }
+              @keyframes rect-tr-in {
+                0% { transform: translate(300px, -300px) scale(6) rotate(90deg); opacity: 0; }
+                10% { opacity: 1; }
+                23% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+                100% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+              }
+              @keyframes rect-br-in {
+                0% { transform: translate(300px, 300px) scale(6) rotate(90deg); opacity: 0; }
+                10% { opacity: 1; }
+                23% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+                100% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+              }
+              @keyframes rect-bl-in {
+                0% { transform: translate(-300px, 300px) scale(6) rotate(-90deg); opacity: 0; }
+                10% { opacity: 1; }
+                23% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+                100% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+              }
+
+              .mobile-flying-logo svg {
+                overflow: visible; /* Permits rects to be rendered outside the SVG wrapper */
+              }
+
+              .logo-rect-1 { transform-origin: 6.5px 6.5px; animation: rect-tl-in 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+              .logo-rect-2 { transform-origin: 17.5px 6.5px; animation: rect-tr-in 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+              .logo-rect-3 { transform-origin: 17.5px 17.5px; animation: rect-br-in 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+              .logo-rect-4 { transform-origin: 6.5px 17.5px; animation: rect-bl-in 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
               .mobile-stamp-scene {
                 width: 100%;
@@ -338,12 +372,12 @@ const TutorDashboard: React.FC = () => {
             `}</style>
 
             {/* Flying Logo that returns to the top */}
-            <div className="mobile-flying-logo">
+            <div className="mobile-flying-logo z-50">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-auto drop-shadow-2xl text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="7" height="7" x="3" y="3" rx="1" />
-                <rect width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
-                <rect width="7" height="7" x="14" y="14" rx="1" />
-                <rect width="7" height="7" x="3" y="14" rx="1" />
+                <rect className="logo-rect-1" width="7" height="7" x="3" y="3" rx="1" />
+                <rect className="logo-rect-2" width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
+                <rect className="logo-rect-3" width="7" height="7" x="14" y="14" rx="1" />
+                <rect className="logo-rect-4" width="7" height="7" x="3" y="14" rx="1" />
               </svg>
             </div>
 
