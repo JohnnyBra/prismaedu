@@ -273,9 +273,10 @@ const TutorDashboard: React.FC = () => {
                 100% { opacity: 1; transform: scale(1) translateZ(0px); pointer-events: auto; }
               }
 
-              /* El logo vuela desde el cilindro hacia arriba para clavarse en la parte superior donde antes estaba el estático */
+              /* El logo vuela desde fuera, baja a su posición base y vuela de nuevo para clavarse arriba */
               @keyframes logo-fly {
-                0% { transform: translateY(0px) translateZ(85px) scale(0.2); opacity: 0; }
+                0% { transform: translateY(-50px) translateZ(300px) scale(4); opacity: 0; }
+                8% { opacity: 1; }
                 23% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
                 80% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
                 100% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
@@ -459,7 +460,6 @@ const TutorDashboard: React.FC = () => {
               }
 
               /* Los iconos vuelan desde sus caras 3D a sus posiciones 2D absolutas finales */
-              /* Start: en la cara 3D. End: en el layout del hub */
               @keyframes card-deploy {
                  0% { 
                     opacity: 0; 
@@ -471,8 +471,8 @@ const TutorDashboard: React.FC = () => {
                     /* Se mantiene persiguiendo la cara en rotación */
                     transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); 
                  }
-                 80% { 
-                    /* Se "suelta" de la vista rotatoria local para ir a destino global (efecto hibrido) */
+                 75% { 
+                    /* Aterriza más pronto para transicionar ágilmente */
                     opacity: 1; 
                     transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
                  }
@@ -482,18 +482,19 @@ const TutorDashboard: React.FC = () => {
                  }
               }
 
-               /* Fade in of actual interactive cards after animation resolves */
-              @keyframes final-card-fade {
-                0% { opacity: 0; pointer-events: none; }
-                84% { opacity: 0; pointer-events: none; }
-                100% { opacity: 1; pointer-events: auto; }
+              /* Fade in and expand actual interactive cards right out of the landing icon */
+              @keyframes final-card-deploy {
+                0% { opacity: 0; transform: scale(0.3); pointer-events: none; }
+                74% { opacity: 0; transform: scale(0.3); pointer-events: none; }
+                85% { opacity: 1; transform: scale(1.05); pointer-events: none; }
+                100% { opacity: 1; transform: scale(1); pointer-events: auto; }
               }
 
-              /* Ocultar prism-cards simulados del vuelo */
+              /* Ocultar prism-cards simulados exactamente al hacer spawn de las reales */
               @keyframes fake-card-fade {
                 0% { opacity: 1; }
-                84% { opacity: 1; }
-                85% { opacity: 0; }
+                74% { opacity: 1; }
+                75% { opacity: 0; }
                 100% { opacity: 0; }
               }
 
@@ -615,7 +616,8 @@ const TutorDashboard: React.FC = () => {
                 marginTop: '-45px',
                 left: `calc(50% + ${item.pos.x}px)`,
                 top: `calc(50% + ${item.pos.y}px)`,
-                animation: `final-card-fade 3.6s ease-out forwards`,
+                transformOrigin: '44px 50%',
+                animation: `final-card-deploy 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
                 opacity: 0,
               } as React.CSSProperties;
 
