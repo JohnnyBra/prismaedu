@@ -255,37 +255,136 @@ const TutorDashboard: React.FC = () => {
             <p className="text-white/40 text-lg font-body">Prisma Educación - La Hispanidad</p>
           </div>
 
-          {/* MOBILE VIEW (Grid Layout) */}
-          <div className="flex flex-col gap-4 px-4 w-full md:hidden">
-            {hubItems.map((item, i) => {
-              const content = (
-                <>
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${item.color}`}>
-                    {item.icon}
-                  </div>
-                  <div className="flex-1 text-left">
-                    <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1">{item.title}</h3>
-                    <p className="text-sm text-white/40 leading-snug">{item.desc}</p>
-                  </div>
-                  <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
-                </>
-              );
-              const className = `glass rounded-2xl p-5 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4`;
-              const animStyle = { animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s both` };
-
-              if (item.type === 'button') {
-                return (
-                  <button key={i} onClick={item.onClick} className={className} style={animStyle}>
-                    {content}
-                  </button>
-                );
+          {/* MOBILE VIEW (3D Wheel Unroll Animation) */}
+          <div className="flex md:hidden relative w-full h-[460px] mx-auto perspective-[1200px] mt-4">
+            <style>{`
+              @keyframes mobile-scene-rotate {
+                0% { transform: translateY(100px) rotateX(90deg); }
+                60% { transform: translateY(100px) rotateX(-360deg); }
+                100% { transform: translateY(0px) rotateX(-360deg); }
               }
-              return (
-                <a key={i} href={item.href} className={className} style={animStyle}>
-                  {content}
-                </a>
-              );
-            })}
+
+              @keyframes mobile-card-deploy {
+                 /* Rotating as a wheel */
+                 0% { transform: rotateX(var(--rx)) translateZ(100px) scale(0.9); opacity: 0; }
+                 5% { transform: rotateX(var(--rx)) translateZ(100px) scale(0.9); opacity: 1; }
+                 60% { transform: rotateX(var(--rx)) translateZ(100px) scale(0.9); opacity: 1; }
+                 
+                 /* Unroll drop sequence */
+                 80% { 
+                    transform: translateY(var(--ty)) rotateX(360deg) translateZ(0px) scale(1); 
+                    opacity: 1;
+                 }
+                 100% { 
+                    transform: translateY(var(--ty)) rotateX(360deg) translateZ(0px) scale(1); 
+                    opacity: 1; 
+                 }
+              }
+
+              @keyframes mobile-fake-fade {
+                0% { opacity: 1; }
+                84% { opacity: 1; }
+                85% { opacity: 0; }
+                100% { opacity: 0; }
+              }
+
+              @keyframes mobile-final-fade {
+                0% { opacity: 0; pointer-events: none; }
+                84% { opacity: 0; pointer-events: none; }
+                100% { opacity: 1; pointer-events: auto; }
+              }
+
+              .mobile-scene {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                transform-style: preserve-3d;
+                animation: mobile-scene-rotate 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+              }
+
+              .mobile-card-wrapper {
+                 position: absolute;
+                 left: 1rem; right: 1rem;
+                 display: flex; justify-content: center;
+                 transform-style: preserve-3d;
+                 /* Adding individual delays to unroll them one by one like a scroll */
+                 animation: mobile-card-deploy 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                            mobile-fake-fade 3.5s linear forwards;
+              }
+            `}</style>
+
+            {/* Flying Simulated Cylinder */}
+            <div className="mobile-scene z-10">
+              {hubItems.map((item, i) => {
+                const content = (
+                  <>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                      {item.icon}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1">{item.title}</h3>
+                      <p className="text-sm text-white/40 leading-snug">{item.desc}</p>
+                    </div>
+                    <ArrowRight size={18} className="text-white/20" />
+                  </>
+                );
+
+                const finalY = i * 90; // Spacing
+
+                return (
+                  <div
+                    key={`mb-fly-${i}`}
+                    className="mobile-card-wrapper"
+                    style={{
+                      '--rx': `${i * 72}deg`,
+                      '--ty': `${finalY}px`
+                    } as React.CSSProperties}
+                  >
+                    <div className={`glass rounded-2xl p-5 border border-white/10 flex items-center gap-4 w-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-slate-900/80 backdrop-blur-md`}>
+                      {content}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Actual Interactive Target List */}
+            <div className="absolute inset-x-0 top-0 bottom-0 z-30">
+              {hubItems.map((item, i) => {
+                const content = (
+                  <>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${item.color}`}>
+                      {item.icon}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1">{item.title}</h3>
+                      <p className="text-sm text-white/40 leading-snug">{item.desc}</p>
+                    </div>
+                    <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
+                  </>
+                );
+
+                const className = `absolute left-4 right-4 glass rounded-2xl p-5 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4 shadow-xl active:scale-95`;
+                const style = {
+                  top: `${i * 90}px`,
+                  animation: `mobile-final-fade 3.6s ease-out forwards`,
+                  opacity: 0,
+                } as React.CSSProperties;
+
+                if (item.type === 'button') {
+                  return (
+                    <button key={`mb-final-${i}`} onClick={item.onClick} className={className} style={style}>
+                      {content}
+                    </button>
+                  );
+                }
+                return (
+                  <a key={`mb-final-${i}`} href={item.href} className={className} style={style}>
+                    {content}
+                  </a>
+                );
+              })}
+            </div>
           </div>
 
           {/* DESKTOP VIEW (3D Animation) */}
