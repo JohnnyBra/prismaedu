@@ -194,7 +194,7 @@ const TutorDashboard: React.FC = () => {
             </svg>
           </div>
           <h2 className="font-display text-3xl font-bold text-white/90 drop-shadow-md">Hola, {currentUser?.name}</h2>
-          <p className="text-white/40 text-lg font-body">Portal del Profesorado - La Hispanidad</p>
+          <p className="text-white/40 text-lg font-body">Prisma Educación - La Hispanidad</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 w-full">
