@@ -181,7 +181,12 @@ const TutorDashboard: React.FC = () => {
       <div className="w-full max-w-4xl z-10 flex flex-col items-center animate-fade-in">
         <div className="text-center mb-8 relative">
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 flex justify-center w-full mb-4">
-            <img src="/logo.png" alt="Logo Prisma" className="h-20 w-auto object-contain drop-shadow-2xl" onError={(e) => e.currentTarget.style.display = 'none'} />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-auto drop-shadow-2xl text-slate-800 dark:text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="7" height="7" x="3" y="3" rx="1" />
+              <rect width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
+              <rect width="7" height="7" x="14" y="14" rx="1" />
+              <rect width="7" height="7" x="3" y="14" rx="1" />
+            </svg>
           </div>
           <h2 className="font-display text-3xl font-bold text-white/90 drop-shadow-md">Hola, {currentUser?.name}</h2>
           <p className="text-white/40 text-lg font-body">Portal del Profesorado - La Hispanidad</p>
@@ -704,8 +709,8 @@ const TutorDashboard: React.FC = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`py-3 border-b-2 font-display font-bold text-sm flex items-center gap-2 transition-all duration-200 relative ${active
-                  ? `${tab.borderColor} ${tab.textColor}`
-                  : 'border-transparent text-white/30 hover:text-white/50'
+                ? `${tab.borderColor} ${tab.textColor}`
+                : 'border-transparent text-white/30 hover:text-white/50'
                 }`}
             >
               <Icon size={16} /> {tab.label}
