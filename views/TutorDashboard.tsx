@@ -405,7 +405,7 @@ const TutorDashboard: React.FC = () => {
                     className="mobile-stamp-face"
                     style={{
                       transform: `rotateX(${i * 72}deg) translateZ(85px)`,
-                      animationDelay: `${0.5 + i * 0.3}s`
+                      animationDelay: `${0.45 + i * 0.28}s`
                     }}
                   >
                     <div className={`glass rounded-2xl p-5 border border-white/10 flex items-center gap-4 w-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-slate-900/40 backdrop-blur-md`}>
@@ -435,8 +435,8 @@ const TutorDashboard: React.FC = () => {
                 const className = `absolute left-4 right-4 glass rounded-2xl p-5 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4 shadow-xl active:scale-95`;
                 const style = {
                   top: `${i * 105}px`,
-                  animation: `real-deploy 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both`,
-                  animationDelay: `${0.5 + i * 0.3}s`
+                  animation: `real-deploy 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both`,
+                  animationDelay: `${0.45 + i * 0.28}s`
                 } as React.CSSProperties;
 
                 if (item.type === 'button') {
@@ -500,11 +500,10 @@ const TutorDashboard: React.FC = () => {
                  10% { opacity: 1; transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); }
                  40% { 
                     opacity: 1; 
-                    /* Se mantiene persiguiendo la cara en rotación */
                     transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); 
                  }
-                 55% { 
-                    /* Aterriza más pronto para transicionar ágilmente */
+                 60% { 
+                    /* Aterriza y da un respiro visual antes de expandirse */
                     opacity: 1; 
                     transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
                  }
@@ -517,16 +516,16 @@ const TutorDashboard: React.FC = () => {
               /* Fade in and expand actual interactive cards right out of the landing icon */
               @keyframes final-card-deploy {
                 0% { opacity: 0; transform: scale(0.3); pointer-events: none; }
-                54% { opacity: 0; transform: scale(0.3); pointer-events: none; }
-                65% { opacity: 1; transform: scale(1.05); pointer-events: none; }
+                74% { opacity: 0; transform: scale(0.3); pointer-events: none; }
+                85% { opacity: 1; transform: scale(1.05); pointer-events: none; }
                 100% { opacity: 1; transform: scale(1); pointer-events: auto; }
               }
 
               /* Ocultar prism-cards simulados exactamente al hacer spawn de las reales */
               @keyframes fake-card-fade {
                 0% { opacity: 1; }
-                54% { opacity: 1; }
-                55% { opacity: 0; }
+                74% { opacity: 1; }
+                75% { opacity: 0; }
                 100% { opacity: 0; }
               }
 
@@ -536,7 +535,7 @@ const TutorDashboard: React.FC = () => {
                 position: absolute; 
                 top: 50%; left: 50%;
                 transform-style: preserve-3d;
-                animation: scene-rotate 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: scene-rotate 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
               }
 
               .prism-face {
@@ -550,7 +549,7 @@ const TutorDashboard: React.FC = () => {
                 backdrop-filter: blur(4px);
                 /* Al hacer la caja más alta (300px), el origen de rotación para que se abra bien como los pétalos de una flor larga debe ajustarse desde donde tocan la junta base. */
                 transform-origin: 50% 75%;
-                animation: face-open 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: face-open 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
                 backface-visibility: hidden;
               }
 
@@ -564,8 +563,8 @@ const TutorDashboard: React.FC = () => {
                 align-items: center; justify-content: center;
                 /* El pentágono base shape for top lid */
                 clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
-                animation: lid-transform 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                           lid-border-fade 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: lid-transform 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                           lid-border-fade 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
               }
 
               .flying-icon-wrapper {
@@ -573,8 +572,8 @@ const TutorDashboard: React.FC = () => {
                  width: 0; height: 0;
                  display: flex; align-items: center; justify-content: center;
                  transform-style: preserve-3d;
-                 animation: card-deploy 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                            fake-card-fade 2.0s linear forwards;
+                 animation: card-deploy 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                            fake-card-fade 2.2s linear forwards;
               }
 
               @keyframes glow-spin {
@@ -649,7 +648,7 @@ const TutorDashboard: React.FC = () => {
                 left: `calc(50% + ${item.pos.x}px)`,
                 top: `calc(50% + ${item.pos.y}px)`,
                 transformOrigin: '44px 50%',
-                animation: `final-card-deploy 2.0s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+                animation: `final-card-deploy 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
                 opacity: 0,
               } as React.CSSProperties;
 
