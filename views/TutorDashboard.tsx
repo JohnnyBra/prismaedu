@@ -462,34 +462,32 @@ const TutorDashboard: React.FC = () => {
               /* Escena base con rotación 3D del prisma completo */
               @keyframes scene-rotate {
                 0% { transform: rotateX(-15deg) rotateY(0deg) translateY(50px); }
-                60% { transform: rotateX(-15deg) rotateY(-360deg) translateY(50px); }
-                70% { transform: rotateX(0deg) rotateY(-360deg) translateY(0px); }
+                40% { transform: rotateX(-15deg) rotateY(-360deg) translateY(50px); }
+                55% { transform: rotateX(0deg) rotateY(-360deg) translateY(0px); }
                 100% { transform: rotateX(0deg) rotateY(-360deg) translateY(0px); }
               }
 
               /* Caras del prisma cayendo hacia fuera como pétalos (apertura) */
-              /* Cada cara originalmente está en RotateY(N * 72deg). 
-                 Para abrirla "hacia abajo", rotamos en X localmente. */
               @keyframes face-open {
                 0% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(0deg); opacity: 1; border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02)); }
-                60% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(0deg); opacity: 1; border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02)); }
-                80% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(-90deg); opacity: 0; border-color: transparent; background: transparent; }
+                40% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(0deg); opacity: 1; border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02)); }
+                55% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(-90deg); opacity: 0; border-color: transparent; background: transparent; }
                 100% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(-90deg); opacity: 0; }
               }
 
               /* La tapa superior es inicialmente un polígono, luego se vuelve el logo plano */
               @keyframes lid-transform {
                 0% { transform: translateY(-150px) rotateX(90deg) scale(0.9); opacity: 1; }
-                60% { transform: translateY(-150px) rotateX(90deg) scale(1.1); opacity: 1; }
-                70% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
+                40% { transform: translateY(-150px) rotateX(90deg) scale(1.1); opacity: 1; }
+                55% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
                 100% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
               }
 
               /* Fade out del borde 3D de la tapa cuando baja a su sitio */
               @keyframes lid-border-fade {
                  0% { border-color: rgba(59, 130, 246, 0.4); background: rgba(15, 23, 42, 0.8); }
-                 60% { border-color: rgba(59, 130, 246, 0.4); background: rgba(15, 23, 42, 0.8); }
-                 70% { border-color: transparent; background: transparent; }
+                 40% { border-color: rgba(59, 130, 246, 0.4); background: rgba(15, 23, 42, 0.8); }
+                 55% { border-color: transparent; background: transparent; }
                  100% { border-color: transparent; background: transparent; }
               }
 
@@ -500,12 +498,12 @@ const TutorDashboard: React.FC = () => {
                     transform: rotateY(var(--ry)) translateZ(71px) translateY(-20px) scale(0.3);
                  }
                  10% { opacity: 1; transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); }
-                 60% { 
+                 40% { 
                     opacity: 1; 
                     /* Se mantiene persiguiendo la cara en rotación */
                     transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); 
                  }
-                 75% { 
+                 55% { 
                     /* Aterriza más pronto para transicionar ágilmente */
                     opacity: 1; 
                     transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
@@ -519,16 +517,16 @@ const TutorDashboard: React.FC = () => {
               /* Fade in and expand actual interactive cards right out of the landing icon */
               @keyframes final-card-deploy {
                 0% { opacity: 0; transform: scale(0.3); pointer-events: none; }
-                74% { opacity: 0; transform: scale(0.3); pointer-events: none; }
-                85% { opacity: 1; transform: scale(1.05); pointer-events: none; }
+                54% { opacity: 0; transform: scale(0.3); pointer-events: none; }
+                65% { opacity: 1; transform: scale(1.05); pointer-events: none; }
                 100% { opacity: 1; transform: scale(1); pointer-events: auto; }
               }
 
               /* Ocultar prism-cards simulados exactamente al hacer spawn de las reales */
               @keyframes fake-card-fade {
                 0% { opacity: 1; }
-                74% { opacity: 1; }
-                75% { opacity: 0; }
+                54% { opacity: 1; }
+                55% { opacity: 0; }
                 100% { opacity: 0; }
               }
 
@@ -538,7 +536,7 @@ const TutorDashboard: React.FC = () => {
                 position: absolute; 
                 top: 50%; left: 50%;
                 transform-style: preserve-3d;
-                animation: scene-rotate 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: scene-rotate 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
               }
 
               .prism-face {
@@ -552,7 +550,7 @@ const TutorDashboard: React.FC = () => {
                 backdrop-filter: blur(4px);
                 /* Al hacer la caja más alta (300px), el origen de rotación para que se abra bien como los pétalos de una flor larga debe ajustarse desde donde tocan la junta base. */
                 transform-origin: 50% 75%;
-                animation: face-open 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: face-open 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
                 backface-visibility: hidden;
               }
 
@@ -566,8 +564,8 @@ const TutorDashboard: React.FC = () => {
                 align-items: center; justify-content: center;
                 /* El pentágono base shape for top lid */
                 clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
-                animation: lid-transform 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                           lid-border-fade 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: lid-transform 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                           lid-border-fade 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
               }
 
               .flying-icon-wrapper {
@@ -575,8 +573,8 @@ const TutorDashboard: React.FC = () => {
                  width: 0; height: 0;
                  display: flex; align-items: center; justify-content: center;
                  transform-style: preserve-3d;
-                 animation: card-deploy 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                            fake-card-fade 3.5s linear forwards;
+                 animation: card-deploy 2.0s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                            fake-card-fade 2.0s linear forwards;
               }
 
               @keyframes glow-spin {
@@ -651,7 +649,7 @@ const TutorDashboard: React.FC = () => {
                 left: `calc(50% + ${item.pos.x}px)`,
                 top: `calc(50% + ${item.pos.y}px)`,
                 transformOrigin: '44px 50%',
-                animation: `final-card-deploy 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+                animation: `final-card-deploy 2.0s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
                 opacity: 0,
               } as React.CSSProperties;
 
