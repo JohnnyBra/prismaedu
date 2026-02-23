@@ -288,102 +288,187 @@ const TutorDashboard: React.FC = () => {
             })}
           </div>
 
-          {/* DESKTOP VIEW (Pentagon Layout with SVG Prism Animation) */}
-          <div className="hidden md:flex relative w-full h-[600px] mt-4 mx-auto justify-center items-center">
+          {/* DESKTOP VIEW (3D Animation) */}
+          <div className="hidden md:flex relative w-full h-[600px] mt-4 mx-auto justify-center items-center perspective-[1200px]">
             {/* Scoped Animations */}
             <style>{`
-              @keyframes prism-draw {
-                0% { stroke-dashoffset: 1500; fill: transparent; }
-                50% { stroke-dashoffset: 0; fill: transparent; }
-                100% { stroke-dashoffset: 0; fill: rgba(59, 130, 246, 0.04); }
+              /* Escena base con rotación 3D del prisma completo */
+              @keyframes scene-rotate {
+                0% { transform: rotateX(-15deg) rotateY(0deg) translateY(50px); }
+                60% { transform: rotateX(-15deg) rotateY(-360deg) translateY(50px); }
+                70% { transform: rotateX(0deg) rotateY(-360deg) translateY(0px); }
+                100% { transform: rotateX(0deg) rotateY(-360deg) translateY(0px); }
               }
-              @keyframes line-shoot {
-                0% { stroke-dashoffset: 600; opacity: 1; }
-                80% { stroke-dashoffset: 0; opacity: 1; }
-                100% { stroke-dashoffset: 0; opacity: 0; }
+
+              /* Caras del prisma cayendo hacia fuera como pétalos (apertura) */
+              /* Cada cara originalmente está en RotateY(N * 72deg). 
+                 Para abrirla "hacia abajo", rotamos en X localmente. */
+              @keyframes face-open {
+                0% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(0deg); opacity: 1; border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02)); }
+                60% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(0deg); opacity: 1; border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02)); }
+                80% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(-90deg); opacity: 0; border-color: transparent; background: transparent; }
+                100% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(-90deg); opacity: 0; }
               }
-              @keyframes card-fly {
-                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.1); }
-                40% { opacity: 1; transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(0.6); }
-                100% { opacity: 1; transform: translate(var(--tx), var(--ty)) scale(1); }
+
+              /* La tapa superior es inicialmente un polígono, luego se vuelve el logo plano */
+              @keyframes lid-transform {
+                0% { transform: translateY(-75px) rotateX(90deg) scale(0.9); opacity: 1; }
+                60% { transform: translateY(-75px) rotateX(90deg) scale(1.1); opacity: 1; }
+                70% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
+                100% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
               }
-              @keyframes logo-pulse {
-                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-                50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+              /* Fade out del borde 3D de la tapa cuando baja a su sitio */
+              @keyframes lid-border-fade {
+                 0% { border-color: rgba(59, 130, 246, 0.4); background: rgba(15, 23, 42, 0.8); }
+                 60% { border-color: rgba(59, 130, 246, 0.4); background: rgba(15, 23, 42, 0.8); }
+                 70% { border-color: transparent; background: transparent; }
+                 100% { border-color: transparent; background: transparent; }
               }
-              @keyframes prism-fade {
-                0% { opacity: 0; transform: scale(0.8); }
-                100% { opacity: 1; transform: scale(1); }
+
+              /* Los iconos vuelan desde sus caras 3D a sus posiciones 2D absolutas finales */
+              /* Start: en la cara 3D. End: en el layout del hub */
+              @keyframes card-deploy {
+                 0% { 
+                    opacity: 0; 
+                    transform: rotateY(var(--ry)) translateZ(71px) translateY(-20px) scale(0.3);
+                 }
+                 10% { opacity: 1; transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); }
+                 60% { 
+                    opacity: 1; 
+                    /* Se mantiene persiguiendo la cara en rotación */
+                    transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); 
+                 }
+                 80% { 
+                    /* Se "suelta" de la vista rotatoria local para ir a destino global (efecto hibrido) */
+                    opacity: 1; 
+                    transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
+                 }
+                 100% { 
+                    opacity: 1; 
+                    transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
+                 }
               }
+
+               /* Fade in of actual interactive cards after animation resolves */
+              @keyframes final-card-fade {
+                0% { opacity: 0; pointer-events: none; }
+                84% { opacity: 0; pointer-events: none; }
+                100% { opacity: 1; pointer-events: auto; }
+              }
+
+              /* Ocultar prism-cards simulados del vuelo */
+              @keyframes fake-card-fade {
+                0% { opacity: 1; }
+                84% { opacity: 1; }
+                85% { opacity: 0; }
+                100% { opacity: 0; }
+              }
+
+              .prism-scene {
+                width: 0px; 
+                height: 0px; 
+                position: absolute; 
+                top: 50%; left: 50%;
+                transform-style: preserve-3d;
+                animation: scene-rotate 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+              }
+
+              .prism-face {
+                position: absolute;
+                width: 100px;
+                height: 150px;
+                margin-left: -50px; /* Centrado en 0,0 */
+                margin-top: -75px; 
+                border: 2px solid rgba(59, 130, 246, 0.4);
+                background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02));
+                backdrop-filter: blur(4px);
+                transform-origin: bottom center;
+                animation: face-open 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                backface-visibility: hidden;
+              }
+
+              .prism-top {
+                position: absolute;
+                width: 154px; /* Aprox ancho máximo de un pentágono de lado 100 */
+                height: 146px; 
+                margin-left: -77px;
+                margin-top: -73px;
+                display: flex;
+                align-items: center; justify-content: center;
+                /* El pentágono base shape for top lid */
+                clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
+                animation: lid-transform 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                           lid-border-fade 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+              }
+
+              .flying-icon-wrapper {
+                 position: absolute;
+                 width: 0; height: 0;
+                 display: flex; align-items: center; justify-content: center;
+                 transform-style: preserve-3d;
+                 animation: card-deploy 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                            fake-card-fade 3.5s linear forwards;
+              }
+
               @keyframes glow-spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
               }
             `}</style>
 
-            {/* SVG Prism Background */}
-            <svg className="absolute w-full h-full z-10 pointer-events-none" viewBox="-450 -300 900 600" style={{ animation: 'prism-fade 0.6s ease-out' }}>
-              {/* Inner Back Pentagon */}
-              <polygon points="0,-60 38,-7.6 23.5,12.3 -23.5,12.3 -38,-7.6" fill="rgba(0,0,0,0.2)" stroke="#3b82f6" strokeOpacity="0.3" strokeWidth="1" />
+            {/* THE 3D SCENE */}
+            <div className="prism-scene z-10">
+              {/* 5 Wall Faces */}
+              {[0, 1, 2, 3, 4].map(i => (
+                <div
+                  key={`face-${i}`}
+                  className="prism-face"
+                  style={{ '--ry': `${i * 72}deg` } as React.CSSProperties}
+                />
+              ))}
 
-              {/* Connecting edges from back to front */}
-              <line x1="0" y1="-90" x2="0" y2="-60" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
-              <line x1="85.6" y1="-27.8" x2="38" y2="-7.6" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
-              <line x1="52.9" y1="72.8" x2="23.5" y2="12.3" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
-              <line x1="-52.9" y1="72.8" x2="-23.5" y2="12.3" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
-              <line x1="-85.6" y1="-27.8" x2="-38" y2="-7.6" stroke="#3b82f6" strokeOpacity="0.4" strokeWidth="1.5" />
+              {/* Top Lid -> Transforms into Logo Center */}
+              <div className="prism-top z-50">
+                <div className="w-24 h-24 bg-slate-900/40 rounded-3xl border border-primary-500/40 flex items-center justify-center backdrop-blur-md shadow-2xl relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="7" height="7" x="3" y="3" rx="1.5" />
+                    <rect width="7" height="7" x="14" y="3" rx="1.5" fill="#3b82f6" stroke="#3b82f6" />
+                    <rect width="7" height="7" x="14" y="14" rx="1.5" />
+                    <rect width="7" height="7" x="3" y="14" rx="1.5" />
+                  </svg>
+                </div>
+              </div>
 
-              {/* Outer Front Pentagon (Prism Face) */}
-              <polygon
-                points="0,-90 85.6,-27.8 52.9,72.8 -52.9,72.8 -85.6,-27.8"
-                stroke="#3b82f6"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-                strokeDasharray="1500"
-                style={{ animation: 'prism-draw 2s ease-out forwards' }}
-              />
-
-              {/* Beams shooting from prism vertices to final card positions */}
-              {hubItems.map((item, i) => {
-                const startX = [0, 85.6, 52.9, -52.9, -85.6][i];
-                const startY = [-90, -27.8, 72.8, 72.8, -27.8][i];
-                return (
-                  <line
-                    key={i}
-                    x1={startX} y1={startY}
-                    x2={item.pos.x} y2={item.pos.y}
-                    stroke="#3b82f6"
-                    strokeOpacity="0.6"
-                    strokeWidth="2"
-                    strokeDasharray="600"
-                    strokeDashoffset="600"
-                    style={{ animation: `line-shoot 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) ${1 + i * 0.15}s forwards` }}
-                  />
-                );
-              })}
-            </svg>
-
-            {/* Center Logo */}
-            <div
-              className="absolute z-20 w-28 h-28 bg-slate-900/60 rounded-3xl border border-primary-500/40 flex items-center justify-center backdrop-blur-xl shadow-[0_0_40px_rgba(59,130,246,0.25)] ring-4 ring-primary-500/10"
-              style={{
-                left: '50%', top: '50%',
-                animation: 'logo-pulse 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
-              }}
-            >
-              {/* Rotating glow ring in background */}
-              <div className="absolute w-[150%] h-[150%] rounded-full opacity-30 select-none pointer-events-none" style={{ background: 'conic-gradient(from 0deg, transparent 0 340deg, #3b82f6 360deg)', animation: 'glow-spin 4s linear infinite' }} />
-
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-white drop-shadow-lg relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="7" height="7" x="3" y="3" rx="1.5" />
-                <rect width="7" height="7" x="14" y="3" rx="1.5" fill="#3b82f6" stroke="#3b82f6" />
-                <rect width="7" height="7" x="14" y="14" rx="1.5" />
-                <rect width="7" height="7" x="3" y="14" rx="1.5" />
-              </svg>
+              {/* Flying Icons Simulation (they start attached to rotating faces, then fly out) */}
+              {hubItems.map((item, i) => (
+                <div
+                  key={`fly-${i}`}
+                  className="flying-icon-wrapper"
+                  style={{
+                    '--ry': `${i * 72}deg`,
+                    '--tx': `${item.pos.x}px`,
+                    '--ty': `${item.pos.y}px`
+                  } as React.CSSProperties}
+                >
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 shadow-xl ${item.color}`}>
+                    {item.icon}
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* Positioned Cards */}
+            {/* Glowing Ring for the logo (appears when animation finishes) */}
+            <div
+              className="absolute z-0 w-36 h-36 rounded-full opacity-0 pointer-events-none"
+              style={{
+                left: 'calc(50% - 72px)', top: 'calc(50% - 72px)',
+                background: 'conic-gradient(from 0deg, transparent 0 340deg, #3b82f6 360deg)',
+                animation: 'glow-spin 4s linear infinite, final-card-fade 3.5s forwards'
+              }}
+            />
+
+            {/* THE FINAL INTERACTIVE CARDS (Fade in exactly when flying icons disappear) */}
             {hubItems.map((item, i) => {
               const content = (
                 <>
@@ -400,28 +485,24 @@ const TutorDashboard: React.FC = () => {
 
               const className = `absolute z-30 glass rounded-[20px] p-4 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4 w-[280px] shadow-2xl shadow-black/20 hover:scale-105 active:scale-[0.98]`;
 
-              const delay = 1.3 + (i * 0.15);
               const style = {
-                '--tx': `${item.pos.x}px`,
-                '--ty': `${item.pos.y}px`,
-                animation: `card-fly 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards`,
+                marginLeft: '-140px',
+                marginTop: '-45px',
+                left: `calc(50% + ${item.pos.x}px)`,
+                top: `calc(50% + ${item.pos.y}px)`,
+                animation: `final-card-fade 3.6s ease-out forwards`,
                 opacity: 0,
-                // Start offset by its own size and animated tx/ty relative to center
-                marginLeft: '-140px', // half of 280px
-                marginTop: '-45px', // half of 90px (approx height)
-                left: '50%',
-                top: '50%',
               } as React.CSSProperties;
 
               if (item.type === 'button') {
                 return (
-                  <button key={i} onClick={item.onClick} className={className} style={style}>
+                  <button key={`final-${i}`} onClick={item.onClick} className={className} style={style}>
                     {content}
                   </button>
                 );
               }
               return (
-                <a key={i} href={item.href} className={className} style={style}>
+                <a key={`final-${i}`} href={item.href} className={className} style={style}>
                   {content}
                 </a>
               );
