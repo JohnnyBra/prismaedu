@@ -248,16 +248,16 @@ const TutorDashboard: React.FC = () => {
           </div>
 
           {/* MOBILE VIEW (3D Wheel Unroll Animation) */}
-          <div className="flex md:hidden relative w-full h-[460px] mx-auto perspective-[1200px] mt-4">
+          <div className="flex md:hidden relative w-full h-[520px] mx-auto perspective-[1200px] mt-4">
             <style>{`
               /* Rueda/tampón que baja y gira */
               @keyframes mobile-stamp-roll {
                 0% { transform: translateY(0px) rotateX(0deg); opacity: 0; }
                 5% { transform: translateY(0px) rotateX(0deg); opacity: 1; }
                 23% { transform: translateY(0px) rotateX(0deg); opacity: 1; }
-                80% { transform: translateY(360px) rotateX(-288deg); opacity: 1; }
-                85% { transform: translateY(360px) rotateX(-288deg); opacity: 0; }
-                100% { transform: translateY(360px) rotateX(-288deg); opacity: 0; }
+                80% { transform: translateY(420px) rotateX(-288deg); opacity: 1; }
+                85% { transform: translateY(420px) rotateX(-288deg); opacity: 0; }
+                100% { transform: translateY(420px) rotateX(-288deg); opacity: 0; }
               }
 
               /* Fade out instantáneo de cada tarjeta falsa al estamparse */
@@ -276,9 +276,9 @@ const TutorDashboard: React.FC = () => {
               /* El logo vuela desde el cilindro hacia arriba para clavarse en la parte superior donde antes estaba el estático */
               @keyframes logo-fly {
                 0% { transform: translateY(0px) translateZ(85px) scale(0.2); opacity: 0; }
-                5% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
-                22% { transform: translateY(-270px) translateZ(0px) scale(0.9); opacity: 1; }
-                100% { transform: translateY(-270px) translateZ(0px) scale(0.9); opacity: 1; }
+                23% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
+                80% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
+                100% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
               }
 
               .mobile-stamp-scene {
@@ -362,7 +362,7 @@ const TutorDashboard: React.FC = () => {
                   </>
                 );
 
-                const finalY = i * 90; // Spacing
+                const finalY = i * 105; // Spacing
 
                 return (
                   <div
@@ -399,7 +399,7 @@ const TutorDashboard: React.FC = () => {
 
                 const className = `absolute left-4 right-4 glass rounded-2xl p-5 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4 shadow-xl active:scale-95`;
                 const style = {
-                  top: `${i * 90}px`,
+                  top: `${i * 105}px`,
                   animation: `real-deploy 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both`,
                   animationDelay: `${0.5 + i * 0.3}s`
                 } as React.CSSProperties;
