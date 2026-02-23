@@ -259,8 +259,8 @@ const TutorDashboard: React.FC = () => {
           <div className="flex md:hidden relative w-full h-[460px] mx-auto perspective-[1200px] mt-4">
             <style>{`
               @keyframes mobile-scene-rotate {
-                0% { transform: translateY(100px) rotateX(90deg); }
-                60% { transform: translateY(100px) rotateX(-360deg); }
+                0% { transform: translateY(0px) rotateX(90deg); }
+                50% { transform: translateY(0px) rotateX(-360deg); }
                 100% { transform: translateY(0px) rotateX(-360deg); }
               }
 
@@ -288,6 +288,13 @@ const TutorDashboard: React.FC = () => {
                 100% { opacity: 0; }
               }
 
+              @keyframes mobile-lid-fade {
+                 0% { opacity: 1; }
+                 60% { opacity: 1; }
+                 80% { opacity: 0; }
+                 100% { opacity: 0; }
+              }
+
               @keyframes mobile-final-fade {
                 0% { opacity: 0; pointer-events: none; }
                 84% { opacity: 0; pointer-events: none; }
@@ -300,6 +307,21 @@ const TutorDashboard: React.FC = () => {
                 position: absolute;
                 transform-style: preserve-3d;
                 animation: mobile-scene-rotate 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+              }
+
+              .mobile-lid {
+                position: absolute;
+                left: 50%;
+                margin-left: -48px;
+                /* Colocado en la profundidad del cilindro para hacer de "tapa" o base del rodillo */
+                transform: translateY(45px) rotateX(-90deg) translateZ(100px);
+                background: rgba(15, 23, 42, 0.9);
+                border: 1px solid rgba(59, 130, 246, 0.4);
+                border-radius: 20px;
+                width: 96px; height: 96px;
+                display: flex; align-items: center; justify-content: center;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                animation: mobile-lid-fade 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
               }
 
               .mobile-card-wrapper {
@@ -315,6 +337,15 @@ const TutorDashboard: React.FC = () => {
 
             {/* Flying Simulated Cylinder */}
             <div className="mobile-scene z-10">
+              {/* Fixed Lid (Prisma Logo as side base of cylinder) */}
+              <div className="mobile-lid">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="7" height="7" x="3" y="3" rx="1.5" />
+                  <rect width="7" height="7" x="14" y="3" rx="1.5" fill="#3b82f6" stroke="#3b82f6" />
+                  <rect width="7" height="7" x="14" y="14" rx="1.5" />
+                  <rect width="7" height="7" x="3" y="14" rx="1.5" />
+                </svg>
+              </div>
               {hubItems.map((item, i) => {
                 const content = (
                   <>
