@@ -277,8 +277,8 @@ const TutorDashboard: React.FC = () => {
               @keyframes logo-fly {
                 0% { transform: translateY(0px) translateZ(85px) scale(0.2); opacity: 0; }
                 5% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
-                22% { transform: translateY(-190px) translateZ(0px) scale(0.9); opacity: 1; }
-                100% { transform: translateY(-190px) translateZ(0px) scale(0.9); opacity: 1; }
+                22% { transform: translateY(-270px) translateZ(0px) scale(0.9); opacity: 1; }
+                100% { transform: translateY(-270px) translateZ(0px) scale(0.9); opacity: 1; }
               }
 
               .mobile-stamp-scene {
