@@ -258,55 +258,64 @@ const TutorDashboard: React.FC = () => {
           {/* MOBILE VIEW (3D Wheel Unroll Animation) */}
           <div className="flex md:hidden relative w-full h-[460px] mx-auto perspective-[1200px] mt-4">
             <style>{`
-              @keyframes mobile-scene-rotate {
-                0% { transform: translateY(0px) rotateX(90deg); }
-                50% { transform: translateY(0px) rotateX(-360deg); }
-                100% { transform: translateY(0px) rotateX(-360deg); }
+              /* Rueda/tampón que baja y gira */
+              @keyframes mobile-stamp-roll {
+                0% { transform: translateY(0px) rotateX(0deg); opacity: 0; }
+                5% { transform: translateY(0px) rotateX(0deg); opacity: 1; }
+                23% { transform: translateY(0px) rotateX(0deg); opacity: 1; }
+                80% { transform: translateY(360px) rotateX(-288deg); opacity: 1; }
+                85% { transform: translateY(360px) rotateX(-288deg); opacity: 0; }
+                100% { transform: translateY(360px) rotateX(-288deg); opacity: 0; }
               }
 
-              @keyframes mobile-card-deploy {
-                 /* Rotating as a wheel */
-                 0% { transform: rotateX(var(--rx)) translateZ(100px) scale(0.9); opacity: 0; }
-                 5% { transform: rotateX(var(--rx)) translateZ(100px) scale(0.9); opacity: 1; }
-                 60% { transform: rotateX(var(--rx)) translateZ(100px) scale(0.9); opacity: 1; }
-                 
-                 /* Unroll drop sequence */
-                 80% { 
-                    transform: translateY(var(--ty)) rotateX(360deg) translateZ(0px) scale(1); 
-                    opacity: 1;
-                 }
-                 100% { 
-                    transform: translateY(var(--ty)) rotateX(360deg) translateZ(0px) scale(1); 
-                    opacity: 1; 
-                 }
-              }
-
-              @keyframes mobile-fake-fade {
-                0% { opacity: 1; }
-                84% { opacity: 1; }
-                85% { opacity: 0; }
+              /* Fade out instantáneo de cada tarjeta falsa al estamparse */
+              @keyframes fake-vanish {
+                0%, 99% { opacity: 1; }
                 100% { opacity: 0; }
               }
 
-              @keyframes mobile-lid-fade {
-                 0% { opacity: 1; }
-                 60% { opacity: 1; }
-                 80% { opacity: 0; }
-                 100% { opacity: 0; }
+              /* Fade in con rebote de cada tarjeta real que se queda en pantalla */
+              @keyframes real-deploy {
+                0% { opacity: 0; transform: scale(0.85) translateZ(-20px); pointer-events: none; }
+                1% { opacity: 1; transform: scale(0.85) translateZ(-20px); pointer-events: none; }
+                100% { opacity: 1; transform: scale(1) translateZ(0px); pointer-events: auto; }
               }
 
-              @keyframes mobile-final-fade {
-                0% { opacity: 0; pointer-events: none; }
-                84% { opacity: 0; pointer-events: none; }
-                100% { opacity: 1; pointer-events: auto; }
+              /* El logo vuela desde el cilindro hacia arriba */
+              @keyframes logo-fly {
+                0% { transform: translateY(0px) translateZ(85px) scale(0.2); opacity: 0; }
+                5% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
+                22% { transform: translateY(-130px) translateZ(0px) scale(0.9); opacity: 1; }
+                100% { transform: translateY(-130px) translateZ(0px) scale(0.9); opacity: 1; }
               }
 
-              .mobile-scene {
+              .mobile-stamp-scene {
                 width: 100%;
-                height: 100%;
+                height: 100px;
                 position: absolute;
+                top: 0;
                 transform-style: preserve-3d;
-                animation: mobile-scene-rotate 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: mobile-stamp-roll 3.5s linear forwards;
+              }
+
+              .mobile-stamp-face {
+                 position: absolute;
+                 left: 1rem; right: 1rem;
+                 top: 10px;
+                 display: flex; justify-content: center;
+                 transform-style: preserve-3d;
+                 /* transform is set via inline style for var(--rx) */
+                 animation: fake-vanish 0.01s forwards;
+              }
+
+              .mobile-flying-logo {
+                 position: absolute;
+                 left: 50%; top: 25px;
+                 margin-left: -32px;
+                 width: 64px; height: 64px;
+                 display: flex; align-items: center; justify-content: center;
+                 z-index: 50;
+                 animation: logo-fly 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
               }
 
               .mobile-lid {
@@ -335,17 +344,18 @@ const TutorDashboard: React.FC = () => {
               }
             `}</style>
 
-            {/* Flying Simulated Cylinder */}
-            <div className="mobile-scene z-10">
-              {/* Fixed Lid (Prisma Logo as side base of cylinder) */}
-              <div className="mobile-lid">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="7" height="7" x="3" y="3" rx="1.5" />
-                  <rect width="7" height="7" x="14" y="3" rx="1.5" fill="#3b82f6" stroke="#3b82f6" />
-                  <rect width="7" height="7" x="14" y="14" rx="1.5" />
-                  <rect width="7" height="7" x="3" y="14" rx="1.5" />
-                </svg>
-              </div>
+            {/* Flying Logo that returns to the top */}
+            <div className="mobile-flying-logo">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-auto drop-shadow-2xl text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="7" height="7" x="3" y="3" rx="1" />
+                <rect width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
+                <rect width="7" height="7" x="14" y="14" rx="1" />
+                <rect width="7" height="7" x="3" y="14" rx="1" />
+              </svg>
+            </div>
+
+            {/* Flying Simulated Cylinder (Stamp Roller) */}
+            <div className="mobile-stamp-scene z-10">
               {hubItems.map((item, i) => {
                 const content = (
                   <>
@@ -365,13 +375,13 @@ const TutorDashboard: React.FC = () => {
                 return (
                   <div
                     key={`mb-fly-${i}`}
-                    className="mobile-card-wrapper"
+                    className="mobile-stamp-face"
                     style={{
-                      '--rx': `${i * 72}deg`,
-                      '--ty': `${finalY}px`
-                    } as React.CSSProperties}
+                      transform: `rotateX(${i * 72}deg) translateZ(85px)`,
+                      animationDelay: `${0.8 + i * 0.5}s`
+                    }}
                   >
-                    <div className={`glass rounded-2xl p-5 border border-white/10 flex items-center gap-4 w-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-slate-900/80 backdrop-blur-md`}>
+                    <div className={`glass rounded-2xl p-5 border border-white/10 flex items-center gap-4 w-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-slate-900/40 backdrop-blur-md`}>
                       {content}
                     </div>
                   </div>
@@ -398,8 +408,8 @@ const TutorDashboard: React.FC = () => {
                 const className = `absolute left-4 right-4 glass rounded-2xl p-5 ${item.border} hover:bg-white/10 transition-all group flex items-center gap-4 shadow-xl active:scale-95`;
                 const style = {
                   top: `${i * 90}px`,
-                  animation: `mobile-final-fade 3.6s ease-out forwards`,
-                  opacity: 0,
+                  animation: `real-deploy 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both`,
+                  animationDelay: `${0.8 + i * 0.5}s`
                 } as React.CSSProperties;
 
                 if (item.type === 'button') {
