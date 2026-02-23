@@ -287,7 +287,7 @@ const TutorDashboard: React.FC = () => {
                 position: absolute;
                 top: 0;
                 transform-style: preserve-3d;
-                animation: mobile-stamp-roll 3.5s linear forwards;
+                animation: mobile-stamp-roll 2s linear forwards;
               }
 
               .mobile-stamp-face {
@@ -307,7 +307,7 @@ const TutorDashboard: React.FC = () => {
                  width: 64px; height: 64px;
                  display: flex; align-items: center; justify-content: center;
                  z-index: 50;
-                 animation: logo-fly 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                 animation: logo-fly 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
               }
 
               .mobile-lid {
@@ -370,7 +370,7 @@ const TutorDashboard: React.FC = () => {
                     className="mobile-stamp-face"
                     style={{
                       transform: `rotateX(${i * 72}deg) translateZ(85px)`,
-                      animationDelay: `${0.8 + i * 0.5}s`
+                      animationDelay: `${0.5 + i * 0.3}s`
                     }}
                   >
                     <div className={`glass rounded-2xl p-5 border border-white/10 flex items-center gap-4 w-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-slate-900/40 backdrop-blur-md`}>
@@ -401,7 +401,7 @@ const TutorDashboard: React.FC = () => {
                 const style = {
                   top: `${i * 90}px`,
                   animation: `real-deploy 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both`,
-                  animationDelay: `${0.8 + i * 0.5}s`
+                  animationDelay: `${0.5 + i * 0.3}s`
                 } as React.CSSProperties;
 
                 if (item.type === 'button') {
@@ -503,7 +503,7 @@ const TutorDashboard: React.FC = () => {
                 position: absolute; 
                 top: 50%; left: 50%;
                 transform-style: preserve-3d;
-                animation: scene-rotate 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: scene-rotate 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
               }
 
               .prism-face {
@@ -517,7 +517,7 @@ const TutorDashboard: React.FC = () => {
                 backdrop-filter: blur(4px);
                 /* Al hacer la caja más alta (300px), el origen de rotación para que se abra bien como los pétalos de una flor larga debe ajustarse desde donde tocan la junta base. */
                 transform-origin: 50% 75%;
-                animation: face-open 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                animation: face-open 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
                 backface-visibility: hidden;
               }
 
