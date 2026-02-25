@@ -4,12 +4,12 @@ import Avatar from '../components/Avatar';
 import TaskCard from '../components/TaskCard';
 import { Role, Task } from '../types';
 import { AVATAR_ITEMS } from '../constants';
-import { ShoppingBag, Star, LogOut, CheckCircle, Settings, X, MessageSquare, Send, History, Clock, Zap, Sparkles } from 'lucide-react';
+import { ShoppingBag, Star, LogOut, CheckCircle, Settings, X, MessageSquare, Send, History, Clock, Zap, Sparkles, Mailbox, Check } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 
 const StudentDashboard: React.FC = () => {
-  const { users, currentUser, tasks, completions, completeTask, logout, buyAvatarItem, redeemReward, rewards, updatePin, messages, sendMessage, redemptions, markMessagesRead } = useData();
-  const [activeTab, setActiveTab] = useState<'tasks' | 'shop' | 'chat'>('tasks');
+  const { users, currentUser, tasks, completions, completeTask, logout, buyAvatarItem, redeemReward, rewards, updatePin, messages, sendMessage, sendBuzonMessage, redemptions, markMessagesRead } = useData();
+  const [activeTab, setActiveTab] = useState<'tasks' | 'shop' | 'chat' | 'buzon'>('tasks');
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'SCHOOL' | 'HOME'>('ALL');
   const [shopView, setShopView] = useState<'CATALOG' | 'HISTORY'>('CATALOG');
   const [shopCategory, setShopCategory] = useState<'AVATAR' | 'SCHOOL_REWARDS' | 'HOME_REWARDS'>('AVATAR');
@@ -17,9 +17,13 @@ const StudentDashboard: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [newPin, setNewPin] = useState('');
   const [chatMessage, setChatMessage] = useState('');
+  const [buzonMessage, setBuzonMessage] = useState('');
+  const [buzonContext, setBuzonContext] = useState<'SCHOOL' | 'HOME'>('SCHOOL');
+  const [buzonAnonymous, setBuzonAnonymous] = useState(false);
 
   const tutor = users.find(u => u.role === Role.TUTOR && u.classId === currentUser?.classId);
-  const unreadMessages = tutor && currentUser ? messages.filter(m => m.fromId === tutor.id && m.toId === currentUser.id && !m.read).length : 0;
+  const parent = users.find(u => u.role === Role.PARENT && u.familyId === currentUser?.familyId);
+  const unreadMessages = tutor && currentUser ? messages.filter(m => m.fromId === tutor.id && m.toId === currentUser.id && !m.read && m.type !== 'BUZON').length : 0;
 
   const myTasks = tasks.filter(t =>
     (t.assignedTo.length === 0 || t.assignedTo.includes(currentUser!.id))
@@ -66,9 +70,22 @@ const StudentDashboard: React.FC = () => {
   };
 
   const conversation = tutor ? messages.filter(m =>
-    (m.fromId === currentUser?.id && m.toId === tutor.id) ||
-    (m.fromId === tutor.id && m.toId === currentUser?.id)
+    m.type !== 'BUZON' && ((m.fromId === currentUser?.id && m.toId === tutor.id) ||
+      (m.fromId === tutor.id && m.toId === currentUser?.id))
   ).sort((a, b) => a.timestamp - b.timestamp) : [];
+
+  const myBuzonMessages = messages.filter(m => m.type === 'BUZON' && m.fromId === currentUser?.id).sort((a, b) => b.timestamp - a.timestamp);
+
+  const handleSendBuzonMessage = () => {
+    if (!buzonMessage) return;
+    if (buzonContext === 'SCHOOL' && tutor) {
+      sendBuzonMessage(tutor.id, buzonMessage, 'SCHOOL', buzonAnonymous);
+    } else if (buzonContext === 'HOME' && parent) {
+      sendBuzonMessage(parent.id, buzonMessage, 'HOME', false);
+    }
+    setBuzonMessage('');
+    alert('Mensaje enviado al buzón rojo');
+  };
 
   const filteredTasks = myTasks.filter(t => {
     if (taskFilter === 'ALL') return true;
@@ -94,6 +111,7 @@ const StudentDashboard: React.FC = () => {
     { id: 'tasks' as const, icon: CheckCircle, label: 'Tareas', emoji: '📋', color: 'primary' },
     { id: 'shop' as const, icon: ShoppingBag, label: 'Tienda', emoji: '🎁', color: 'secondary' },
     { id: 'chat' as const, icon: MessageSquare, label: 'Profe', emoji: '💬', color: 'accent', badge: unreadMessages },
+    { id: 'buzon' as const, icon: Mailbox, label: 'Buzón Rojo', emoji: '📮', color: 'danger' },
   ];
 
   return (
@@ -194,11 +212,10 @@ const StudentDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-300 relative ${
-                  active
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-300 relative ${active
                     ? 'glass-student-card text-white student-tab-active'
                     : 'glass text-white/40 hover:text-white/70 hover:bg-white/8 hover:scale-[1.02]'
-                }`}
+                  }`}
               >
                 {tab.badge && tab.badge > 0 && (
                   <div className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-pink-500 to-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-bounce-subtle">
@@ -224,9 +241,8 @@ const StudentDashboard: React.FC = () => {
                 <button
                   key={f.key}
                   onClick={() => setTaskFilter(f.key)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all duration-200 hover:scale-105 active:scale-95 ${
-                    taskFilter === f.key ? f.activeClass : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
-                  }`}
+                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all duration-200 hover:scale-105 active:scale-95 ${taskFilter === f.key ? f.activeClass : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
+                    }`}
                 >
                   {f.label}
                 </button>
@@ -284,9 +300,8 @@ const StudentDashboard: React.FC = () => {
                     <button
                       key={cat.key}
                       onClick={() => setShopCategory(cat.key)}
-                      className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
-                        shopCategory === cat.key ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'
-                      }`}
+                      className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopCategory === cat.key ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'
+                        }`}
                     >
                       {cat.label}
                     </button>
@@ -356,9 +371,8 @@ const StudentDashboard: React.FC = () => {
                     <div>
                       <h4 className="font-display font-semibold text-white/90 text-sm">{redemption.rewardTitle}</h4>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                          redemption.context === 'SCHOOL' ? 'bg-primary-400/15 text-primary-300' : 'bg-secondary-400/15 text-secondary-300'
-                        }`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${redemption.context === 'SCHOOL' ? 'bg-primary-400/15 text-primary-300' : 'bg-secondary-400/15 text-secondary-300'
+                          }`}>
                           {redemption.context === 'SCHOOL' ? '🏫 Colegio' : '🏠 Casa'}
                         </span>
                         <span className="text-[10px] text-white/30 flex items-center gap-1">
@@ -387,11 +401,10 @@ const StudentDashboard: React.FC = () => {
                 const isMe = msg.fromId === currentUser?.id;
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${
-                      isMe
+                    <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${isMe
                         ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-br-md shadow-lg shadow-purple-500/15'
                         : 'glass-student text-white/85 rounded-bl-md'
-                    }`}>
+                      }`}>
                       {msg.content}
                     </div>
                   </div>
@@ -413,6 +426,86 @@ const StudentDashboard: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* BUZON VIEW */}
+        {activeTab === 'buzon' && (
+          <div className="animate-slide-up space-y-4">
+            <div className="glass-student-card rounded-2xl p-5 glow-border-red">
+              <div className="flex items-center gap-3 mb-4 text-red-500">
+                <Mailbox size={24} />
+                <h2 className="font-display font-bold text-white text-lg">Buzón Rojo</h2>
+              </div>
+              <p className="text-white/60 text-sm mb-4">Expresa tus miedos, preocupaciones y deseos.</p>
+
+              <div className="flex gap-2 mb-4 p-1 glass rounded-xl">
+                <button
+                  onClick={() => setBuzonContext('SCHOOL')}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${buzonContext === 'SCHOOL' ? 'bg-red-500/80 text-white' : 'text-white/40 hover:text-white/60'}`}
+                >
+                  🏫 Para el Cole
+                </button>
+                <button
+                  onClick={() => setBuzonContext('HOME')}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${buzonContext === 'HOME' ? 'bg-red-500/80 text-white' : 'text-white/40 hover:text-white/60'}`}
+                >
+                  🏠 Para Casa
+                </button>
+              </div>
+
+              <textarea
+                className="input-glass w-full rounded-xl text-sm p-3 mb-3 resize-none h-24"
+                placeholder={buzonContext === 'SCHOOL' ? "Escribe a tu tutor..." : "Escribe a tu familia..."}
+                value={buzonMessage}
+                onChange={e => setBuzonMessage(e.target.value)}
+              />
+
+              {buzonContext === 'SCHOOL' && (
+                <label className="flex items-center gap-2 text-white/70 text-sm mb-4 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={buzonAnonymous}
+                    onChange={e => setBuzonAnonymous(e.target.checked)}
+                    className="rounded text-red-500 bg-white/10 border-white/20 focus:ring-red-500/50"
+                  />
+                  Enviar de forma anónima
+                </label>
+              )}
+
+              <button
+                onClick={handleSendBuzonMessage}
+                className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Send size={16} /> Enviar al Buzón
+              </button>
+            </div>
+
+            <div className="glass-student-card rounded-2xl p-5">
+              <h3 className="font-display font-bold text-white text-sm mb-4">Mis Envios al Buzón Rojo</h3>
+              <div className="space-y-3">
+                {myBuzonMessages.length === 0 ? (
+                  <p className="text-white/30 text-xs text-center">Aún no has enviado nada al buzón rojo.</p>
+                ) : (
+                  myBuzonMessages.map(msg => (
+                    <div key={msg.id} className="glass rounded-xl p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${msg.context === 'SCHOOL' ? 'bg-primary-400/15 text-primary-300' : 'bg-secondary-400/15 text-secondary-300'
+                          }`}>
+                          {msg.context === 'SCHOOL' ? '🏫 Cole' : '🏠 Casa'}
+                          {msg.isAnonymous && msg.context === 'SCHOOL' && ' (Anónimo)'}
+                        </span>
+                        <div className={`flex items-center gap-1 text-[10px] font-bold ${msg.read ? 'text-emerald-400' : 'text-white/40'}`}>
+                          {msg.read ? <><Check size={12} /> Visto por {msg.context === 'SCHOOL' ? 'Tutor' : 'Familia'}</> : 'Enviado'}
+                        </div>
+                      </div>
+                      <p className="text-white/80 text-sm italic">"{msg.content}"</p>
+                      <span className="text-[10px] text-white/30 block mt-2">{formatDate(msg.timestamp)}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Bottom Nav - Mobile Only */}
@@ -424,9 +517,8 @@ const StudentDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-4 rounded-xl transition-all duration-200 relative ${
-                  active ? 'text-white scale-110' : 'text-white/35'
-                }`}
+                className={`flex flex-col items-center py-1.5 px-4 rounded-xl transition-all duration-200 relative ${active ? 'text-white scale-110' : 'text-white/35'
+                  }`}
               >
                 {tab.badge && tab.badge > 0 && (
                   <div className="absolute top-0 right-2 bg-gradient-to-r from-pink-500 to-red-500 text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-bounce-subtle">
@@ -457,9 +549,8 @@ const RewardCard: React.FC<{ reward: any, onRedeem: () => void, userPoints: numb
       style={{ animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.05}s both` }}
     >
       <div className="text-center mb-3">
-        <div className={`w-10 h-10 mx-auto mb-2 rounded-xl flex items-center justify-center ${
-          isSchool ? 'bg-primary-400/20 text-primary-300' : 'bg-secondary-400/20 text-secondary-300'
-        }`}>
+        <div className={`w-10 h-10 mx-auto mb-2 rounded-xl flex items-center justify-center ${isSchool ? 'bg-primary-400/20 text-primary-300' : 'bg-secondary-400/20 text-secondary-300'
+          }`}>
           <ShoppingBag size={18} />
         </div>
         <h3 className="font-display font-semibold text-xs text-white/90 leading-tight">{reward.title}</h3>
@@ -468,11 +559,10 @@ const RewardCard: React.FC<{ reward: any, onRedeem: () => void, userPoints: numb
       <button
         onClick={onRedeem}
         disabled={!canAfford || !inStock}
-        className={`w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 ${
-          canAfford && inStock
+        className={`w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 ${canAfford && inStock
             ? `bg-gradient-to-r ${isSchool ? 'from-primary-500 to-primary-400 shadow-primary-500/20' : 'from-secondary-500 to-secondary-400 shadow-secondary-500/20'} text-white shadow-lg hover:shadow-xl hover:brightness-110`
             : 'bg-white/5 text-white/20 cursor-not-allowed'
-        }`}
+          }`}
       >
         ⭐ {reward.cost}
       </button>

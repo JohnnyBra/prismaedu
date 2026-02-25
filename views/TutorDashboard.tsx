@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
-import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, Newspaper, LayoutDashboard, ListChecks, ChevronRight, ChevronDown } from 'lucide-react';
+import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, Newspaper, LayoutDashboard, ListChecks, ChevronRight, ChevronDown, Mailbox } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import { Role, User, Task } from '../types';
 
-type Tab = 'CLASSROOM' | 'REWARDS' | 'MESSAGES';
+type Tab = 'CLASSROOM' | 'REWARDS' | 'MESSAGES' | 'BUZON';
 
 const TutorDashboard: React.FC = () => {
   const { users, currentUser, logout, assignPoints, createTask, updatePin, tasks, completions, toggleTaskCompletion, rewards, createReward, deleteReward, messages, sendMessage, classes } = useData();
@@ -133,7 +133,12 @@ const TutorDashboard: React.FC = () => {
 
   const getTotalUnreadCount = () => {
     if (!currentUser) return 0;
-    return messages.filter(m => m.toId === currentUser.id && !m.read).length;
+    return messages.filter(m => m.toId === currentUser.id && !m.read && m.type !== 'BUZON').length;
+  };
+
+  const getUnreadBuzonCount = () => {
+    if (!currentUser) return 0;
+    return messages.filter(m => m.type === 'BUZON' && m.context === 'SCHOOL' && m.toId === currentUser.id && !m.read).length;
   };
 
   // --- RENDERERS ---
@@ -1056,7 +1061,64 @@ const TutorDashboard: React.FC = () => {
     { id: 'CLASSROOM' as const, icon: Users, label: 'Alumnos', borderColor: 'border-primary-500', textColor: 'text-primary-400' },
     { id: 'REWARDS' as const, icon: Gift, label: 'Premios', borderColor: 'border-emerald-500', textColor: 'text-emerald-400' },
     { id: 'MESSAGES' as const, icon: MessageSquare, label: 'Mensajería', borderColor: 'border-accent-500', textColor: 'text-accent-400' },
+    { id: 'BUZON' as const, icon: Mailbox, label: 'Buzón Rojo', borderColor: 'border-red-500', textColor: 'text-red-500' },
   ];
+
+  const renderBuzon = () => {
+    const buzonMsgs = messages.filter(m => m.type === 'BUZON' && m.context === 'SCHOOL' && m.toId === currentUser?.id).sort((a, b) => b.timestamp - a.timestamp);
+
+    return (
+      <div className="animate-slide-up">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-500">
+            <Mailbox size={20} />
+          </div>
+          <h2 className="font-display text-lg font-bold text-white/90">Buzón Rojo</h2>
+        </div>
+
+        <div className="space-y-3">
+          {buzonMsgs.length === 0 ? (
+            <div className="text-center py-16 glass rounded-2xl">
+              <Mailbox size={40} className="mx-auto mb-3 text-white/15" />
+              <p className="text-white/30 text-sm">No hay mensajes en el buzón rojo.</p>
+            </div>
+          ) : (
+            buzonMsgs.map(msg => {
+              const student = users.find(u => u.id === msg.fromId);
+              const senderName = msg.isAnonymous ? 'Anónimo' : student?.name || 'Desconocido';
+
+              return (
+                <div key={msg.id} className={`glass rounded-2xl p-4 flex flex-col glow-border-red ${!msg.read ? 'bg-red-500/10' : ''}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-white/90 text-sm flex items-center gap-2">
+                      {senderName}
+                      {!msg.read && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">Nuevo</span>}
+                    </span>
+                    <span className="text-[10px] text-white/40">{new Date(msg.timestamp).toLocaleString()}</span>
+                  </div>
+                  <p className="text-white/80 text-sm italic mb-4">"{msg.content}"</p>
+
+                  {!msg.read && (
+                    <button
+                      onClick={() => markMessagesRead(msg.fromId, currentUser!.id)}
+                      className="self-end bg-gradient-to-r from-red-600 to-red-500 text-white font-bold text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                    >
+                      <CheckCircle size={14} /> Marcar como visto
+                    </button>
+                  )}
+                  {msg.read && (
+                    <div className="self-end text-emerald-400 text-xs font-bold flex items-center gap-1">
+                      <CheckCircle size={14} /> Visto
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen min-h-[100dvh] mesh-tutor flex flex-col font-body relative">
@@ -1120,6 +1182,9 @@ const TutorDashboard: React.FC = () => {
               {tab.id === 'MESSAGES' && getTotalUnreadCount() > 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full -ml-1">{getTotalUnreadCount()}</span>
               )}
+              {tab.id === 'BUZON' && getUnreadBuzonCount() > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full -ml-1">{getUnreadBuzonCount()}</span>
+              )}
             </button>
           );
         })}
@@ -1131,6 +1196,7 @@ const TutorDashboard: React.FC = () => {
         {activeTab === 'CLASSROOM' && renderClassroom()}
         {activeTab === 'REWARDS' && renderRewards()}
         {activeTab === 'MESSAGES' && renderMessages()}
+        {activeTab === 'BUZON' && renderBuzon()}
 
         {/* Settings Modal */}
         {renderSettingsModal()}
@@ -1299,6 +1365,11 @@ const TutorDashboard: React.FC = () => {
                 {tab.id === 'MESSAGES' && getTotalUnreadCount() > 0 && (
                   <div className="absolute top-0 right-2 bg-red-500 text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                     {getTotalUnreadCount()}
+                  </div>
+                )}
+                {tab.id === 'BUZON' && getUnreadBuzonCount() > 0 && (
+                  <div className="absolute top-0 right-2 bg-red-500 text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                    {getUnreadBuzonCount()}
                   </div>
                 )}
                 <div className={`p-1.5 rounded-xl transition-all duration-200 ${active ? 'bg-white/15' : ''}`}>
