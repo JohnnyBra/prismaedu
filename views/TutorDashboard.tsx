@@ -502,8 +502,8 @@ const TutorDashboard: React.FC = () => {
                     opacity: 1; 
                     transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); 
                  }
-                 60% { 
-                    /* Aterriza y da un respiro visual antes de expandirse */
+                 74% { 
+                    /* Aterriza suavemente y se expande la tarjeta final */
                     opacity: 1; 
                     transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
                  }
@@ -515,17 +515,17 @@ const TutorDashboard: React.FC = () => {
 
               /* Fade in and expand actual interactive cards right out of the landing icon */
               @keyframes final-card-deploy {
-                0% { opacity: 0; transform: scale(0.3); pointer-events: none; }
-                74% { opacity: 0; transform: scale(0.3); pointer-events: none; }
-                85% { opacity: 1; transform: scale(1.05); pointer-events: none; }
+                0% { opacity: 0; transform: scale(0.85); pointer-events: none; }
+                74% { opacity: 0; transform: scale(0.85); pointer-events: none; }
+                85% { opacity: 1; transform: scale(1.02); pointer-events: none; }
                 100% { opacity: 1; transform: scale(1); pointer-events: auto; }
               }
 
-              /* Ocultar prism-cards simulados exactamente al hacer spawn de las reales */
+              /* Ocultar prism-cards simulados suavemente cruzando con las reales */
               @keyframes fake-card-fade {
                 0% { opacity: 1; }
                 74% { opacity: 1; }
-                75% { opacity: 0; }
+                85% { opacity: 0; }
                 100% { opacity: 0; }
               }
 
