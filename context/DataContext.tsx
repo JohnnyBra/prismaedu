@@ -14,7 +14,7 @@ interface DataContextType {
   messages: Message[];
   redemptions: Redemption[];
   connected: boolean;
-  
+
   // Actions
   login: (userId: string, pin: string) => boolean;
   logout: () => void;
@@ -30,7 +30,8 @@ interface DataContextType {
   updatePin: (newPin: string) => void;
   sendMessage: (toId: string, content: string) => void;
   markMessagesRead: (fromId: string, toId: string) => void;
-  
+  sendBuzonMessage: (toId: string, content: string, msgContext: 'SCHOOL' | 'HOME', isAnonymous: boolean) => void;
+
   // Admin Actions
   addClass: (name: string) => void;
   updateClass: (id: string, name: string) => void;
@@ -44,7 +45,7 @@ interface DataContextType {
   deleteFamily: (familyId: string) => void;
   updateFamilyId: (oldId: string, newId: string) => void;
   setAllUsers: (users: User[]) => void;
-  migratePins: () => Promise<{success: boolean, count: number}>;
+  migratePins: () => Promise<{ success: boolean, count: number }>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -89,13 +90,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     newSocket.on('disconnect', () => setConnected(false));
 
     newSocket.on('init_state', (data) => {
-        setUsers(data.users);
-        setClasses(data.classes);
-        setTasks(data.tasks);
-        setRewards(data.rewards);
-        setCompletions(data.completions);
-        setMessages(data.messages);
-        setRedemptions(data.redemptions);
+      setUsers(data.users);
+      setClasses(data.classes);
+      setTasks(data.tasks);
+      setRewards(data.rewards);
+      setCompletions(data.completions);
+      setMessages(data.messages);
+      setRedemptions(data.redemptions);
     });
 
     newSocket.on('sync_users', (data) => setUsers(data));
@@ -117,7 +118,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     newSocket.on('sync_redemptions', (data) => setRedemptions(data));
 
     return () => {
-        newSocket.close();
+      newSocket.close();
     };
   }, []);
 
@@ -143,17 +144,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: userId, password: pin })
-      }).catch(() => {});
+      }).catch(() => { });
       return true;
     }
     return false;
   };
 
   const logout = () => {
-      setCurrentUserId(null);
-      localStorage.removeItem('sc_session_user');
-      // Clear SSO cookie (fire-and-forget)
-      fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    setCurrentUserId(null);
+    localStorage.removeItem('sc_session_user');
+    // Clear SSO cookie (fire-and-forget)
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => { });
   };
 
   const updatePin = (newPin: string) => {
@@ -177,11 +178,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const createReward = (rewardData: Omit<Reward, 'id'>) => {
-     const newReward: Reward = {
-       ...rewardData,
-       id: `reward_${Date.now()}`
-     };
-     emitRewards([newReward, ...rewards]);
+    const newReward: Reward = {
+      ...rewardData,
+      id: `reward_${Date.now()}`
+    };
+    emitRewards([newReward, ...rewards]);
   };
 
   const deleteReward = (id: string) => {
@@ -191,13 +192,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const completeTask = (taskId: string, studentId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
-    
+
     const alreadyDone = completions.some(c => c.taskId === taskId && c.userId === studentId);
     if (alreadyDone && task.isUnique) return;
 
     emitCompletions([...completions, { taskId, userId: studentId, timestamp: Date.now() }]);
     assignPoints(studentId, task.points);
-    
+
     if (currentUser?.role === Role.STUDENT && (window as any).confetti) {
       (window as any).confetti({
         particleCount: 100,
@@ -227,12 +228,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const user = users.find(u => u.id === studentId);
     const reward = rewards.find(r => r.id === rewardId);
     if (!user || !reward) return false;
-    
+
     if (user.points >= reward.cost) {
       assignPoints(studentId, -reward.cost);
-      
+
       if (reward.stock && reward.stock > 0) {
-         emitRewards(rewards.map(r => r.id === rewardId ? {...r, stock: (r.stock || 0) - 1} : r));
+        emitRewards(rewards.map(r => r.id === rewardId ? { ...r, stock: (r.stock || 0) - 1 } : r));
       }
 
       const redemption: Redemption = {
@@ -255,7 +256,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!user) return false;
     const item = AVATAR_ITEMS.find(i => i.id === itemId);
     if (!item) return false;
-    if (user.inventory?.includes(itemId)) return true; 
+    if (user.inventory?.includes(itemId)) return true;
 
     if (user.points >= item.cost) {
       emitUserUpdate(user.id, {
@@ -289,10 +290,26 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const markMessagesRead = (fromId: string, toId: string) => {
-    const newMessages = messages.map(m => 
+    const newMessages = messages.map(m =>
       (m.fromId === fromId && m.toId === toId) ? { ...m, read: true } : m
     );
     emitMessages(newMessages);
+  };
+
+  const sendBuzonMessage = (toId: string, content: string, msgContext: 'SCHOOL' | 'HOME', isAnonymous: boolean) => {
+    if (!currentUserId) return;
+    const msg: Message = {
+      id: `buzon_${Date.now()}`,
+      fromId: currentUserId,
+      toId,
+      content,
+      timestamp: Date.now(),
+      read: false,
+      type: 'BUZON',
+      context: msgContext,
+      isAnonymous
+    };
+    emitMessages([...messages, msg]);
   };
 
   const addClass = (name: string) => {
@@ -360,7 +377,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitUsers(newUsersList);
   };
 
-  const migratePins = (): Promise<{success: boolean, count: number}> => {
+  const migratePins = (): Promise<{ success: boolean, count: number }> => {
     return new Promise((resolve, reject) => {
       if (!socket) {
         reject('No socket connection');
@@ -405,6 +422,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       updatePin,
       sendMessage,
       markMessagesRead,
+      sendBuzonMessage,
       addClass,
       updateClass,
       deleteClass,

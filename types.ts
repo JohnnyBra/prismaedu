@@ -47,7 +47,7 @@ export interface User {
   familyId?: string; // Links student to parents
   classId?: string;  // Links student to tutor
   // Profile
-  avatarConfig?: AvatarConfig; 
+  avatarConfig?: AvatarConfig;
   inventory?: string[]; // IDs of owned avatar items
   points: number;       // Unified balance
   pin: string;          // Simple login PIN (e.g., '0000')
@@ -62,15 +62,15 @@ export interface Task {
   points: number;
   icon: string;
   context: ContextType; // 'SCHOOL' or 'HOME'
-  
+
   // Assignment Logic
   assignedTo: string[]; // User IDs
   createdBy: string;    // Tutor ID or Parent ID
   workType?: 'CLASSWORK' | 'HOMEWORK'; // Distinguish between Classwork and Homework (created by Tutor)
-  
+
   // School Specifics
   isPriority?: boolean; // If true, shows as a POP-UP for the student (for Tutor tasks)
-  
+
   // Scheduling
   recurrence?: number[]; // 0-6 (Sunday-Saturday)
   isUnique?: boolean;    // Only one person can do it per day
@@ -115,6 +115,9 @@ export interface Message {
   content: string;
   timestamp: number;
   read: boolean;
+  type?: 'CHAT' | 'BUZON';
+  context?: 'SCHOOL' | 'HOME';
+  isAnonymous?: boolean;
 }
 
 // Events & Notifications
@@ -125,5 +128,5 @@ export interface Event {
   type: 'popup' | 'banner'; // Popups must be dismissed
   style: 'default' | 'golden' | 'sparkle';
   assignedTo: string[];
-  readBy: string[]; 
+  readBy: string[];
 }
