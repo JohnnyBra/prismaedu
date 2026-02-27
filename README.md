@@ -1,34 +1,130 @@
 # PrismaEdu - Plataforma de Gestión Educativa Gamificada
 
-PrismaEdu es una aplicación web progresiva (PWA) diseñada para gamificar la gestión de tareas escolares y domésticas. Facilita la comunicación entre profesores, padres y alumnos mediante un sistema de recompensas, avatares personalizables y chats en tiempo real.
+PrismaEdu es el **portal central** de la Suite Educativa La Hispanidad. Actúa como proveedor de identidad (SSO) para todas las demás aplicaciones del ecosistema y como plataforma de gamificación del aula, conectando profesorado, familias y alumnado mediante tareas, recompensas, avatares y chat en tiempo real.
 
-## 🚀 Características Principales
+> **Acceso:** Todos los roles del colegio acceden a PrismaEdu. Es el único portal al que acceden familias y alumnado.
 
-### 👨‍🏫 Para Profesores (Prisma Aula)
-*   **Gestión de Clase:** Visualización de todos los alumnos con sus avatares y puntos.
-*   **Asignación de Puntos:** Sumar o restar puntos por comportamiento o logros.
-*   **Tareas Escolares:** Crear tareas para toda la clase con opción de "Alta Prioridad" (Notificación visual para el alumno).
-*   **Tienda Escolar:** Crear recompensas canjeables (ej. "Sentarse con un amigo", "Pase sin deberes").
-*   **Chat:** Comunicación directa con alumnos y padres.
-*   **Accesos Directos:** Enlaces integrados a Biblioteca, Reservas y Excursiones.
+---
 
-### 🏠 Para Familias
-*   **Gestión Familiar:** Visualización del progreso de todos los hijos.
-*   **Tareas Domésticas:** Asignar tareas del hogar (ej. "Poner la mesa") con recompensas en puntos.
-*   **Acciones Rápidas:** Botones para premiar o corregir comportamiento instantáneamente.
-*   **Comunicación:** Chat directo con el tutor del colegio.
+## 🚀 Funcionalidades por Público
 
-### 🎓 Para Alumnos
-*   **Gamificación:** Ganar puntos completando tareas de casa y del colegio.
-*   **Personalización:** Comprar ropa y accesorios para su avatar usando los puntos ganados.
-*   **Tienda de Recompensas:** Canjear puntos por premios reales (definidos por profes o padres).
-*   **Historial:** Ver el registro de premios canjeados.
+### 🎓 Alumnado
 
-### ⚙️ Características Técnicas (Actualizado)
-*   **Backend:** Node.js + Express.
-*   **Persistencia:** Base de datos **SQLite** (`database.sqlite`) alojada en el servidor.
-*   **Sincronización:** **Socket.IO** para actualizaciones "push" en tiempo real (evita condiciones de carrera y mantiene todas las sesiones sincronizadas instantáneamente).
-*   **Diseño:** Interfaz moderna y responsiva construida con Tailwind CSS y React.
+- **Gestión de tareas**
+  - Ver todas las tareas asignadas (escolares y de casa)
+  - Filtrar por contexto (colegio/casa), prioridad y estado de completado
+  - Completar tareas para acumular puntos
+  - Recibir notificaciones emergentes cuando el tutor marca una tarea como "Misión Especial" (alta prioridad)
+
+- **Tienda de recompensas**
+  - Explorar recompensas escolares (creadas por el tutor) y de casa (creadas por las familias)
+  - Sistema de rareza: Gratis → Común → Raro → Épico → Legendario
+  - Canjear puntos por recompensas reales
+  - Ver historial completo de canjes
+
+- **Avatar personalizable**
+  - Avatar compuesto por 6 capas independientes: base, pelo, parte superior, parte inferior, calzado y accesorio
+  - Comprar ítems en la tienda de avatar con puntos ganados
+  - Ver armario con todos los ítems disponibles y adquiridos
+
+- **Mensajería**
+  - Chat en tiempo real con el tutor de clase
+  - Buzón escolar: enviar mensajes anónimos al tutor
+  - Buzón familiar: enviar mensajes a los padres/madres
+  - Ver respuestas recibidas y contador de mensajes no leídos
+
+- **Configuración**
+  - Cambiar PIN de acceso de 4 dígitos (siempre número primo)
+
+---
+
+### 🏠 Familias
+
+- **Visión general de la familia**
+  - Ver todos los hijos vinculados con sus puntos actuales y avatares
+
+- **Gestión de recompensas de casa**
+  - Crear, editar y eliminar recompensas de contexto doméstico
+  - Definir coste en puntos y stock disponible
+  - Monitorizar qué recompensas canjean los hijos
+
+- **Gestión de tareas de casa**
+  - Crear y asignar tareas del hogar a los hijos (ej. "Poner la mesa", "Ordenar la habitación")
+  - Definir puntos por tarea y seguir el estado de completado
+
+- **Mensajería**
+  - Chat directo con el tutor de cada hijo
+  - Recibir mensajes del buzón familiar (incluidos mensajes anónimos de los hijos)
+  - Recibir notificaciones automáticas cuando el tutor asigna o retira puntos
+
+---
+
+### 👨‍🏫 Profesorado
+
+- **Gestión del aula**
+  - Ver todos los alumnos de la clase con avatares y puntos actuales
+  - Sumar o restar puntos a alumnos individuales (con notificación automática a familias)
+  - Acceder a la ficha detallada de cada alumno: puntos, avatar, tareas asignadas, historial de recompensas
+
+- **Tareas escolares**
+  - Crear tareas para toda la clase con tipo (trabajo en clase / deberes) y valor en puntos
+  - Marcar tareas como "Alta Prioridad" (muestra popup al alumno al entrar)
+  - Configurar recurrencia semanal por días de la semana
+  - Activar modo tarea única (no repetible)
+
+- **Tienda escolar**
+  - Crear, editar y eliminar recompensas canjeables por los alumnos
+  - Fijar coste en puntos, rareza y stock
+  - Ver historial de canjes por alumno
+
+- **Mensajería**
+  - Chat individual con alumnos y con sus familias
+  - Gestionar el buzón de sugerencias de la clase
+  - Los mensajes de asignación de puntos se envían automáticamente a las familias
+
+- **Accesos al ecosistema**
+  - Accesos directos a Aulas, BiblioHispa, Excursiones e Intranet desde el dashboard
+
+---
+
+### 🏫 Dirección / Administración
+
+- **Gestión completa de usuarios**
+  - Crear, editar y eliminar usuarios de todos los roles (alumnos, tutores, familias, personal)
+  - Importación masiva desde CSV con creación automática de familias y generación de PINs primos
+  - Mover alumnos entre familias y clases
+  - Exportar listados de usuarios
+  - Cambiar PINs de cualquier usuario
+
+- **Gestión de clases**
+  - Crear, editar y eliminar clases
+  - Vincular tutores a clases
+  - Ver composición completa de cada clase
+  - Importación masiva de alumnos a clases por CSV
+
+- **Administración del sistema**
+  - Gestionar roles del personal (ADMIN, DIRECCION, TESORERIA, COORDINACION)
+  - Acceso y edición de todos los datos del sistema
+  - Semilla y reinicio de base de datos (entorno de desarrollo: `npm run reset`)
+
+- **Supervisión y analítica**
+  - Estadísticas globales: usuarios totales, puntos distribuidos, tareas creadas
+  - Filtrar por clase
+  - Seguimiento de rendimiento por alumno y clase
+
+- **Apariencia**
+  - Cambiar tema global del sistema (claro/oscuro/automático)
+
+---
+
+## ⚙️ Características Técnicas
+
+- **Backend:** Node.js + Express (CommonJS)
+- **Base de datos:** SQLite (`database.sqlite`) con caché LRU en memoria
+- **Autenticación:** PIN de 4 dígitos (alumnos/familias) + Google OAuth (`@colegiolahispanidad.es`)
+- **Sincronización:** Socket.IO — eventos en tiempo real (`sync_users`, `sync_tasks`, `sync_classes`, `sync_messages`, etc.)
+- **SSO:** Proveedor de identidad central para Aulas, BiblioHispa, Excursiones e Intranet
+- **Diseño:** Sistema "Prismatic Glass" con glassmorfismo, soporte automático de temas claro/oscuro
 
 ---
 
