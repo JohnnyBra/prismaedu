@@ -153,8 +153,8 @@ const generateSchoolData = async () => {
                     pin: studentPin,
                     altPin: '0000',
                     email: studentEmail,
-                    inventory: ['base_1', 'top_1', 'bot_1'],
-                    avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' }
+                    inventory: ['base_1', 'top_1', 'bot_1', 'shoes_1', 'hair_1'],
+                    avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1', shoesId: 'shoes_1', hairId: 'hair_1' }
                 });
 
                 // Parent

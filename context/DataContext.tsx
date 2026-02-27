@@ -122,6 +122,31 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
+  // Auto-grant free avatar items to existing users who don't have them yet
+  const FREE_ITEMS = ['base_1', 'top_1', 'bot_1', 'shoes_1', 'hair_1', 'base_2', 'base_4'];
+  useEffect(() => {
+    if (!currentUser || !socket || currentUser.role !== Role.STUDENT) return;
+    const inv = currentUser.inventory || [];
+    const missingItems = FREE_ITEMS.filter(id => !inv.includes(id));
+    const config = currentUser.avatarConfig || {};
+    const needsShoes = !config.shoesId;
+    const needsHair = !config.hairId;
+    if (missingItems.length > 0 || needsShoes || needsHair) {
+      const updates: Partial<User> = {};
+      if (missingItems.length > 0) {
+        updates.inventory = [...inv, ...missingItems];
+      }
+      if (needsShoes || needsHair) {
+        updates.avatarConfig = {
+          ...config,
+          ...(needsShoes ? { shoesId: 'shoes_1' } : {}),
+          ...(needsHair ? { hairId: 'hair_1' } : {}),
+        };
+      }
+      emitUserUpdate(currentUser.id, updates);
+    }
+  }, [currentUser?.id, socket, currentUser?.inventory?.length]);
+
   const emitUsers = (newUsers: User[]) => socket?.emit('update_users', newUsers);
   const emitUserUpdate = (id: string, updates: Partial<User>) => socket?.emit('user_update', { id, updates });
   const emitUserAdd = (user: User) => socket?.emit('user_add', user);
@@ -331,8 +356,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       ...userData,
       id: `user_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
       points: 0,
-      inventory: ['base_1', 'top_1', 'bot_1'],
-      avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1' }
+      inventory: ['base_1', 'top_1', 'bot_1', 'shoes_1', 'hair_1'],
+      avatarConfig: { baseId: 'base_1', topId: 'top_1', bottomId: 'bot_1', shoesId: 'shoes_1', hairId: 'hair_1' }
     };
     emitUserAdd(newUser);
   };
