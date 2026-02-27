@@ -1,18 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
 import TaskCard from '../components/TaskCard';
-import { Role, Task } from '../types';
+import { Role, Task, AvatarItemType, AvatarConfig } from '../types';
 import { AVATAR_ITEMS } from '../constants';
 import { ShoppingBag, Star, LogOut, CheckCircle, Settings, X, MessageSquare, Send, History, Clock, Zap, Sparkles, Mailbox, Check } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 
+// Tier color borders based on price
+const getTierClass = (cost: number): string => {
+  if (cost === 0) return 'border-emerald-400/40';
+  if (cost <= 50) return 'border-sky-400/40';
+  if (cost <= 200) return 'border-purple-400/50';
+  if (cost <= 500) return 'border-amber-400/50';
+  return 'border-rose-400/60';
+};
+
+const getTierLabel = (cost: number): string => {
+  if (cost === 0) return 'Gratis';
+  if (cost <= 50) return 'Comun';
+  if (cost <= 200) return 'Raro';
+  if (cost <= 500) return 'Epico';
+  return 'Legendario';
+};
+
+const getTierGlow = (cost: number): string => {
+  if (cost === 0) return '';
+  if (cost <= 50) return 'shadow-sky-400/10';
+  if (cost <= 200) return 'shadow-purple-400/15';
+  if (cost <= 500) return 'shadow-amber-400/20';
+  return 'shadow-rose-400/25 shadow-lg';
+};
+
+const AVATAR_CATEGORIES: { key: AvatarItemType; label: string; emoji: string; configKey: keyof AvatarConfig }[] = [
+  { key: 'base', label: 'Cuerpo', emoji: '🧍', configKey: 'baseId' },
+  { key: 'hair', label: 'Pelo', emoji: '💇', configKey: 'hairId' },
+  { key: 'top', label: 'Camiseta', emoji: '👕', configKey: 'topId' },
+  { key: 'bottom', label: 'Pantalon', emoji: '👖', configKey: 'bottomId' },
+  { key: 'shoes', label: 'Zapatos', emoji: '👟', configKey: 'shoesId' },
+  { key: 'accessory', label: 'Accesorio', emoji: '✨', configKey: 'accessoryId' },
+];
+
 const StudentDashboard: React.FC = () => {
-  const { users, currentUser, tasks, completions, completeTask, logout, buyAvatarItem, redeemReward, rewards, updatePin, messages, sendMessage, sendBuzonMessage, redemptions, markMessagesRead } = useData();
+  const { users, currentUser, tasks, completions, completeTask, logout, buyAvatarItem, redeemReward, rewards, updatePin, messages, sendMessage, sendBuzonMessage, redemptions, markMessagesRead, updateAvatar } = useData();
   const [activeTab, setActiveTab] = useState<'tasks' | 'shop' | 'chat' | 'buzon'>('tasks');
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'SCHOOL' | 'HOME'>('ALL');
-  const [shopView, setShopView] = useState<'CATALOG' | 'HISTORY'>('CATALOG');
+  const [shopView, setShopView] = useState<'CATALOG' | 'WARDROBE' | 'HISTORY'>('CATALOG');
   const [shopCategory, setShopCategory] = useState<'AVATAR' | 'SCHOOL_REWARDS' | 'HOME_REWARDS'>('AVATAR');
+  const [avatarFilter, setAvatarFilter] = useState<AvatarItemType>('base');
+  const [wardrobeFilter, setWardrobeFilter] = useState<AvatarItemType>('base');
   const [priorityAck, setPriorityAck] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [newPin, setNewPin] = useState('');
@@ -20,6 +56,7 @@ const StudentDashboard: React.FC = () => {
   const [buzonMessage, setBuzonMessage] = useState('');
   const [buzonContext, setBuzonContext] = useState<'SCHOOL' | 'HOME'>('SCHOOL');
   const [buzonAnonymous, setBuzonAnonymous] = useState(false);
+  const [previewItem, setPreviewItem] = useState<string | null>(null);
 
   const tutor = users.find(u => u.role === Role.TUTOR && u.classId === currentUser?.classId);
   const parent = users.find(u => u.role === Role.PARENT && u.familyId === currentUser?.familyId);
@@ -92,7 +129,6 @@ const StudentDashboard: React.FC = () => {
     return t.context === taskFilter;
   });
 
-  const avatarItems = AVATAR_ITEMS.filter(i => i.cost > 0);
   const schoolRewards = rewards.filter(r => r.context === 'SCHOOL');
   const homeRewards = rewards.filter(r =>
     r.context === 'HOME' &&
@@ -105,6 +141,42 @@ const StudentDashboard: React.FC = () => {
 
   const formatDate = (ts: number) => {
     return new Date(ts).toLocaleDateString() + ' ' + new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Avatar shop: items filtered by category, excluding owned free items
+  const filteredAvatarItems = useMemo(() => {
+    return AVATAR_ITEMS.filter(i => i.type === avatarFilter);
+  }, [avatarFilter]);
+
+  // Wardrobe: only owned items by category
+  const wardrobeItems = useMemo(() => {
+    return AVATAR_ITEMS.filter(i => i.type === wardrobeFilter && currentUser?.inventory?.includes(i.id));
+  }, [wardrobeFilter, currentUser?.inventory]);
+
+  // Preview config for shop/wardrobe
+  const previewConfig = useMemo((): AvatarConfig | undefined => {
+    if (!currentUser?.avatarConfig) return undefined;
+    if (!previewItem) return currentUser.avatarConfig;
+    const item = AVATAR_ITEMS.find(i => i.id === previewItem);
+    if (!item) return currentUser.avatarConfig;
+    const cat = AVATAR_CATEGORIES.find(c => c.key === item.type);
+    if (!cat) return currentUser.avatarConfig;
+    return { ...currentUser.avatarConfig, [cat.configKey]: previewItem };
+  }, [currentUser?.avatarConfig, previewItem]);
+
+  const handleEquip = (itemId: string) => {
+    const item = AVATAR_ITEMS.find(i => i.id === itemId);
+    if (!item) return;
+    const cat = AVATAR_CATEGORIES.find(c => c.key === item.type);
+    if (!cat) return;
+    updateAvatar({ [cat.configKey]: itemId });
+    setPreviewItem(null);
+  };
+
+  const handleUnequip = (type: AvatarItemType) => {
+    const cat = AVATAR_CATEGORIES.find(c => c.key === type);
+    if (!cat) return;
+    updateAvatar({ [cat.configKey]: undefined });
   };
 
   const tabs = [
@@ -273,13 +345,19 @@ const StudentDashboard: React.FC = () => {
         {/* SHOP VIEW */}
         {activeTab === 'shop' && (
           <div className="animate-slide-up">
-            {/* Shop Mode Toggle */}
+            {/* Shop Mode Toggle: Catálogo / Vestidor / Historial */}
             <div className="flex glass rounded-xl p-1 mb-5">
               <button
                 onClick={() => setShopView('CATALOG')}
                 className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopView === 'CATALOG' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
               >
                 🛍️ Catalogo
+              </button>
+              <button
+                onClick={() => setShopView('WARDROBE')}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopView === 'WARDROBE' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
+              >
+                👗 Vestidor
               </button>
               <button
                 onClick={() => setShopView('HISTORY')}
@@ -289,6 +367,7 @@ const StudentDashboard: React.FC = () => {
               </button>
             </div>
 
+            {/* ═══ CATALOG VIEW ═══ */}
             {shopView === 'CATALOG' && (
               <>
                 <div className="flex gap-1 mb-5 glass rounded-xl p-1">
@@ -308,51 +387,207 @@ const StudentDashboard: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {shopCategory === 'AVATAR' && avatarItems.map((item, i) => {
-                    const owned = currentUser?.inventory?.includes(item.id);
-                    return (
-                      <div
-                        key={item.id}
-                        className="glass-student-card rounded-2xl p-4 flex flex-col items-center glow-border-candy hover:scale-[1.03] transition-transform duration-200"
-                        style={{ animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s both` }}
-                      >
-                        <div className="w-16 h-16 relative mb-3">
-                          <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg">
-                            <g dangerouslySetInnerHTML={{ __html: item.svg }} />
-                          </svg>
-                        </div>
-                        <h3 className="font-display font-semibold text-xs text-white/90">{item.name}</h3>
-                        <div className="mt-2 w-full">
-                          {owned ? (
-                            <button className="w-full py-1.5 glass text-emerald-400/60 rounded-lg text-[10px] font-bold cursor-default" disabled>
-                              ✅ Tuyo
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => buyAvatarItem(item.id)}
-                              disabled={currentUser!.points < item.cost}
-                              className="w-full py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 disabled:from-surface-700 disabled:to-surface-700 disabled:text-white/20 text-white rounded-lg text-[10px] font-bold transition-all hover:shadow-neon-purple active:scale-95 hover:brightness-110"
-                            >
-                              ⭐ {item.cost}
-                            </button>
-                          )}
+                {/* Avatar subcategory filter */}
+                {shopCategory === 'AVATAR' && (
+                  <>
+                    <div className="flex gap-1.5 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+                      {AVATAR_CATEGORIES.map(cat => (
+                        <button
+                          key={cat.key}
+                          onClick={() => setAvatarFilter(cat.key)}
+                          className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 ${
+                            avatarFilter === cat.key
+                              ? 'bg-white/15 text-white border-white/25'
+                              : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
+                          }`}
+                        >
+                          {cat.emoji} {cat.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Preview avatar with hovered item */}
+                    {previewItem && (
+                      <div className="flex justify-center mb-4 animate-scale-in">
+                        <div className="glass-student-card rounded-2xl p-4 flex items-center gap-4 glow-border-candy">
+                          <Avatar config={previewConfig} size={80} showRing glowColor="rgba(168,85,247,0.5)" />
+                          <div className="text-xs text-white/60">
+                            <p className="font-display font-bold text-white text-sm">Vista previa</p>
+                            <p>Asi se vera tu avatar</p>
+                          </div>
                         </div>
                       </div>
-                    );
-                  })}
+                    )}
 
-                  {shopCategory === 'SCHOOL_REWARDS' && schoolRewards.map((reward, i) => (
-                    <RewardCard key={reward.id} reward={reward} onRedeem={() => redeemReward(reward.id, currentUser!.id)} userPoints={currentUser!.points} index={i} />
-                  ))}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {filteredAvatarItems.map((item, i) => {
+                        const owned = currentUser?.inventory?.includes(item.id);
+                        const equipped = currentUser?.avatarConfig && AVATAR_CATEGORIES.find(c => c.key === item.type) &&
+                          currentUser.avatarConfig[AVATAR_CATEGORIES.find(c => c.key === item.type)!.configKey] === item.id;
+                        const tierClass = getTierClass(item.cost);
+                        const tierGlow = getTierGlow(item.cost);
+                        const tierLabel = getTierLabel(item.cost);
 
-                  {shopCategory === 'HOME_REWARDS' && homeRewards.map((reward, i) => (
-                    <RewardCard key={reward.id} reward={reward} onRedeem={() => redeemReward(reward.id, currentUser!.id)} userPoints={currentUser!.points} index={i} />
-                  ))}
-                </div>
+                        return (
+                          <div
+                            key={item.id}
+                            className={`glass-student-card rounded-2xl p-4 flex flex-col items-center border-2 ${tierClass} ${tierGlow} hover:scale-[1.03] transition-transform duration-200`}
+                            style={{ animation: `slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.04}s both` }}
+                            onMouseEnter={() => setPreviewItem(item.id)}
+                            onMouseLeave={() => setPreviewItem(null)}
+                          >
+                            <div className="w-16 h-16 relative mb-2">
+                              <svg viewBox="-5 -10 110 115" className="w-full h-full drop-shadow-lg">
+                                {/* Show base body outline for context */}
+                                <g opacity="0.15">
+                                  <circle cx="50" cy="22" r="16" fill="#CBD5E1"/>
+                                  <ellipse cx="50" cy="56" rx="20" ry="14" fill="#CBD5E1"/>
+                                  <rect x="36" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
+                                  <rect x="52" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
+                                </g>
+                                <g dangerouslySetInnerHTML={{ __html: item.svg }} />
+                              </svg>
+                            </div>
+                            <h3 className="font-display font-semibold text-xs text-white/90">{item.name}</h3>
+                            <span className={`text-[9px] font-bold mt-0.5 ${
+                              item.cost === 0 ? 'text-emerald-400/70' :
+                              item.cost <= 50 ? 'text-sky-400/70' :
+                              item.cost <= 200 ? 'text-purple-400/70' :
+                              item.cost <= 500 ? 'text-amber-400/70' :
+                              'text-rose-400/70'
+                            }`}>{tierLabel}</span>
+                            <div className="mt-2 w-full">
+                              {owned ? (
+                                equipped ? (
+                                  <button className="w-full py-1.5 glass text-amber-400/60 rounded-lg text-[10px] font-bold cursor-default" disabled>
+                                    ⭐ Equipado
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleEquip(item.id)}
+                                    className="w-full py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-[10px] font-bold transition-all hover:brightness-110 active:scale-95"
+                                  >
+                                    👗 Equipar
+                                  </button>
+                                )
+                              ) : (
+                                <button
+                                  onClick={() => buyAvatarItem(item.id)}
+                                  disabled={currentUser!.points < item.cost}
+                                  className="w-full py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 disabled:from-surface-700 disabled:to-surface-700 disabled:text-white/20 text-white rounded-lg text-[10px] font-bold transition-all hover:shadow-neon-purple active:scale-95 hover:brightness-110"
+                                >
+                                  {item.cost === 0 ? '🎁 Gratis' : `⭐ ${item.cost}`}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                {/* School/Home rewards grids */}
+                {shopCategory !== 'AVATAR' && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {shopCategory === 'SCHOOL_REWARDS' && schoolRewards.map((reward, i) => (
+                      <RewardCard key={reward.id} reward={reward} onRedeem={() => redeemReward(reward.id, currentUser!.id)} userPoints={currentUser!.points} index={i} />
+                    ))}
+                    {shopCategory === 'HOME_REWARDS' && homeRewards.map((reward, i) => (
+                      <RewardCard key={reward.id} reward={reward} onRedeem={() => redeemReward(reward.id, currentUser!.id)} userPoints={currentUser!.points} index={i} />
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
+            {/* ═══ WARDROBE (VESTIDOR) VIEW ═══ */}
+            {shopView === 'WARDROBE' && (
+              <div className="animate-slide-up">
+                {/* Large avatar preview */}
+                <div className="flex justify-center mb-6">
+                  <div className="glass-student-card rounded-3xl p-6 glow-border-candy">
+                    <Avatar config={previewConfig} size={140} showRing glowColor="rgba(168,85,247,0.5)" />
+                    <p className="text-center text-white/50 text-xs mt-3 font-display font-bold">Tu Avatar</p>
+                  </div>
+                </div>
+
+                {/* Category filter */}
+                <div className="flex gap-1.5 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+                  {AVATAR_CATEGORIES.map(cat => {
+                    const equippedId = currentUser?.avatarConfig?.[cat.configKey];
+                    const hasEquipped = !!equippedId;
+                    return (
+                      <button
+                        key={cat.key}
+                        onClick={() => setWardrobeFilter(cat.key)}
+                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 relative ${
+                          wardrobeFilter === cat.key
+                            ? 'bg-white/15 text-white border-white/25'
+                            : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
+                        }`}
+                      >
+                        {cat.emoji} {cat.label}
+                        {hasEquipped && <span className="ml-1 text-emerald-400">•</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Unequip button */}
+                {currentUser?.avatarConfig?.[AVATAR_CATEGORIES.find(c => c.key === wardrobeFilter)!.configKey] && (
+                  <button
+                    onClick={() => handleUnequip(wardrobeFilter)}
+                    className="w-full mb-3 py-2 glass rounded-xl text-xs font-bold text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-all"
+                  >
+                    ✕ Quitar {AVATAR_CATEGORIES.find(c => c.key === wardrobeFilter)?.label}
+                  </button>
+                )}
+
+                {/* Items grid */}
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                  {wardrobeItems.length === 0 && (
+                    <div className="col-span-full text-center py-10 animate-fade-in">
+                      <div className="text-4xl mb-3">🛒</div>
+                      <p className="text-white/50 font-display font-bold text-sm">No tienes items de {AVATAR_CATEGORIES.find(c => c.key === wardrobeFilter)?.label}</p>
+                      <p className="text-white/30 text-xs mt-1">¡Ve al catalogo a comprar!</p>
+                    </div>
+                  )}
+                  {wardrobeItems.map((item, i) => {
+                    const cat = AVATAR_CATEGORIES.find(c => c.key === item.type)!;
+                    const equipped = currentUser?.avatarConfig?.[cat.configKey] === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item.id)}
+                        onMouseEnter={() => setPreviewItem(item.id)}
+                        onMouseLeave={() => setPreviewItem(null)}
+                        className={`glass-student-card rounded-2xl p-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.05] ${
+                          equipped ? 'ring-2 ring-amber-400/60 bg-amber-400/10' : ''
+                        }`}
+                        style={{ animation: `slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.04}s both` }}
+                      >
+                        <div className="w-12 h-12 mb-1">
+                          <svg viewBox="-5 -10 110 115" className="w-full h-full">
+                            <g opacity="0.1">
+                              <circle cx="50" cy="22" r="16" fill="#CBD5E1"/>
+                              <ellipse cx="50" cy="56" rx="20" ry="14" fill="#CBD5E1"/>
+                              <rect x="36" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
+                              <rect x="52" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
+                            </g>
+                            <g dangerouslySetInnerHTML={{ __html: item.svg }} />
+                          </svg>
+                        </div>
+                        <span className="text-[10px] font-bold text-white/80 text-center leading-tight">{item.name}</span>
+                        {equipped && <span className="text-[9px] text-amber-400 font-bold mt-0.5">Equipado</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* ═══ HISTORY VIEW ═══ */}
             {shopView === 'HISTORY' && (
               <div className="space-y-3 animate-slide-up">
                 {myRedemptions.length === 0 && (

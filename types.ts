@@ -20,7 +20,7 @@ export interface ClassGroup {
 }
 
 // Avatar System
-export type AvatarItemType = 'base' | 'top' | 'bottom' | 'shoes' | 'accessory';
+export type AvatarItemType = 'base' | 'top' | 'bottom' | 'shoes' | 'hair' | 'accessory';
 export interface AvatarItem {
   id: string;
   type: AvatarItemType;
@@ -33,6 +33,7 @@ export interface AvatarConfig {
   topId?: string;
   bottomId?: string;
   shoesId?: string;
+  hairId?: string;
   accessoryId?: string;
 }
 
