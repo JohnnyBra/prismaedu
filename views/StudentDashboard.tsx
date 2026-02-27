@@ -58,6 +58,22 @@ const StudentDashboard: React.FC = () => {
   const [buzonAnonymous, setBuzonAnonymous] = useState(false);
   const [previewItem, setPreviewItem] = useState<string | null>(null);
 
+  const [greetingState, setGreetingState] = useState<'SHOWING' | 'CLOSING' | 'CLOSED'>('SHOWING');
+
+  useEffect(() => {
+    if (greetingState === 'SHOWING') {
+      const t = setTimeout(() => setGreetingState('CLOSING'), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [greetingState]);
+
+  useEffect(() => {
+    if (greetingState === 'CLOSING') {
+      const t = setTimeout(() => setGreetingState('CLOSED'), 600);
+      return () => clearTimeout(t);
+    }
+  }, [greetingState]);
+
   const tutor = users.find(u => u.role === Role.TUTOR && u.classId === currentUser?.classId);
   const parent = users.find(u => u.role === Role.PARENT && u.familyId === currentUser?.familyId);
   const unreadMessages = tutor && currentUser ? messages.filter(m => m.fromId === tutor.id && m.toId === currentUser.id && !m.read && m.type !== 'BUZON').length : 0;
@@ -189,12 +205,88 @@ const StudentDashboard: React.FC = () => {
   return (
     <div className="min-h-screen min-h-[100dvh] mesh-student flex flex-col font-body relative">
 
+      {/* Greeting Overlay */}
+      {greetingState !== 'CLOSED' && (
+        <div
+          className={`fixed inset-0 z-[100] ${greetingState === 'CLOSING' ? 'pointer-events-none' : 'cursor-pointer'}`}
+          onClick={() => setGreetingState('CLOSING')}
+        >
+          <style>{`
+            @keyframes wave-large {
+              0%, 100% { transform: rotate(0deg); }
+              25% { transform: rotate(-10deg); }
+              75% { transform: rotate(10deg); }
+            }
+            .animate-wave-large {
+              animation: wave-large 1s ease-in-out infinite;
+              transform-origin: bottom center;
+            }
+            @keyframes move-to-header-overlay {
+              from { opacity: 1; backdrop-filter: blur(12px); background: rgba(15, 23, 42, 0.9); }
+              to { opacity: 0; backdrop-filter: blur(0px); background: rgba(15, 23, 42, 0); }
+            }
+            .animate-close-overlay {
+              animation: move-to-header-overlay 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            @keyframes move-to-header-avatar {
+              from { 
+                top: 50%; 
+                left: 50%; 
+                transform: translate(-50%, -50%) scale(1); 
+                opacity: 1;
+              }
+              to { 
+                top: calc(0.75rem + var(--safe-top) + 24px); 
+                left: calc(max(1rem, calc(50vw - 448px + 1rem)) + 24px); 
+                transform: translate(-50%, -50%) scale(0.192); 
+                opacity: 0.5;
+              }
+            }
+            .animate-close-avatar {
+              animation: move-to-header-avatar 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+          `}</style>
+
+          {/* Background */}
+          <div className={`absolute inset-0 ${greetingState === 'CLOSING' ? 'animate-close-overlay' : 'bg-[#0f172a]/90 backdrop-blur-md animate-fade-in'}`} />
+
+          {/* Avatar */}
+          <div className={`absolute z-10 ${greetingState === 'CLOSING' ? 'animate-close-avatar' : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'}`}>
+            <div className={greetingState === 'SHOWING' ? 'animate-wave-large' : ''}>
+              <Avatar config={currentUser?.avatarConfig} size={250} showRing glowColor="rgba(168,85,247,0.8)" />
+            </div>
+          </div>
+
+          {/* Text and Close */}
+          {greetingState === 'SHOWING' && (
+            <>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[150px] w-full text-center pointer-events-none">
+                <h1 className="font-display font-black text-white text-4xl animate-slide-up bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400 shadow-sm">
+                  ¡Hola, {currentUser?.name?.split(' ')[0]}! 👋
+                </h1>
+                <p className="text-white/60 mt-4 text-sm animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                  Toca para continuar
+                </p>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); setGreetingState('CLOSING'); }}
+                className="absolute top-6 right-6 p-3 bg-white/10 rounded-full hover:bg-white/20 transition-colors text-white z-20"
+              >
+                <X size={24} />
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Top Bar */}
       <div className="glass-student sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
         <div className="flex justify-between items-center max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setShowSettings(true)}>
-            <Avatar config={currentUser?.avatarConfig} size={48} showRing glowColor="rgba(168,85,247,0.5)" />
-            <div>
+          <div className="flex items-center gap-3 cursor-pointer group">
+            <div onClick={(e) => { e.stopPropagation(); setGreetingState('SHOWING'); }} className="hover:scale-110 transition-transform">
+              <Avatar config={currentUser?.avatarConfig} size={48} showRing glowColor="rgba(168,85,247,0.5)" />
+            </div>
+            <div onClick={() => setShowSettings(true)}>
               <h1 className="font-display font-extrabold text-white leading-none text-base">
                 ¡Hola, {currentUser?.name?.split(' ')[0]}! 👋
               </h1>
@@ -285,8 +377,8 @@ const StudentDashboard: React.FC = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-300 relative ${active
-                    ? 'glass-student-card text-white student-tab-active'
-                    : 'glass text-white/40 hover:text-white/70 hover:bg-white/8 hover:scale-[1.02]'
+                  ? 'glass-student-card text-white student-tab-active'
+                  : 'glass text-white/40 hover:text-white/70 hover:bg-white/8 hover:scale-[1.02]'
                   }`}
               >
                 {tab.badge && tab.badge > 0 && (
@@ -395,11 +487,10 @@ const StudentDashboard: React.FC = () => {
                         <button
                           key={cat.key}
                           onClick={() => setAvatarFilter(cat.key)}
-                          className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 ${
-                            avatarFilter === cat.key
+                          className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 ${avatarFilter === cat.key
                               ? 'bg-white/15 text-white border-white/25'
                               : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
-                          }`}
+                            }`}
                         >
                           {cat.emoji} {cat.label}
                         </button>
@@ -440,22 +531,21 @@ const StudentDashboard: React.FC = () => {
                               <svg viewBox="-5 -10 110 115" className="w-full h-full drop-shadow-lg">
                                 {/* Show base body outline for context */}
                                 <g opacity="0.15">
-                                  <circle cx="50" cy="22" r="16" fill="#CBD5E1"/>
-                                  <ellipse cx="50" cy="56" rx="20" ry="14" fill="#CBD5E1"/>
-                                  <rect x="36" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
-                                  <rect x="52" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
+                                  <circle cx="50" cy="22" r="16" fill="#CBD5E1" />
+                                  <ellipse cx="50" cy="56" rx="20" ry="14" fill="#CBD5E1" />
+                                  <rect x="36" y="68" width="12" height="22" rx="4" fill="#CBD5E1" />
+                                  <rect x="52" y="68" width="12" height="22" rx="4" fill="#CBD5E1" />
                                 </g>
                                 <g dangerouslySetInnerHTML={{ __html: item.svg }} />
                               </svg>
                             </div>
                             <h3 className="font-display font-semibold text-xs text-white/90">{item.name}</h3>
-                            <span className={`text-[9px] font-bold mt-0.5 ${
-                              item.cost === 0 ? 'text-emerald-400/70' :
-                              item.cost <= 50 ? 'text-sky-400/70' :
-                              item.cost <= 200 ? 'text-purple-400/70' :
-                              item.cost <= 500 ? 'text-amber-400/70' :
-                              'text-rose-400/70'
-                            }`}>{tierLabel}</span>
+                            <span className={`text-[9px] font-bold mt-0.5 ${item.cost === 0 ? 'text-emerald-400/70' :
+                                item.cost <= 50 ? 'text-sky-400/70' :
+                                  item.cost <= 200 ? 'text-purple-400/70' :
+                                    item.cost <= 500 ? 'text-amber-400/70' :
+                                      'text-rose-400/70'
+                              }`}>{tierLabel}</span>
                             <div className="mt-2 w-full">
                               {owned ? (
                                 equipped ? (
@@ -521,11 +611,10 @@ const StudentDashboard: React.FC = () => {
                       <button
                         key={cat.key}
                         onClick={() => setWardrobeFilter(cat.key)}
-                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 relative ${
-                          wardrobeFilter === cat.key
+                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 relative ${wardrobeFilter === cat.key
                             ? 'bg-white/15 text-white border-white/25'
                             : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
-                        }`}
+                          }`}
                       >
                         {cat.emoji} {cat.label}
                         {hasEquipped && <span className="ml-1 text-emerald-400">•</span>}
@@ -562,18 +651,17 @@ const StudentDashboard: React.FC = () => {
                         onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item.id)}
                         onMouseEnter={() => setPreviewItem(item.id)}
                         onMouseLeave={() => setPreviewItem(null)}
-                        className={`glass-student-card rounded-2xl p-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.05] ${
-                          equipped ? 'ring-2 ring-amber-400/60 bg-amber-400/10' : ''
-                        }`}
+                        className={`glass-student-card rounded-2xl p-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.05] ${equipped ? 'ring-2 ring-amber-400/60 bg-amber-400/10' : ''
+                          }`}
                         style={{ animation: `slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.04}s both` }}
                       >
                         <div className="w-12 h-12 mb-1">
                           <svg viewBox="-5 -10 110 115" className="w-full h-full">
                             <g opacity="0.1">
-                              <circle cx="50" cy="22" r="16" fill="#CBD5E1"/>
-                              <ellipse cx="50" cy="56" rx="20" ry="14" fill="#CBD5E1"/>
-                              <rect x="36" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
-                              <rect x="52" y="68" width="12" height="22" rx="4" fill="#CBD5E1"/>
+                              <circle cx="50" cy="22" r="16" fill="#CBD5E1" />
+                              <ellipse cx="50" cy="56" rx="20" ry="14" fill="#CBD5E1" />
+                              <rect x="36" y="68" width="12" height="22" rx="4" fill="#CBD5E1" />
+                              <rect x="52" y="68" width="12" height="22" rx="4" fill="#CBD5E1" />
                             </g>
                             <g dangerouslySetInnerHTML={{ __html: item.svg }} />
                           </svg>
@@ -637,8 +725,8 @@ const StudentDashboard: React.FC = () => {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[80%] px-3.5 py-2 rounded-2xl text-sm ${isMe
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-br-md shadow-lg shadow-purple-500/15'
-                        : 'glass-student text-white/85 rounded-bl-md'
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-br-md shadow-lg shadow-purple-500/15'
+                      : 'glass-student text-white/85 rounded-bl-md'
                       }`}>
                       {msg.content}
                     </div>
@@ -795,8 +883,8 @@ const RewardCard: React.FC<{ reward: any, onRedeem: () => void, userPoints: numb
         onClick={onRedeem}
         disabled={!canAfford || !inStock}
         className={`w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 ${canAfford && inStock
-            ? `bg-gradient-to-r ${isSchool ? 'from-primary-500 to-primary-400 shadow-primary-500/20' : 'from-secondary-500 to-secondary-400 shadow-secondary-500/20'} text-white shadow-lg hover:shadow-xl hover:brightness-110`
-            : 'bg-white/5 text-white/20 cursor-not-allowed'
+          ? `bg-gradient-to-r ${isSchool ? 'from-primary-500 to-primary-400 shadow-primary-500/20' : 'from-secondary-500 to-secondary-400 shadow-secondary-500/20'} text-white shadow-lg hover:shadow-xl hover:brightness-110`
+          : 'bg-white/5 text-white/20 cursor-not-allowed'
           }`}
       >
         ⭐ {reward.cost}
