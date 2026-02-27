@@ -6,6 +6,22 @@ PrismaEdu es el **portal central** de la Suite Educativa La Hispanidad. Actúa c
 
 ---
 
+## 📸 Capturas de Pantalla
+
+| Login — Selección de Rol | Alumno — Tareas |
+|:---:|:---:|
+| ![Login selección de rol](docs/screenshots/01-login-seleccion-rol.png) | ![Alumno tareas](docs/screenshots/02-alumno-tareas.png) |
+
+| Alumno — Tienda de Recompensas | Tutor — Gestión de Clase |
+|:---:|:---:|
+| ![Alumno tienda](docs/screenshots/03-alumno-tienda-recompensas.png) | ![Tutor clase](docs/screenshots/04-tutor-gestion-clase.png) |
+
+| Familia — Dashboard | Administración — Gestión de Usuarios |
+|:---:|:---:|
+| ![Familia dashboard](docs/screenshots/05-familia-dashboard.png) | ![Admin usuarios](docs/screenshots/06-admin-gestion-usuarios.png) |
+
+---
+
 ## 🚀 Funcionalidades por Público
 
 ### 🎓 Alumnado
