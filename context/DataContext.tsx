@@ -53,7 +53,26 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(() => localStorage.getItem('sc_session_user'));
+  const SESSION_TTL = 8 * 60 * 60 * 1000; // 8 horas
+
+  const readSession = (): string | null => {
+    try {
+      const stored = localStorage.getItem('sc_session_user');
+      if (!stored) return null;
+      const { id, at } = JSON.parse(stored);
+      if (Date.now() - at < SESSION_TTL) return id;
+      localStorage.removeItem('sc_session_user');
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const writeSession = (id: string) => {
+    localStorage.setItem('sc_session_user', JSON.stringify({ id, at: Date.now() }));
+  };
+
+  const [currentUserId, setCurrentUserId] = useState<string | null>(() => readSession());
 
   // Data State
   const [users, setUsers] = useState<User[]>([]);
@@ -73,7 +92,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const userId = params.get('user_id');
     if (userId) {
       setCurrentUserId(userId);
-      localStorage.setItem('sc_session_user', userId);
+      writeSession(userId);
       // Clean URL
       window.history.replaceState({}, '', window.location.pathname);
     }
@@ -163,7 +182,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const user = users.find(u => u.id === userId);
     if (user && user.pin === pin) {
       setCurrentUserId(user.id);
-      localStorage.setItem('sc_session_user', user.id);
+      writeSession(user.id);
       // Trigger server-side SSO cookie creation (fire-and-forget)
       fetch('/api/auth/external-check', {
         method: 'POST',
