@@ -184,7 +184,8 @@ app.get('/auth/google/callback',
         path: '/',
         httpOnly: true,
         secure: true,
-        sameSite: 'Lax'
+        sameSite: 'Lax',
+        maxAge: 8 * 60 * 60 * 1000
       });
     }
     res.redirect(`/?user_id=${req.user.id}`);
