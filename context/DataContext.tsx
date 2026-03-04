@@ -183,11 +183,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (user && user.pin === pin) {
       setCurrentUserId(user.id);
       writeSession(user.id);
-      // Trigger server-side SSO cookie creation (fire-and-forget)
+      // Trigger server-side SSO cookie creation (keepalive garantiza que completa aunque el usuario navegue)
       fetch('/api/auth/external-check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: userId, password: pin })
+        body: JSON.stringify({ username: userId, password: pin }),
+        keepalive: true
       }).catch(() => { });
       return true;
     }
