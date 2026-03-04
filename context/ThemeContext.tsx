@@ -27,6 +27,13 @@ function readStoredPref(): ThemePref {
   return 'auto';
 }
 
+function setThemeCookie(pref: ThemePref) {
+  const cookieValue = pref === 'auto' ? 'system' : pref;
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const domain = isLocal ? '' : '; domain=.bibliohispa.es';
+  document.cookie = `HISPA_THEME=${cookieValue}; path=/; max-age=31536000; SameSite=Lax${domain}`;
+}
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [preference, setPreferenceState] = useState<ThemePref>(readStoredPref);
   const [systemTheme, setSystemTheme] = useState<ThemeMode>(getSystemTheme);
@@ -44,12 +51,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     document.documentElement.setAttribute('data-theme', resolvedTheme);
   }, [resolvedTheme]);
 
+  // Sync preference to shared cookie on mount and on change
+  useEffect(() => {
+    setThemeCookie(preference);
+  }, [preference]);
+
   const setPreference = useCallback((pref: ThemePref) => {
     setPreferenceState(pref);
     try {
       if (pref === 'auto') localStorage.removeItem(STORAGE_KEY);
       else localStorage.setItem(STORAGE_KEY, pref);
     } catch {}
+    setThemeCookie(pref);
   }, []);
 
   const cycle = useCallback(() => {
