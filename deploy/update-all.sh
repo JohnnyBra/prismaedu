@@ -120,7 +120,28 @@ update_app() {
     return 1
   fi
 
-  # 4. Reiniciar PM2
+  # 4. Parchear nginx (solo Intranet)
+  if [[ "$pm2name" == "intranet-hispa" ]]; then
+    NGINX_CONF="/etc/nginx/sites-available/intranet-hispa"
+    NGINX_CHANGED=0
+    if [ -f "$NGINX_CONF" ]; then
+      if ! grep -q "location /api/data" "$NGINX_CONF"; then
+        info "Añadiendo /api/data a nginx..."
+        sed -i '/location \/uploads\//i\    location /api/data {\n        proxy_pass http://127.0.0.1:3011;\n        proxy_read_timeout 10s;\n    }\n' "$NGINX_CONF"
+        NGINX_CHANGED=1
+      fi
+      if ! grep -q "location /api/file" "$NGINX_CONF"; then
+        info "Añadiendo /api/file a nginx..."
+        sed -i '/location \/api\/data/i\    location /api/file {\n        proxy_pass http://127.0.0.1:3011;\n    }\n' "$NGINX_CONF"
+        NGINX_CHANGED=1
+      fi
+      if [ "$NGINX_CHANGED" = "1" ]; then
+        nginx -t && systemctl reload nginx && ok "Nginx actualizado y recargado"
+      fi
+    fi
+  fi
+
+  # 5. Reiniciar PM2
   info "Reiniciando PM2 (${pm2name})..."
   if ${sudo_prefix}pm2 describe "$pm2name" &>/dev/null; then
     eval "${sudo_prefix}$post_cmd" 2>/dev/null
