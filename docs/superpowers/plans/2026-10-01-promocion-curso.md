@@ -1597,3 +1597,7 @@ After a reset, in Gestión Clases open any class with students, click the new ch
 - "Ver archivados" view → Task 6, verified Task 12 Step 5.
 - Individual "Cambiar de clase" without breaking `familyId` → Tasks 7, 8, verified Task 12 Step 7.
 - Student lists sorted by first surname → Task 2 (`sortBySurname`, reusing the existing `(a.lastName || a.name).localeCompare(...)` convention), used throughout Task 9.
+
+## Post-implementation amendment (found during Task 12 manual QA)
+
+Manual QA against the real app surfaced a gap in Task 9's manual-regroup rows: the destination `<select>` only offered classes at the *next* level, with no way to hold a student back a year. Fixed in `components/PromotionPanel.tsx`'s `ManualRowView`: the select now groups the existing next-level options under an "Promociona a {nivel}" `<optgroup>`, and adds a second "No promociona (repite)" `<optgroup>` listing the row's own `sourceClasses` (the current level's A/B classes, already available on `ManualRow`) so a repeating student can be placed into either group of the level they're already in. No change was needed to `rowToPlan`, `applyPromotion`, or `utils/promotion.ts` — assigning a same-level `classId` goes through the exact same mechanism as a normal promotion assignment.
