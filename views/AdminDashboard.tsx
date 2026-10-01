@@ -6,8 +6,9 @@ import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronR
 import ThemeToggle from '../components/ThemeToggle';
 import Avatar from '../components/Avatar';
 import MoveClassModal from '../components/MoveClassModal';
+import PromotionPanel from '../components/PromotionPanel';
 
-type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
+type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF' | 'PROMOTION';
 
 const getSortKey = (u: User) => {
   if (u.lastName) return u.lastName.toLowerCase();
@@ -1788,6 +1789,7 @@ const AdminDashboard: React.FC = () => {
           <TabButton active={activeTab === 'FAMILIES'} onClick={() => setActiveTab('FAMILIES')} icon={<Users size={18}/>} label="Gestión Familias" />
           <TabButton active={activeTab === 'TASKS'} onClick={() => setActiveTab('TASKS')} icon={<BookOpen size={18}/>} label="Gestión Tareas" />
           <TabButton active={activeTab === 'STAFF'} onClick={() => setActiveTab('STAFF')} icon={<Briefcase size={18}/>} label="Personal" />
+          <TabButton active={activeTab === 'PROMOTION'} onClick={() => setActiveTab('PROMOTION')} icon={<ArrowUpCircle size={18}/>} label="Promoción de Curso" />
         </div>
       </div>
 
@@ -1799,6 +1801,7 @@ const AdminDashboard: React.FC = () => {
           <MobileTabButton active={activeTab === 'FAMILIES'} onClick={() => setActiveTab('FAMILIES')} icon={<Users size={20}/>} label="Familias" />
           <MobileTabButton active={activeTab === 'TASKS'} onClick={() => setActiveTab('TASKS')} icon={<BookOpen size={20}/>} label="Tareas" />
           <MobileTabButton active={activeTab === 'STAFF'} onClick={() => setActiveTab('STAFF')} icon={<Briefcase size={20}/>} label="Staff" />
+          <MobileTabButton active={activeTab === 'PROMOTION'} onClick={() => setActiveTab('PROMOTION')} icon={<ArrowUpCircle size={20}/>} label="Curso" />
         </div>
       </div>
 
@@ -1809,6 +1812,14 @@ const AdminDashboard: React.FC = () => {
          {activeTab === 'FAMILIES' && renderFamiliesTab()}
          {activeTab === 'TASKS' && renderTasksTab()}
          {activeTab === 'STAFF' && renderStaffTab()}
+         {activeTab === 'PROMOTION' && (
+           <PromotionPanel
+             users={users}
+             classes={classes}
+             setClassNextTarget={setClassNextTarget}
+             applyPromotion={applyPromotion}
+           />
+         )}
 
          <input
             type="file"
