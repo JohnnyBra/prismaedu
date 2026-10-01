@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, CheckCircle2, Download, GraduationCap, Users as UsersIcon } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle2, Download, GraduationCap, Users as UsersIcon } from 'lucide-react';
 import { ClassGroup, Role, User } from '../types';
 import {
   LEVEL_SEQUENCE,
   PromotionPlan,
   computeOrphanParentIds,
   getManualTargetClasses,
+  getNextLevel,
   getTransitionType,
   resolveNextClassId,
   sortBySurname
@@ -162,11 +163,49 @@ export const describePlan = (plan: PromotionPlan, users: User[]): string[] => {
   return lines;
 };
 
+// Warns when a row being promoted now targets a level that still has its own pending row
+// (i.e. that level hasn't been promoted away yet) outside of this same operation — those
+// future arrivals would otherwise get silently swept up the next time that level is promoted.
+export const computeOrderWarnings = (rowsToRun: PromotionRow[], allRows: PromotionRow[]): string[] => {
+  const rowsToRunSet = new Set(rowsToRun);
+  const otherPendingLevels = new Set(allRows.filter(r => !rowsToRunSet.has(r)).map(r => r.level));
+  const warnings: string[] = [];
+
+  rowsToRun.forEach(row => {
+    if (row.type === 'TERMINAL') return;
+    const targetLevel = row.type === 'DIRECT' ? getNextLevel(row.level) : row.nextLevel;
+    if (targetLevel && otherPendingLevels.has(targetLevel)) {
+      const label = row.type === 'DIRECT' ? row.sourceClass.name : `${row.level} (reagrupación)`;
+      warnings.push(`"${label}" promociona a ${targetLevel}, pero ese nivel todavía tiene alumnos sin promocionar fuera de esta operación. Si no los promocionas también ahora, se mezclarán con ellos más tarde. Promociona primero los niveles superiores.`);
+    }
+  });
+
+  return warnings;
+};
+
+// Warns when a direct (per-class) promotion would leave the target class with more than 10 students.
+export const computeCapacityWarnings = (rowsToRun: PromotionRow[], users: User[], classes: ClassGroup[]): string[] => {
+  const warnings: string[] = [];
+
+  rowsToRun.forEach(row => {
+    if (row.type !== 'DIRECT' || !row.targetClassId) return;
+    const targetClass = classes.find(c => c.id === row.targetClassId);
+    if (!targetClass) return;
+    const existingCount = users.filter(u => u.role === Role.STUDENT && !u.archived && u.classId === row.targetClassId).length;
+    const total = existingCount + row.students.length;
+    if (total > 10) {
+      warnings.push(`"${targetClass.name}" tendrá ${total} alumnos tras la promoción (más de 10).`);
+    }
+  });
+
+  return warnings;
+};
+
 const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClassNextTarget, applyPromotion }) => {
   const rows = useMemo(() => buildRows(users, classes), [users, classes]);
   const [manualAssignments, setManualAssignments] = useState<Record<string, Record<string, string>>>({});
   const [directOverrides, setDirectOverrides] = useState<Record<string, string>>({});
-  const [pendingPlan, setPendingPlan] = useState<{ plan: PromotionPlan; summary: string[] } | null>(null);
+  const [pendingPlan, setPendingPlan] = useState<{ plan: PromotionPlan; summary: string[]; warnings: string[] } | null>(null);
 
   const rowsWithResolvedTargets: PromotionRow[] = rows.map(row =>
     row.type === 'DIRECT' ? { ...row, targetClassId: directOverrides[row.key] ?? row.targetClassId } : row
@@ -207,7 +246,11 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
     if (plans.length === 0) return;
 
     const mergedPlan = mergePlans(plans);
-    setPendingPlan({ plan: mergedPlan, summary: describePlan(mergedPlan, users) });
+    const warnings = [
+      ...computeOrderWarnings(rowsToRun, rowsWithResolvedTargets),
+      ...computeCapacityWarnings(rowsToRun, users, classes)
+    ];
+    setPendingPlan({ plan: mergedPlan, summary: describePlan(mergedPlan, users), warnings });
   };
 
   const confirmPromotion = () => {
@@ -299,9 +342,19 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
         <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4" onClick={() => setPendingPlan(null)}>
           <div className="glass-strong rounded-3xl p-6 w-full max-w-md shadow-glass-lg modal-content" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-display font-bold text-white/90 mb-4">Confirmar Promoción</h3>
-            <ul className="space-y-1 mb-6 text-sm text-white/70 font-body list-disc list-inside">
+            <ul className="space-y-1 mb-4 text-sm text-white/70 font-body list-disc list-inside">
               {pendingPlan.summary.map((line, i) => <li key={i}>{line}</li>)}
             </ul>
+            {pendingPlan.warnings.length > 0 && (
+              <div className="mb-6 p-3 rounded-xl bg-amber-500/10 border border-amber-500/25">
+                <p className="text-[10px] font-bold text-amber-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <AlertTriangle size={12} /> Advertencias
+                </p>
+                <ul className="space-y-1 text-xs text-amber-200/90 font-body list-disc list-inside">
+                  {pendingPlan.warnings.map((line, i) => <li key={i}>{line}</li>)}
+                </ul>
+              </div>
+            )}
             <p className="text-xs text-white/40 mb-6 font-body flex items-center gap-2">
               <Download size={14} /> Se descargará una copia de seguridad (JSON) antes de aplicar los cambios.
             </p>
