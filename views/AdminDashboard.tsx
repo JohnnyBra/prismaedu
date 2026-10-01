@@ -2,7 +2,7 @@ import React, { useState, useRef, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { isPrime, generateUniquePrime } from '../utils/primes';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon, Printer } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon, Printer, Archive, Repeat, ArrowUpCircle } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import Avatar from '../components/Avatar';
 
@@ -87,6 +87,9 @@ const AdminDashboard: React.FC = () => {
   // Move User State
   const [userToMove, setUserToMove] = useState<User | null>(null);
   const [destinationFamilyId, setDestinationFamilyId] = useState<string>('');
+
+  // Archived families visibility toggle (FAMILIES tab)
+  const [showArchivedFamilies, setShowArchivedFamilies] = useState(false);
 
   // Task Edit State
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -821,7 +824,7 @@ const AdminDashboard: React.FC = () => {
 
     const classTutor = users.find(u => u.role === Role.TUTOR && u.classId === selectedClassForDetail.id);
     const classStudents = users
-      .filter(u => u.role === Role.STUDENT && u.classId === selectedClassForDetail.id)
+      .filter(u => u.role === Role.STUDENT && u.classId === selectedClassForDetail.id && !u.archived)
       .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
 
     return (
@@ -1321,7 +1324,9 @@ const AdminDashboard: React.FC = () => {
     if (selectedFamilyClass.id === 'unassigned') {
          familyIds = unassignedFamilyIds;
     } else {
-         const studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedFamilyClass.id);
+         const studentsInClass = users.filter(u =>
+           u.role === Role.STUDENT && u.classId === selectedFamilyClass.id && (showArchivedFamilies || !u.archived)
+         );
          familyIds = Array.from(new Set(studentsInClass.map(s => s.familyId).filter(Boolean))) as string[];
     }
 
@@ -1343,7 +1348,13 @@ const AdminDashboard: React.FC = () => {
              </div>
          </div>
 
-         <div className="flex justify-end">
+         <div className="flex justify-end gap-2">
+             <button
+                onClick={() => setShowArchivedFamilies(v => !v)}
+                className={`btn-ghost flex items-center gap-2 text-sm ${showArchivedFamilies ? '!bg-primary-500/20 !text-primary-300' : ''}`}
+             >
+                <Archive size={18} /> {showArchivedFamilies ? 'Ocultar Archivados' : 'Ver Archivados'}
+             </button>
              <button
                 onClick={handlePrintClassPins}
                 className="btn-ghost flex items-center gap-2 text-sm"
@@ -1432,10 +1443,10 @@ const AdminDashboard: React.FC = () => {
            {familyIds.map(famId => {
              const members = users.filter(u => u.familyId === famId);
              const parents = members
-                .filter(u => u.role === Role.PARENT)
+                .filter(u => u.role === Role.PARENT && (showArchivedFamilies || !u.archived))
                 .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
              const students = members
-                .filter(u => u.role === Role.STUDENT)
+                .filter(u => u.role === Role.STUDENT && (showArchivedFamilies || !u.archived))
                 .sort((a, b) => (a.lastName || a.name).localeCompare(b.lastName || b.name));
              const familyName = getFamilyName(famId);
              const isEditing = editingFamilyId === famId;
@@ -1528,7 +1539,10 @@ const AdminDashboard: React.FC = () => {
                        <ul className="space-y-2">
                          {parents.map(p => (
                            <li key={p.id} className="flex items-center justify-between glass rounded-xl px-3 py-2">
-                             <span className="text-sm font-medium text-white/80 font-body">{p.name} <span className="text-white/30 text-xs font-mono ml-1">PIN: {p.pin}</span></span>
+                             <span className="text-sm font-medium text-white/80 font-body">
+                               {p.name} <span className="text-white/30 text-xs font-mono ml-1">PIN: {p.pin}</span>
+                               {p.archived && <span className="text-[9px] text-amber-400/70 ml-1 uppercase font-bold">Archivado</span>}
+                             </span>
                              <div className="flex items-center gap-1">
                                <button
                                   onClick={() => handleEditGenericUser(p)}
@@ -1559,7 +1573,10 @@ const AdminDashboard: React.FC = () => {
                              <div className="flex items-center gap-2">
                                <Avatar config={s.avatarConfig} size={24} />
                                <div className="flex flex-col">
-                                 <span className="text-sm font-medium text-white/90 leading-none font-body">{s.name}</span>
+                                 <span className="text-sm font-medium text-white/90 leading-none font-body">
+                                   {s.name}
+                                   {s.archived && <span className="text-[9px] text-amber-400/70 ml-1 uppercase font-bold">Archivado</span>}
+                                 </span>
                                  <span className="text-[10px] text-white/30 font-mono">
                                    PIN: {s.pin} | {classes.find(c => c.id === s.classId)?.name || 'Sin Clase'}
                                  </span>
