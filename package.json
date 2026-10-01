@@ -40,5 +40,9 @@
     "tailwindcss": "^3.3.3",
     "typescript": "^5.9.3",
     "vite": "^4.4.5"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "sqlite3@5.1.7": true
   }
 }
