@@ -5,6 +5,17 @@ import { PromotionPlan, computeOrphanParentIds } from '../utils/promotion';
 import { AVATAR_ITEMS } from '../constants';
 import { io, Socket } from 'socket.io-client';
 
+export interface BackupInfo {
+  filename: string;
+  createdAt: string;
+  size: number;
+}
+
+export interface BackupData {
+  generatedAt: string;
+  [collection: string]: unknown;
+}
+
 interface DataContextType {
   currentUser: User | null;
   users: User[];
@@ -51,6 +62,9 @@ interface DataContextType {
   setClassNextTarget: (classId: string, nextClassId: string) => void;
   applyPromotion: (plan: PromotionPlan) => void;
   restoreFromSnapshot: (users: User[], classes: ClassGroup[]) => void;
+  createBackup: () => Promise<{ filename: string; generatedAt: string; data: BackupData }>;
+  listBackups: () => Promise<BackupInfo[]>;
+  restoreBackup: (payload: { filename: string } | { data: BackupData }) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -496,6 +510,66 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
+  const createBackup = (): Promise<{ filename: string; generatedAt: string; data: BackupData }> => {
+    return new Promise((resolve, reject) => {
+      if (!socket) {
+        reject('No socket connection');
+        return;
+      }
+      if (!currentUser) {
+        reject('User not authenticated');
+        return;
+      }
+      socket.emit('create_backup', { requesterId: currentUser.id }, (response: any) => {
+        if (response?.success) {
+          resolve(response);
+        } else {
+          reject(response?.error || 'Unknown error');
+        }
+      });
+    });
+  };
+
+  const listBackups = (): Promise<BackupInfo[]> => {
+    return new Promise((resolve, reject) => {
+      if (!socket) {
+        reject('No socket connection');
+        return;
+      }
+      if (!currentUser) {
+        reject('User not authenticated');
+        return;
+      }
+      socket.emit('list_backups', { requesterId: currentUser.id }, (response: any) => {
+        if (response?.success) {
+          resolve(response.backups);
+        } else {
+          reject(response?.error || 'Unknown error');
+        }
+      });
+    });
+  };
+
+  const restoreBackup = (payload: { filename: string } | { data: BackupData }): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!socket) {
+        reject('No socket connection');
+        return;
+      }
+      if (!currentUser) {
+        reject('User not authenticated');
+        return;
+      }
+      socket.emit('restore_backup', { requesterId: currentUser.id, ...payload }, (response: any) => {
+        if (response?.success) {
+          resolve();
+        } else {
+          reject(response?.error || 'Unknown error');
+        }
+      });
+    });
+  };
+
   return (
     <DataContext.Provider value={{
       currentUser,
@@ -538,7 +612,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       moveStudentClass,
       setClassNextTarget,
       applyPromotion,
-      restoreFromSnapshot
+      restoreFromSnapshot,
+      createBackup,
+      listBackups,
+      restoreBackup
     }}>
       {children}
     </DataContext.Provider>

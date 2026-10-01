@@ -2,13 +2,14 @@ import React, { useState, useRef, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { isPrime, generateUniquePrime } from '../utils/primes';
 import { Role, User, Task } from '../types';
-import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon, Printer, Archive, Repeat, ArrowUpCircle } from 'lucide-react';
+import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon, Printer, Archive, Repeat, ArrowUpCircle, Database } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import Avatar from '../components/Avatar';
 import MoveClassModal from '../components/MoveClassModal';
 import PromotionPanel from '../components/PromotionPanel';
+import BackupManager from '../components/BackupManager';
 
-type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF' | 'PROMOTION';
+type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF' | 'PROMOTION' | 'BACKUPS';
 
 const getSortKey = (u: User) => {
   if (u.lastName) return u.lastName.toLowerCase();
@@ -21,7 +22,7 @@ const getSortKey = (u: User) => {
 };
 
 const AdminDashboard: React.FC = () => {
-  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers, migratePins, moveStudentClass, setClassNextTarget, applyPromotion, restoreFromSnapshot } = useData();
+  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers, migratePins, moveStudentClass, setClassNextTarget, applyPromotion, restoreFromSnapshot, createBackup, listBackups, restoreBackup } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
 
   // Local state for edits/creation
@@ -1790,6 +1791,7 @@ const AdminDashboard: React.FC = () => {
           <TabButton active={activeTab === 'TASKS'} onClick={() => setActiveTab('TASKS')} icon={<BookOpen size={18}/>} label="Gestión Tareas" />
           <TabButton active={activeTab === 'STAFF'} onClick={() => setActiveTab('STAFF')} icon={<Briefcase size={18}/>} label="Personal" />
           <TabButton active={activeTab === 'PROMOTION'} onClick={() => setActiveTab('PROMOTION')} icon={<ArrowUpCircle size={18}/>} label="Promoción de Curso" />
+          <TabButton active={activeTab === 'BACKUPS'} onClick={() => setActiveTab('BACKUPS')} icon={<Database size={18}/>} label="Copias de Seguridad" />
         </div>
       </div>
 
@@ -1802,6 +1804,7 @@ const AdminDashboard: React.FC = () => {
           <MobileTabButton active={activeTab === 'TASKS'} onClick={() => setActiveTab('TASKS')} icon={<BookOpen size={20}/>} label="Tareas" />
           <MobileTabButton active={activeTab === 'STAFF'} onClick={() => setActiveTab('STAFF')} icon={<Briefcase size={20}/>} label="Staff" />
           <MobileTabButton active={activeTab === 'PROMOTION'} onClick={() => setActiveTab('PROMOTION')} icon={<ArrowUpCircle size={20}/>} label="Curso" />
+          <MobileTabButton active={activeTab === 'BACKUPS'} onClick={() => setActiveTab('BACKUPS')} icon={<Database size={20}/>} label="Copias" />
         </div>
       </div>
 
@@ -1819,6 +1822,13 @@ const AdminDashboard: React.FC = () => {
              setClassNextTarget={setClassNextTarget}
              applyPromotion={applyPromotion}
              restoreFromSnapshot={restoreFromSnapshot}
+           />
+         )}
+         {activeTab === 'BACKUPS' && (
+           <BackupManager
+             createBackup={createBackup}
+             listBackups={listBackups}
+             restoreBackup={restoreBackup}
            />
          )}
 

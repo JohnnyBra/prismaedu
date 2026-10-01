@@ -25,5 +25,8 @@ dist-ssr
 *.sqlite
 *.env
 
+# Server-stored database backups (created at runtime, not source)
+/backups/
+
 # Git worktrees used for isolated feature work
 .worktrees/

@@ -2,6 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initDB, getData, setData } from './db.js';
 import session from 'express-session';
@@ -136,6 +137,13 @@ passport.use(new GoogleStrategy({
 // Recreate __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Server-stored full-database backups
+const BACKUPS_DIR = path.join(__dirname, '../backups');
+if (!fs.existsSync(BACKUPS_DIR)) {
+  fs.mkdirSync(BACKUPS_DIR, { recursive: true });
+}
+const BACKUP_COLLECTIONS = ['users', 'classes', 'tasks', 'rewards', 'completions', 'messages', 'redemptions'];
 
 const app = express();
 const httpServer = createServer(app);
@@ -456,6 +464,102 @@ io.on('connection', async (socket) => {
       if (callback) callback({ success: true, count: updatedCount });
     } catch (error) {
       console.error('Migration error:', error);
+      if (callback) callback({ success: false, error: error.message });
+    }
+  });
+
+  // Full-database backup/restore (admin tooling, not tied to any specific feature).
+  // Mirrors migrate_pins' authorization pattern: requesterId passed explicitly and
+  // checked server-side, since this app has no server-session-based auth.
+  const BACKUP_ALLOWED_ROLES = ['ADMIN', 'DIRECCION', 'TESORERIA'];
+
+  const authorizeBackupRequest = async (requesterId) => {
+    const users = await getData('users', []);
+    const requester = users.find(u => u.id === requesterId);
+    return !!requester && BACKUP_ALLOWED_ROLES.includes(requester.role);
+  };
+
+  socket.on('create_backup', async ({ requesterId } = {}, callback) => {
+    try {
+      if (!(await authorizeBackupRequest(requesterId))) {
+        if (callback) callback({ success: false, error: 'Unauthorized: Access denied.' });
+        return;
+      }
+
+      const values = await Promise.all(BACKUP_COLLECTIONS.map(key => getData(key, [])));
+      const generatedAt = new Date().toISOString();
+      const backup = { generatedAt };
+      BACKUP_COLLECTIONS.forEach((key, i) => { backup[key] = values[i]; });
+
+      const filename = `backup-${Date.now()}.json`;
+      fs.writeFileSync(path.join(BACKUPS_DIR, filename), JSON.stringify(backup));
+
+      if (callback) callback({ success: true, filename, generatedAt, data: backup });
+    } catch (error) {
+      console.error('Backup creation error:', error);
+      if (callback) callback({ success: false, error: error.message });
+    }
+  });
+
+  socket.on('list_backups', async ({ requesterId } = {}, callback) => {
+    try {
+      if (!(await authorizeBackupRequest(requesterId))) {
+        if (callback) callback({ success: false, error: 'Unauthorized: Access denied.' });
+        return;
+      }
+
+      const files = fs.readdirSync(BACKUPS_DIR).filter(f => f.endsWith('.json'));
+      const backups = files.map(filename => {
+        const stat = fs.statSync(path.join(BACKUPS_DIR, filename));
+        return { filename, size: stat.size, createdAt: stat.mtime.toISOString() };
+      }).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+      if (callback) callback({ success: true, backups });
+    } catch (error) {
+      console.error('List backups error:', error);
+      if (callback) callback({ success: false, error: error.message });
+    }
+  });
+
+  socket.on('restore_backup', async ({ requesterId, filename, data } = {}, callback) => {
+    try {
+      if (!(await authorizeBackupRequest(requesterId))) {
+        if (callback) callback({ success: false, error: 'Unauthorized: Access denied.' });
+        return;
+      }
+
+      let backup;
+      if (filename) {
+        // path.basename strips any directory components, preventing path traversal
+        // via a crafted filename (e.g. "../../etc/passwd").
+        const filePath = path.join(BACKUPS_DIR, path.basename(filename));
+        if (!fs.existsSync(filePath)) {
+          if (callback) callback({ success: false, error: 'La copia de seguridad indicada no existe.' });
+          return;
+        }
+        backup = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      } else if (data) {
+        backup = data;
+      } else {
+        if (callback) callback({ success: false, error: 'No se ha indicado ninguna copia de seguridad.' });
+        return;
+      }
+
+      const missingKey = BACKUP_COLLECTIONS.find(key => !Array.isArray(backup[key]));
+      if (missingKey) {
+        if (callback) callback({ success: false, error: `La copia de seguridad no tiene un formato válido (falta "${missingKey}").` });
+        return;
+      }
+
+      await Promise.all(BACKUP_COLLECTIONS.map(key => setData(key, backup[key])));
+
+      const freshState = {};
+      BACKUP_COLLECTIONS.forEach(key => { freshState[key] = backup[key]; });
+      io.emit('init_state', freshState);
+
+      if (callback) callback({ success: true });
+    } catch (error) {
+      console.error('Restore backup error:', error);
       if (callback) callback({ success: false, error: error.message });
     }
   });
