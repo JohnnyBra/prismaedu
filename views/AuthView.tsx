@@ -40,11 +40,12 @@ const AuthView: React.FC = () => {
     } else if (selectedClassId && step === 'PIN_ENTRY') {
       const familyIdsInClass = new Set(
         users
-          .filter(u => u.classId === selectedClassId && u.familyId)
+          .filter(u => u.classId === selectedClassId && u.familyId && !u.archived)
           .map(u => u.familyId)
       );
 
       const user = users.find(u => {
+        if (u.archived) return false;
         if (u.pin !== pin) return false;
         if (u.classId === selectedClassId) return true;
         if (u.role === Role.PARENT && u.familyId && familyIdsInClass.has(u.familyId)) return true;
@@ -296,7 +297,7 @@ const AuthView: React.FC = () => {
   );
 
   const renderGroupSelect = () => {
-    const studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedClassId);
+    const studentsInClass = users.filter(u => u.role === Role.STUDENT && u.classId === selectedClassId && !u.archived);
     const familyIdsInClass = Array.from(new Set(studentsInClass.map(s => s.familyId))).filter(Boolean);
 
     const families = familyIdsInClass.map(famId => {
@@ -340,11 +341,11 @@ const AuthView: React.FC = () => {
     let filteredUsers: User[] = [];
 
     if (selectedContext === 'ADMIN') {
-      filteredUsers = users.filter(u => u.role === Role.ADMIN || u.role === Role.DIRECCION || u.role === Role.TESORERIA);
+      filteredUsers = users.filter(u => (u.role === Role.ADMIN || u.role === Role.DIRECCION || u.role === Role.TESORERIA) && !u.archived);
     } else if (selectedContext === 'SCHOOL') {
-      filteredUsers = users.filter(u => u.role === Role.TUTOR);
+      filteredUsers = users.filter(u => u.role === Role.TUTOR && !u.archived);
     } else {
-      filteredUsers = users.filter(u => u.familyId === selectedGroupId);
+      filteredUsers = users.filter(u => u.familyId === selectedGroupId && !u.archived);
     }
 
     return (
