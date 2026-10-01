@@ -118,6 +118,10 @@ passport.use(new GoogleStrategy({
         return cb(null, false, { message: 'Usuario no encontrado en el sistema local' });
       }
 
+      if (user.archived) {
+        return cb(null, false, { message: 'Usuario archivado' });
+      }
+
       if (user.role !== 'TUTOR' && user.role !== 'ADMIN') {
         return cb(null, false, { message: 'Acceso restringido a docentes' });
       }
@@ -210,7 +214,8 @@ app.post('/api/auth/external-check', async (req, res) => {
 
     const user = users.find(u =>
       (u.id === username || u.name === username || u.email === username) &&
-      u.pin === password
+      u.pin === password &&
+      !u.archived
     );
 
     if (user) {
