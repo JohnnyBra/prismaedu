@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 *.sqlite
 *.env
+
+# Git worktrees used for isolated feature work
+.worktrees/
