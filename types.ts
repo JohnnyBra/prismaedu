@@ -17,6 +17,7 @@ export interface ClassGroup {
   stage?: string;
   cycle?: string;
   level?: string;
+  nextClassId?: string; // Target class for direct (A→A, B→B) end-of-year promotion
 }
 
 // Avatar System
@@ -54,6 +55,11 @@ export interface User {
   pin: string;          // Simple login PIN (e.g., '0000')
   email?: string;       // For Google Auth
   altPin?: string;      // Alternative PIN
+
+  // Archiving (end-of-year graduation / orphaned family)
+  archived?: boolean;
+  archivedAt?: number;
+  archivedReason?: 'GRADUATED' | 'ORPHAN_FAMILY';
 }
 
 // Task Entity
