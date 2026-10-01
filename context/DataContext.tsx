@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Task, Reward, Role, TaskCompletion, ClassGroup, Message, Redemption } from '../types';
+import { PromotionPlan, computeOrphanParentIds } from '../utils/promotion';
 import { AVATAR_ITEMS } from '../constants';
 import { io, Socket } from 'socket.io-client';
 
@@ -46,6 +47,9 @@ interface DataContextType {
   updateFamilyId: (oldId: string, newId: string) => void;
   setAllUsers: (users: User[]) => void;
   migratePins: () => Promise<{ success: boolean, count: number }>;
+  moveStudentClass: (studentId: string, newClassId: string) => void;
+  setClassNextTarget: (classId: string, nextClassId: string) => void;
+  applyPromotion: (plan: PromotionPlan) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -180,7 +184,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = (userId: string, pin: string) => {
     const user = users.find(u => u.id === userId);
-    if (user && user.pin === pin) {
+    if (user && user.pin === pin && !user.archived) {
       setCurrentUserId(user.id);
       writeSession(user.id);
       // Trigger server-side SSO cookie creation (keepalive garantiza que completa aunque el usuario navegue)
@@ -422,6 +426,50 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitUsers(newUsersList);
   };
 
+  const moveStudentClass = (studentId: string, newClassId: string) => {
+    emitUserUpdate(studentId, { classId: newClassId });
+  };
+
+  const setClassNextTarget = (classId: string, nextClassId: string) => {
+    emitClasses(classes.map(c => c.id === classId ? { ...c, nextClassId } : c));
+  };
+
+  // Single atomic update: reassigns promoted/moved students, archives graduates and any
+  // family they leave with no active children, and unassigns tutors of every source class
+  // touched this run. Deliberately ONE emit — never call archiving/assignment logic in a
+  // loop across multiple rows, or each call would overwrite the previous one's changes
+  // (React state updates are not synchronous between calls).
+  const applyPromotion = (plan: PromotionPlan) => {
+    const graduatingClassIdSet = new Set(plan.graduatingClassIds);
+    const tutorUnassignSet = new Set(plan.classIdsToUnassignTutor);
+
+    const graduateIds = new Set(
+      users
+        .filter(u => u.role === Role.STUDENT && !u.archived && u.classId && graduatingClassIdSet.has(u.classId))
+        .map(u => u.id)
+    );
+    const orphanParentIds = new Set(computeOrphanParentIds(users, graduateIds));
+    const archivedAt = Date.now();
+
+    const newUsers = users.map(u => {
+      if (u.role === Role.STUDENT && plan.studentAssignments[u.id]) {
+        return { ...u, classId: plan.studentAssignments[u.id] };
+      }
+      if (graduateIds.has(u.id)) {
+        return { ...u, archived: true, archivedAt, archivedReason: 'GRADUATED' as const };
+      }
+      if (orphanParentIds.has(u.id)) {
+        return { ...u, archived: true, archivedAt, archivedReason: 'ORPHAN_FAMILY' as const };
+      }
+      if (u.role === Role.TUTOR && u.classId && tutorUnassignSet.has(u.classId)) {
+        return { ...u, classId: undefined };
+      }
+      return u;
+    });
+
+    emitUsers(newUsers);
+  };
+
   const migratePins = (): Promise<{ success: boolean, count: number }> => {
     return new Promise((resolve, reject) => {
       if (!socket) {
@@ -480,7 +528,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       deleteFamily,
       updateFamilyId,
       setAllUsers,
-      migratePins
+      migratePins,
+      moveStudentClass,
+      setClassNextTarget,
+      applyPromotion
     }}>
       {children}
     </DataContext.Provider>
