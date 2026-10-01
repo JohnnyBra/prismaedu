@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { AlertTriangle, ArrowRight, CheckCircle2, Download, GraduationCap, Users as UsersIcon } from 'lucide-react';
+import React, { useMemo, useRef, useState } from 'react';
+import { AlertTriangle, ArrowRight, CheckCircle2, Download, GraduationCap, Upload, Users as UsersIcon } from 'lucide-react';
 import { ClassGroup, Role, User } from '../types';
 import {
   LEVEL_SEQUENCE,
@@ -17,6 +17,7 @@ interface PromotionPanelProps {
   classes: ClassGroup[];
   setClassNextTarget: (classId: string, nextClassId: string) => void;
   applyPromotion: (plan: PromotionPlan) => void;
+  restoreFromSnapshot: (users: User[], classes: ClassGroup[]) => void;
 }
 
 interface DirectRow {
@@ -115,6 +116,16 @@ export const downloadSnapshot = (users: User[], classes: ClassGroup[]) => {
   URL.revokeObjectURL(url);
 };
 
+// Validates that a parsed JSON file looks like a snapshot produced by downloadSnapshot,
+// without trusting its shape blindly before it overwrites every user and class in the app.
+export const isValidSnapshot = (data: any): data is { generatedAt?: string; users: User[]; classes: ClassGroup[] } => {
+  if (!data || typeof data !== 'object') return false;
+  if (!Array.isArray(data.users) || !Array.isArray(data.classes)) return false;
+  if (data.users.some((u: any) => !u || typeof u.id !== 'string' || typeof u.role !== 'string')) return false;
+  if (data.classes.some((c: any) => !c || typeof c.id !== 'string' || typeof c.name !== 'string')) return false;
+  return true;
+};
+
 export const rowToPlan = (row: PromotionRow, manualAssignments: Record<string, string>): PromotionPlan | null => {
   if (row.type === 'DIRECT') {
     if (!row.targetClassId) return null;
@@ -201,11 +212,13 @@ export const computeCapacityWarnings = (rowsToRun: PromotionRow[], users: User[]
   return warnings;
 };
 
-const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClassNextTarget, applyPromotion }) => {
+const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClassNextTarget, applyPromotion, restoreFromSnapshot }) => {
   const rows = useMemo(() => buildRows(users, classes), [users, classes]);
   const [manualAssignments, setManualAssignments] = useState<Record<string, Record<string, string>>>({});
   const [directOverrides, setDirectOverrides] = useState<Record<string, string>>({});
   const [pendingPlan, setPendingPlan] = useState<{ plan: PromotionPlan; summary: string[]; warnings: string[] } | null>(null);
+  const [pendingRestore, setPendingRestore] = useState<{ users: User[]; classes: ClassGroup[]; generatedAt: string } | null>(null);
+  const restoreFileInputRef = useRef<HTMLInputElement>(null);
 
   const rowsWithResolvedTargets: PromotionRow[] = rows.map(row =>
     row.type === 'DIRECT' ? { ...row, targetClassId: directOverrides[row.key] ?? row.targetClassId } : row
@@ -262,10 +275,71 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
     setDirectOverrides({});
   };
 
+  const handleRestoreFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      let parsed: any;
+      try {
+        parsed = JSON.parse(ev.target?.result as string);
+      } catch {
+        alert('No se ha podido leer el fichero. Asegúrate de que es un JSON de copia de seguridad válido.');
+        return;
+      }
+      if (!isValidSnapshot(parsed)) {
+        alert('El fichero no tiene el formato de una copia de seguridad válida (se esperaban "users" y "classes").');
+        return;
+      }
+      setPendingRestore({ users: parsed.users, classes: parsed.classes, generatedAt: parsed.generatedAt || 'fecha desconocida' });
+    };
+    reader.readAsText(file);
+  };
+
+  const confirmRestore = () => {
+    if (!pendingRestore) return;
+    downloadSnapshot(users, classes); // safety net of the current state before overwriting it
+    restoreFromSnapshot(pendingRestore.users, pendingRestore.classes);
+    setPendingRestore(null);
+    setPendingPlan(null);
+    setManualAssignments({});
+    setDirectOverrides({});
+  };
+
+  const restoreControls = (
+    <>
+      <button
+        onClick={() => restoreFileInputRef.current?.click()}
+        className="btn-ghost flex items-center gap-2 text-sm"
+        title="Restaurar usuarios y clases desde un JSON de copia de seguridad"
+      >
+        <Upload size={18} /> Restaurar desde copia
+      </button>
+      <input
+        type="file"
+        ref={restoreFileInputRef}
+        onChange={handleRestoreFileChange}
+        accept=".json"
+        className="hidden"
+      />
+    </>
+  );
+
   if (rows.length === 0) {
     return (
-      <div className="glass rounded-2xl p-8 text-center text-white/40 font-body">
-        No hay alumnos activos pendientes de promoción.
+      <div className="space-y-4 animate-fade-in">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-display font-bold text-white/90">Promoción de Curso</h2>
+          {restoreControls}
+        </div>
+        <div className="glass rounded-2xl p-8 text-center text-white/40 font-body">
+          No hay alumnos activos pendientes de promoción.
+        </div>
+        {pendingRestore && (
+          <RestoreConfirmModal pendingRestore={pendingRestore} onCancel={() => setPendingRestore(null)} onConfirm={confirmRestore} />
+        )}
       </div>
     );
   }
@@ -274,9 +348,12 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
     <div className="space-y-4 animate-fade-in">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-display font-bold text-white/90">Promoción de Curso</h2>
-        <button onClick={() => requestPromotion(rowsWithResolvedTargets)} className="btn-primary flex items-center gap-2">
-          <CheckCircle2 size={18} /> Promocionar Todo
-        </button>
+        <div className="flex items-center gap-2">
+          {restoreControls}
+          <button onClick={() => requestPromotion(rowsWithResolvedTargets)} className="btn-primary flex items-center gap-2">
+            <CheckCircle2 size={18} /> Promocionar Todo
+          </button>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -365,9 +442,42 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
           </div>
         </div>
       )}
+
+      {pendingRestore && (
+        <RestoreConfirmModal pendingRestore={pendingRestore} onCancel={() => setPendingRestore(null)} onConfirm={confirmRestore} />
+      )}
     </div>
   );
 };
+
+interface RestoreConfirmModalProps {
+  pendingRestore: { users: User[]; classes: ClassGroup[]; generatedAt: string };
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+const RestoreConfirmModal: React.FC<RestoreConfirmModalProps> = ({ pendingRestore, onCancel, onConfirm }) => (
+  <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4" onClick={onCancel}>
+    <div className="glass-strong rounded-3xl p-6 w-full max-w-md shadow-glass-lg modal-content" onClick={e => e.stopPropagation()}>
+      <h3 className="text-lg font-display font-bold text-white/90 mb-4 flex items-center gap-2">
+        <AlertTriangle size={20} className="text-red-400" /> Restaurar Copia de Seguridad
+      </h3>
+      <p className="text-sm text-white/70 font-body mb-2">
+        Copia generada el: <span className="font-bold text-white/90">{pendingRestore.generatedAt}</span>
+      </p>
+      <p className="text-sm text-white/70 font-body mb-4">
+        Esto reemplazará TODOS los usuarios ({pendingRestore.users.length}) y clases ({pendingRestore.classes.length}) actuales por los del fichero. Se descargará automáticamente una copia del estado actual antes de aplicar el cambio, por si hace falta deshacerlo.
+      </p>
+      <p className="text-xs text-red-400/80 font-body mb-6 font-bold">
+        Esta acción no se puede deshacer desde la aplicación.
+      </p>
+      <div className="flex gap-3">
+        <button onClick={onCancel} className="btn-ghost flex-1">Cancelar</button>
+        <button onClick={onConfirm} className="btn-danger flex-1">Confirmar Restauración</button>
+      </div>
+    </div>
+  </div>
+);
 
 interface ManualRowViewProps {
   row: ManualRow;

@@ -50,6 +50,7 @@ interface DataContextType {
   moveStudentClass: (studentId: string, newClassId: string) => void;
   setClassNextTarget: (classId: string, nextClassId: string) => void;
   applyPromotion: (plan: PromotionPlan) => void;
+  restoreFromSnapshot: (users: User[], classes: ClassGroup[]) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -470,6 +471,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     emitUsers(newUsers);
   };
 
+  const restoreFromSnapshot = (restoredUsers: User[], restoredClasses: ClassGroup[]) => {
+    emitUsers(restoredUsers);
+    emitClasses(restoredClasses);
+  };
+
   const migratePins = (): Promise<{ success: boolean, count: number }> => {
     return new Promise((resolve, reject) => {
       if (!socket) {
@@ -531,7 +537,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       migratePins,
       moveStudentClass,
       setClassNextTarget,
-      applyPromotion
+      applyPromotion,
+      restoreFromSnapshot
     }}>
       {children}
     </DataContext.Provider>
