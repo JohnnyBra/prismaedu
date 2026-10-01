@@ -27,6 +27,7 @@ interface DirectRow {
   sourceClass: ClassGroup;
   targetClassId: string | null;
   students: User[];
+  levelClasses: ClassGroup[]; // every class at this same level (A/B/...), offered as "repeats" options
 }
 
 interface ManualRow {
@@ -75,7 +76,8 @@ export const buildRows = (users: User[], classes: ClassGroup[]): PromotionRow[] 
           level,
           sourceClass: cls,
           targetClassId: resolveNextClassId(cls, classes),
-          students
+          students,
+          levelClasses: classesAtLevel
         });
       });
     } else if (transitionType === 'MANUAL') {
@@ -126,11 +128,17 @@ export const isValidSnapshot = (data: any): data is { generatedAt?: string; user
   return true;
 };
 
-export const rowToPlan = (row: PromotionRow, manualAssignments: Record<string, string>): PromotionPlan | null => {
+// repeatAssignments maps a studentId to a class at their CURRENT level: a student present here
+// is held back instead of following the row's normal target (promotion) or fate (graduation).
+export const rowToPlan = (
+  row: PromotionRow,
+  manualAssignments: Record<string, string>,
+  repeatAssignments: Record<string, string>
+): PromotionPlan | null => {
   if (row.type === 'DIRECT') {
     if (!row.targetClassId) return null;
     const studentAssignments: Record<string, string> = {};
-    row.students.forEach(s => { studentAssignments[s.id] = row.targetClassId!; });
+    row.students.forEach(s => { studentAssignments[s.id] = repeatAssignments[s.id] || row.targetClassId!; });
     return { studentAssignments, graduatingClassIds: [], classIdsToUnassignTutor: [row.sourceClass.id] };
   }
   if (row.type === 'MANUAL') {
@@ -146,8 +154,14 @@ export const rowToPlan = (row: PromotionRow, manualAssignments: Record<string, s
       classIdsToUnassignTutor: row.sourceClasses.map(c => c.id)
     };
   }
+  // TERMINAL: a repeating student gets an explicit studentAssignments entry instead of being
+  // swept into graduatingClassIds, so they stay active in their chosen class rather than archived.
+  const studentAssignments: Record<string, string> = {};
+  row.students.forEach(s => {
+    if (repeatAssignments[s.id]) studentAssignments[s.id] = repeatAssignments[s.id];
+  });
   return {
-    studentAssignments: {},
+    studentAssignments,
     graduatingClassIds: row.sourceClasses.map(c => c.id),
     classIdsToUnassignTutor: row.sourceClasses.map(c => c.id)
   };
@@ -164,7 +178,13 @@ export const describePlan = (plan: PromotionPlan, users: User[]): string[] => {
   const movedCount = Object.keys(plan.studentAssignments).length;
   if (movedCount > 0) lines.push(`${movedCount} alumno(s) cambiarán de clase.`);
   if (plan.graduatingClassIds.length > 0) {
-    const graduates = users.filter(u => u.role === Role.STUDENT && !u.archived && u.classId && plan.graduatingClassIds.includes(u.classId));
+    // Exclude students with an explicit studentAssignments entry: those are marked as repeating
+    // (see rowToPlan's TERMINAL branch) and will NOT actually be archived — applyPromotion gives
+    // that reassignment priority over class-membership-based graduation.
+    const graduates = users.filter(u =>
+      u.role === Role.STUDENT && !u.archived && u.classId &&
+      plan.graduatingClassIds.includes(u.classId) && !plan.studentAssignments[u.id]
+    );
     const orphanParents = computeOrphanParentIds(users, new Set(graduates.map(g => g.id)));
     lines.push(`${graduates.length} alumno(s) se graduarán y quedarán archivados.`);
     if (orphanParents.length > 0) lines.push(`${orphanParents.length} familia(s) quedarán archivadas (sin hijos activos).`);
@@ -195,7 +215,12 @@ export const computeOrderWarnings = (rowsToRun: PromotionRow[], allRows: Promoti
 };
 
 // Warns when a direct (per-class) promotion would leave the target class with more than 10 students.
-export const computeCapacityWarnings = (rowsToRun: PromotionRow[], users: User[], classes: ClassGroup[]): string[] => {
+export const computeCapacityWarnings = (
+  rowsToRun: PromotionRow[],
+  users: User[],
+  classes: ClassGroup[],
+  repeatAssignments: Record<string, string>
+): string[] => {
   const warnings: string[] = [];
 
   rowsToRun.forEach(row => {
@@ -203,7 +228,9 @@ export const computeCapacityWarnings = (rowsToRun: PromotionRow[], users: User[]
     const targetClass = classes.find(c => c.id === row.targetClassId);
     if (!targetClass) return;
     const existingCount = users.filter(u => u.role === Role.STUDENT && !u.archived && u.classId === row.targetClassId).length;
-    const total = existingCount + row.students.length;
+    // Repeating students don't actually move to the target class, so they don't count toward it.
+    const movingCount = row.students.filter(s => !repeatAssignments[s.id]).length;
+    const total = existingCount + movingCount;
     if (total > 10) {
       warnings.push(`"${targetClass.name}" tendrá ${total} alumnos tras la promoción (más de 10).`);
     }
@@ -216,6 +243,9 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
   const rows = useMemo(() => buildRows(users, classes), [users, classes]);
   const [manualAssignments, setManualAssignments] = useState<Record<string, Record<string, string>>>({});
   const [directOverrides, setDirectOverrides] = useState<Record<string, string>>({});
+  // studentId -> class at their current level they repeat in, for DIRECT/TERMINAL ESO rows.
+  // A flat map (not keyed by row) is safe: a given student only ever appears in one row at a time.
+  const [repeatAssignments, setRepeatAssignments] = useState<Record<string, string>>({});
   const [pendingPlan, setPendingPlan] = useState<{ plan: PromotionPlan; summary: string[]; warnings: string[] } | null>(null);
   const [pendingRestore, setPendingRestore] = useState<{ users: User[]; classes: ClassGroup[]; generatedAt: string } | null>(null);
   const restoreFileInputRef = useRef<HTMLInputElement>(null);
@@ -238,13 +268,27 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
     }));
   };
 
+  const handleRepeatToggle = (studentId: string, checked: boolean, defaultClassId: string) => {
+    setRepeatAssignments(prev => {
+      if (!checked) {
+        const { [studentId]: _removed, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [studentId]: defaultClassId };
+    });
+  };
+
+  const handleRepeatClassChange = (studentId: string, classId: string) => {
+    setRepeatAssignments(prev => ({ ...prev, [studentId]: classId }));
+  };
+
   const requestPromotion = (rowsToRun: PromotionRow[]) => {
     const plans: PromotionPlan[] = [];
     const unresolved: string[] = [];
 
     rowsToRun.forEach(row => {
       const assignments = row.type === 'MANUAL' ? (manualAssignments[row.key] || {}) : {};
-      const plan = rowToPlan(row, assignments);
+      const plan = rowToPlan(row, assignments, repeatAssignments);
       if (!plan) {
         unresolved.push(row.type === 'DIRECT' ? row.sourceClass.name : row.level);
       } else {
@@ -261,7 +305,7 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
     const mergedPlan = mergePlans(plans);
     const warnings = [
       ...computeOrderWarnings(rowsToRun, rowsWithResolvedTargets),
-      ...computeCapacityWarnings(rowsToRun, users, classes)
+      ...computeCapacityWarnings(rowsToRun, users, classes, repeatAssignments)
     ];
     setPendingPlan({ plan: mergedPlan, summary: describePlan(mergedPlan, users), warnings });
   };
@@ -273,6 +317,7 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
     setPendingPlan(null);
     setManualAssignments({});
     setDirectOverrides({});
+    setRepeatAssignments({});
   };
 
   const handleRestoreFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -360,29 +405,41 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
         {rowsWithResolvedTargets.map(row => (
           <div key={row.key} className="glass rounded-2xl shadow-glass p-4">
             {row.type === 'DIRECT' && (
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <p className="font-bold text-white/90 font-body">{row.sourceClass.name}</p>
-                  <p className="text-xs text-white/40">{row.students.length} alumnos activos</p>
+              <div>
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
+                    <p className="font-bold text-white/90 font-body">{row.sourceClass.name}</p>
+                    <p className="text-xs text-white/40">{row.students.length} alumnos activos</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ArrowRight size={18} className="text-white/30" />
+                    <select
+                      value={effectiveTargetClassId(row)}
+                      onChange={e => handleDirectTargetChange(row, e.target.value)}
+                      className="input-glass text-sm"
+                    >
+                      <option value="">-- Sin destino --</option>
+                      {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                    <button
+                      onClick={() => requestPromotion([row])}
+                      disabled={!effectiveTargetClassId(row)}
+                      className="btn-ghost text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Promocionar grupo
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <ArrowRight size={18} className="text-white/30" />
-                  <select
-                    value={effectiveTargetClassId(row)}
-                    onChange={e => handleDirectTargetChange(row, e.target.value)}
-                    className="input-glass text-sm"
-                  >
-                    <option value="">-- Sin destino --</option>
-                    {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                  <button
-                    onClick={() => requestPromotion([row])}
-                    disabled={!effectiveTargetClassId(row)}
-                    className="btn-ghost text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    Promocionar grupo
-                  </button>
-                </div>
+                {row.sourceClass.stage === 'ESO' && (
+                  <RepeatersDisclosure
+                    summary="¿Algún alumno repite curso?"
+                    students={row.students}
+                    options={row.levelClasses}
+                    repeatAssignments={repeatAssignments}
+                    onToggle={handleRepeatToggle}
+                    onClassChange={handleRepeatClassChange}
+                  />
+                )}
               </div>
             )}
 
@@ -396,19 +453,31 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
             )}
 
             {row.type === 'TERMINAL' && (
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <p className="font-bold text-white/90 font-body flex items-center gap-2">
-                    <GraduationCap size={16} className="text-amber-400" /> {row.level}
-                    <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-lg uppercase">Graduación</span>
-                  </p>
-                  <p className="text-xs text-white/40">
-                    {row.students.length} alumnos de {row.sourceClasses.map(c => c.name).join(', ')} quedarán archivados
-                  </p>
+              <div>
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
+                    <p className="font-bold text-white/90 font-body flex items-center gap-2">
+                      <GraduationCap size={16} className="text-amber-400" /> {row.level}
+                      <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-lg uppercase">Graduación</span>
+                    </p>
+                    <p className="text-xs text-white/40">
+                      {row.students.length} alumnos de {row.sourceClasses.map(c => c.name).join(', ')} quedarán archivados
+                    </p>
+                  </div>
+                  <button onClick={() => requestPromotion([row])} className="btn-ghost text-sm !bg-amber-500/15 !border-amber-500/25 !text-amber-300">
+                    Graduar
+                  </button>
                 </div>
-                <button onClick={() => requestPromotion([row])} className="btn-ghost text-sm !bg-amber-500/15 !border-amber-500/25 !text-amber-300">
-                  Graduar
-                </button>
+                {row.sourceClasses[0]?.stage === 'ESO' && (
+                  <RepeatersDisclosure
+                    summary="¿Algún alumno no se gradúa y repite?"
+                    students={row.students}
+                    options={row.sourceClasses}
+                    repeatAssignments={repeatAssignments}
+                    onToggle={handleRepeatToggle}
+                    onClassChange={handleRepeatClassChange}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -519,6 +588,48 @@ const ManualRowView: React.FC<ManualRowViewProps> = ({ row, assignments, onAssig
       ))}
     </div>
   </div>
+);
+
+interface RepeatersDisclosureProps {
+  summary: string;
+  students: User[];
+  options: ClassGroup[];
+  repeatAssignments: Record<string, string>;
+  onToggle: (studentId: string, checked: boolean, defaultClassId: string) => void;
+  onClassChange: (studentId: string, classId: string) => void;
+}
+
+// Collapsed by default ("de manera sencilla"): most promotions have no repeaters, so this stays
+// out of the way until an admin explicitly opens it to mark the few students who don't move on.
+const RepeatersDisclosure: React.FC<RepeatersDisclosureProps> = ({ summary, students, options, repeatAssignments, onToggle, onClassChange }) => (
+  <details className="mt-3">
+    <summary className="text-xs text-white/40 cursor-pointer hover:text-white/60 transition-colors select-none">
+      {summary}
+    </summary>
+    <div className="mt-2 pt-2 border-t border-white/5 divide-y divide-white/5">
+      {students.map(s => (
+        <div key={s.id} className="flex items-center justify-between py-2 gap-3">
+          <label className="flex items-center gap-2 text-sm text-white/70 font-body cursor-pointer">
+            <input
+              type="checkbox"
+              checked={!!repeatAssignments[s.id]}
+              onChange={e => onToggle(s.id, e.target.checked, s.classId || options[0]?.id || '')}
+            />
+            {s.name}
+          </label>
+          {repeatAssignments[s.id] && (
+            <select
+              value={repeatAssignments[s.id]}
+              onChange={e => onClassChange(s.id, e.target.value)}
+              className="input-glass text-xs !py-1"
+            >
+              {options.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          )}
+        </div>
+      ))}
+    </div>
+  </details>
 );
 
 export default PromotionPanel;

@@ -458,9 +458,15 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const graduatingClassIdSet = new Set(plan.graduatingClassIds);
     const tutorUnassignSet = new Set(plan.classIdsToUnassignTutor);
 
+    // A student with an explicit studentAssignments entry is being held back a year (repeating)
+    // rather than graduating, even though their class is in graduatingClassIds — exclude them so
+    // they aren't archived, and so computeOrphanParentIds below doesn't treat them as gone.
     const graduateIds = new Set(
       users
-        .filter(u => u.role === Role.STUDENT && !u.archived && u.classId && graduatingClassIdSet.has(u.classId))
+        .filter(u =>
+          u.role === Role.STUDENT && !u.archived && u.classId && graduatingClassIdSet.has(u.classId) &&
+          !plan.studentAssignments[u.id]
+        )
         .map(u => u.id)
     );
     const orphanParentIds = new Set(computeOrphanParentIds(users, graduateIds));
