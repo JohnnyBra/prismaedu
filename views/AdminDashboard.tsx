@@ -5,6 +5,7 @@ import { Role, User, Task } from '../types';
 import { Users, School, BookOpen, LogOut, Plus, Trash2, Edit2, Save, X, ChevronRight, UserPlus, GraduationCap, Home, CheckSquare, ArrowRightLeft, Key, Upload, Briefcase, ArrowLeft, User as UserIcon, Printer, Archive, Repeat, ArrowUpCircle } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import Avatar from '../components/Avatar';
+import MoveClassModal from '../components/MoveClassModal';
 
 type AdminTab = 'CLASSES' | 'TUTORS' | 'FAMILIES' | 'TASKS' | 'STAFF';
 
@@ -19,7 +20,7 @@ const getSortKey = (u: User) => {
 };
 
 const AdminDashboard: React.FC = () => {
-  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers, migratePins } = useData();
+  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers, migratePins, moveStudentClass, setClassNextTarget, applyPromotion } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
 
   // Local state for edits/creation
@@ -90,6 +91,9 @@ const AdminDashboard: React.FC = () => {
 
   // Archived families visibility toggle (FAMILIES tab)
   const [showArchivedFamilies, setShowArchivedFamilies] = useState(false);
+
+  // Move-class modal state (shared by CLASSES detail roster and FAMILIES tab)
+  const [movingStudent, setMovingStudent] = useState<User | null>(null);
 
   // Task Edit State
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -936,6 +940,13 @@ const AdminDashboard: React.FC = () => {
                      </div>
                   </div>
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                     <button
+                        onClick={(e) => { e.stopPropagation(); setMovingStudent(student); }}
+                        className="p-1.5 rounded-lg text-white/30 hover:text-secondary-400 transition-colors"
+                        title="Cambiar de clase"
+                     >
+                        <Repeat size={16} />
+                     </button>
                      <span className="text-[10px] font-bold text-primary-400 bg-primary-500/15 px-2 py-1 rounded-lg">EDITAR</span>
                      <ChevronRight size={16} className="text-primary-400/60" />
                   </div>
@@ -1583,14 +1594,13 @@ const AdminDashboard: React.FC = () => {
                                </div>
                              </div>
                              <div className="flex gap-2 items-center">
-                                <select
-                                  value={s.classId || ''}
-                                  onChange={(e) => updateUser(s.id, { classId: e.target.value })}
-                                  className="input-glass text-xs !py-0 !px-1 !rounded-lg !border-transparent !bg-transparent text-white/40 w-20"
+                                <button
+                                  onClick={() => setMovingStudent(s)}
+                                  className="text-white/20 hover:text-secondary-400 transition-colors"
+                                  title="Cambiar de clase"
                                 >
-                                   <option value="">Clase?</option>
-                                   {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
+                                  <Repeat size={14} />
+                                </button>
                                 <button
                                   onClick={() => handleEditGenericUser(s)}
                                   className="text-white/20 hover:text-primary-400 transition-colors"
@@ -1807,6 +1817,16 @@ const AdminDashboard: React.FC = () => {
             accept=".csv"
             className="hidden"
           />
+
+         {movingStudent && (
+           <MoveClassModal
+             student={movingStudent}
+             classes={classes}
+             users={users}
+             onClose={() => setMovingStudent(null)}
+             onConfirm={(newClassId) => { moveStudentClass(movingStudent.id, newClassId); setMovingStudent(null); }}
+           />
+         )}
       </main>
     </div>
   );
