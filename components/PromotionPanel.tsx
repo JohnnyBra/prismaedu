@@ -345,7 +345,12 @@ const ManualRowView: React.FC<ManualRowViewProps> = ({ row, assignments, onAssig
             className="input-glass text-xs !py-1"
           >
             <option value="">-- Clase destino --</option>
-            {row.targetOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            <optgroup label={`Promociona a ${row.nextLevel}`}>
+              {row.targetOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </optgroup>
+            <optgroup label="No promociona (repite)">
+              {row.sourceClasses.map(c => <option key={c.id} value={c.id}>{c.name} (repite)</option>)}
+            </optgroup>
           </select>
         </div>
       ))}
