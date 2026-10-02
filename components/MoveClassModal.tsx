@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Repeat } from 'lucide-react';
+import { X, Repeat, AlertTriangle } from 'lucide-react';
 import { ClassGroup, Role, User } from '../types';
 
 interface MoveClassModalProps {
@@ -65,6 +65,15 @@ const MoveClassModal: React.FC<MoveClassModalProps> = ({ student, classes, users
               {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
+
+          {targetClassId && targetClassId !== student.classId && (
+            <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-xs text-amber-200 font-body flex gap-2">
+              <AlertTriangle size={16} className="shrink-0 text-amber-400 mt-0.5" />
+              <p>
+                <span className="font-bold">Atención:</span> este cambio es inmediato y queda reflejado para toda la clase al confirmar. Revisa que la clase destino es la correcta antes de continuar.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-3">

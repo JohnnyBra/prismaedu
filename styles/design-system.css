@@ -410,6 +410,14 @@ html[data-theme="light"] body {
   color: rgba(255, 255, 255, 0.35);
 }
 
+/* Native <option> popups render with an opaque OS background that ignores the
+   translucent glass styling above — without this, dropdown text stays white
+   on a white popup background and is unreadable. */
+.input-glass option {
+  background-color: #0f172a;
+  color: white;
+}
+
 /* ============ BUTTON STYLES ============ */
 .btn-primary {
   background: linear-gradient(135deg, #6366f1, #4f46e5);
@@ -860,6 +868,11 @@ html[data-theme="light"] .input-glass:focus {
 
 html[data-theme="light"] .input-glass::placeholder {
   color: rgba(15, 23, 42, 0.35);
+}
+
+html[data-theme="light"] .input-glass option {
+  background-color: #ffffff;
+  color: #1e293b;
 }
 
 /* --- Modal overrides --- */
