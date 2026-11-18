@@ -67,12 +67,15 @@ interface DataContextType {
   createBackup: () => Promise<{ filename: string; generatedAt: string; data: BackupData }>;
   listBackups: () => Promise<BackupInfo[]>;
   restoreBackup: (payload: { filename: string } | { data: BackupData }) => Promise<void>;
+  schoolYear: number | null;
+  setSchoolYear: (startYear: number) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [schoolYear, setSchoolYearState] = useState<number | null>(null);
   const [connected, setConnected] = useState(false);
   const SESSION_TTL = 8 * 60 * 60 * 1000; // 8 horas
 
@@ -142,7 +145,9 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setCompletions(data.completions);
       setMessages(data.messages);
       setRedemptions(data.redemptions);
+      setSchoolYearState(data.schoolYear ?? null);
     });
+    newSocket.on('sync_school_year', (year: number) => setSchoolYearState(year));
 
     newSocket.on('sync_users', (data) => setUsers(data));
     newSocket.on('sync_user_updated', ({ id, updates }) => {
@@ -583,8 +588,15 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
+  const setSchoolYear = (startYear: number) => {
+    if (!socket || !currentUser) return;
+    socket.emit('set_school_year', { requesterId: currentUser.id, startYear });
+  };
+
   return (
     <DataContext.Provider value={{
+      schoolYear,
+      setSchoolYear,
       currentUser,
       restoringSession,
       users,

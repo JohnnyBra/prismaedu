@@ -286,7 +286,24 @@ const checkApiSecret = (req, res, next) => {
   next();
 };
 
+// Curso escolar actual: el que fije el admin en «Promoción de curso»;
+// si nunca lo ha fijado, el que toca por la fecha (empieza en septiembre).
+const getSchoolYear = async () => {
+  const stored = await getData('schoolYear', null);
+  if (Number.isInteger(stored)) return stored;
+  const now = new Date();
+  return now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+};
+
 // Export APIs
+app.get('/api/export/school-year', checkApiSecret, async (req, res) => {
+  try {
+    res.json({ startYear: await getSchoolYear() });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get('/api/export/classes', checkApiSecret, async (req, res) => {
   try {
     const classes = await getData('classes', []);
@@ -352,7 +369,7 @@ io.on('connection', async (socket) => {
     getData('redemptions', [])
   ]);
 
-  socket.emit('init_state', { users, classes, tasks, rewards, completions, messages, redemptions });
+  socket.emit('init_state', { users, classes, tasks, rewards, completions, messages, redemptions, schoolYear: await getSchoolYear() });
 
   // Handle Updates
   socket.on('update_users', async (newUsers) => {
@@ -499,6 +516,16 @@ io.on('connection', async (socket) => {
       console.error('Backup creation error:', error);
       if (callback) callback({ success: false, error: error.message });
     }
+  });
+
+  socket.on('set_school_year', async ({ requesterId, startYear } = {}, callback) => {
+    if (!(await authorizeBackupRequest(requesterId)) || !Number.isInteger(startYear) || startYear < 2000 || startYear > 2100) {
+      if (callback) callback({ success: false, error: 'Unauthorized or invalid year' });
+      return;
+    }
+    await setData('schoolYear', startYear);
+    io.emit('sync_school_year', startYear);
+    if (callback) callback({ success: true });
   });
 
   socket.on('list_backups', async ({ requesterId } = {}, callback) => {
