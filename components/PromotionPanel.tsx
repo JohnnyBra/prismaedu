@@ -391,9 +391,9 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap justify-between items-center gap-3">
         <h2 className="text-xl font-display font-bold text-white/90">Promoción de Curso</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {restoreControls}
           <button onClick={() => requestPromotion(rowsWithResolvedTargets)} className="btn-primary flex items-center gap-2">
             <CheckCircle2 size={18} /> Promocionar Todo
@@ -416,6 +416,7 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
                     <select
                       value={effectiveTargetClassId(row)}
                       onChange={e => handleDirectTargetChange(row, e.target.value)}
+                      aria-label="Clase de destino"
                       className="input-glass text-sm"
                     >
                       <option value="">-- Sin destino --</option>

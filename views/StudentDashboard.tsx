@@ -268,7 +268,7 @@ const StudentDashboard: React.FC = () => {
                   Toca para continuar
                 </p>
               </div>
-              <button
+              <button aria-label="Cerrar"
                 onClick={(e) => { e.stopPropagation(); setGreetingState('CLOSING'); }}
                 className="absolute top-6 right-6 p-3 bg-white/10 rounded-full hover:bg-white/20 transition-colors text-white z-20"
               >
@@ -283,10 +283,24 @@ const StudentDashboard: React.FC = () => {
       <div className="glass-student hs-luz sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
         <div className="flex justify-between items-center max-w-4xl mx-auto">
           <div className="flex items-center gap-3 cursor-pointer group">
-            <div onClick={(e) => { e.stopPropagation(); setGreetingState('SHOWING'); }} className="hover:scale-110 transition-transform">
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Ver mi saludo"
+              onClick={(e) => { e.stopPropagation(); setGreetingState('SHOWING'); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setGreetingState('SHOWING'); } }}
+              className="hover:scale-110 transition-transform rounded-full"
+            >
               <Avatar config={currentUser?.avatarConfig} size={48} showRing glowColor="rgba(10,160,220,0.5)" />
             </div>
-            <div onClick={() => setShowSettings(true)}>
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Abrir ajustes"
+              onClick={() => setShowSettings(true)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowSettings(true); } }}
+              className="rounded-xl"
+            >
               <h1 className="font-display font-extrabold text-white leading-none text-base">
                 ¡Hola, {currentUser?.name?.split(' ')[0]}! 👋
               </h1>
@@ -301,10 +315,10 @@ const StudentDashboard: React.FC = () => {
           <div className="flex gap-2 items-center">
             <img src="/suite/escudo.png" alt="Colegio La Hispanidad" className="hs-escudo mr-1" />
             <ThemeToggle className="glass rounded-xl text-white/50 hover:text-white/90 hover:bg-white/10" />
-            <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/50 hover:text-white/90 hover:bg-white/10 transition-all hover:scale-105">
+            <button aria-label="Ajustes" onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/50 hover:text-white/90 hover:bg-white/10 transition hover:scale-105">
               <Settings size={18} />
             </button>
-            <button onClick={logout} className="glass rounded-xl p-2.5 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 transition-all hover:scale-105">
+            <button aria-label="Cerrar sesión" onClick={logout} className="glass rounded-xl p-2.5 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 transition hover:scale-105">
               <LogOut size={18} />
             </button>
           </div>
@@ -318,7 +332,7 @@ const StudentDashboard: React.FC = () => {
         {showSettings && (
           <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
             <div className="glass-strong rounded-3xl p-6 w-full max-w-sm shadow-glass-lg modal-content relative">
-              <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors">
+              <button aria-label="Cerrar" onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors">
                 <X size={20} />
               </button>
               <h2 className="font-display text-lg font-bold text-white mb-4 flex items-center gap-2">⚙️ Ajustes</h2>
@@ -362,7 +376,7 @@ const StudentDashboard: React.FC = () => {
 
               <button
                 onClick={handlePriorityAck}
-                className="w-full py-4 text-lg font-display font-bold text-white rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-amber-500 shadow-lg hover:shadow-xl transition-all active:scale-95 hover:scale-[1.02]"
+                className="w-full py-4 text-lg font-display font-bold text-white rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-amber-500 shadow-lg hover:shadow-xl transition active:scale-95 hover:scale-[1.02]"
               >
                 <Sparkles size={18} className="inline mr-2" /> ¡Vamos allá!
               </button>
@@ -378,7 +392,7 @@ const StudentDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-300 relative ${active
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-display font-bold text-sm transition duration-300 relative ${active
                   ? 'glass-student-card text-white student-tab-active'
                   : 'glass text-white/40 hover:text-white/70 hover:bg-white/8 hover:scale-[1.02]'
                   }`}
@@ -407,7 +421,7 @@ const StudentDashboard: React.FC = () => {
                 <button
                   key={f.key}
                   onClick={() => setTaskFilter(f.key)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all duration-200 hover:scale-105 active:scale-95 ${taskFilter === f.key ? f.activeClass : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
+                  className={`px-4 py-2.5 min-h-10 rounded-full text-xs font-bold whitespace-nowrap border transition duration-200 hover:scale-105 active:scale-95 ${taskFilter === f.key ? f.activeClass : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
                     }`}
                 >
                   {f.label}
@@ -443,19 +457,19 @@ const StudentDashboard: React.FC = () => {
             <div className="flex glass rounded-xl p-1 mb-5">
               <button
                 onClick={() => setShopView('CATALOG')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopView === 'CATALOG' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
+                className={`flex-1 py-2.5 min-h-10 text-xs font-bold rounded-lg transition duration-200 ${shopView === 'CATALOG' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
               >
                 🛍️ Catalogo
               </button>
               <button
                 onClick={() => setShopView('WARDROBE')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopView === 'WARDROBE' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
+                className={`flex-1 py-2.5 min-h-10 text-xs font-bold rounded-lg transition duration-200 ${shopView === 'WARDROBE' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
               >
                 👗 Vestidor
               </button>
               <button
                 onClick={() => setShopView('HISTORY')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 ${shopView === 'HISTORY' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
+                className={`flex-1 py-2.5 min-h-10 text-xs font-bold rounded-lg transition duration-200 flex items-center justify-center gap-1.5 ${shopView === 'HISTORY' ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'}`}
               >
                 📜 Historial
               </button>
@@ -473,7 +487,7 @@ const StudentDashboard: React.FC = () => {
                     <button
                       key={cat.key}
                       onClick={() => setShopCategory(cat.key)}
-                      className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${shopCategory === cat.key ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'
+                      className={`flex-1 py-2.5 min-h-10 text-xs font-bold rounded-lg transition duration-200 ${shopCategory === cat.key ? 'glass-student-card text-white' : 'text-white/40 hover:text-white/60'
                         }`}
                     >
                       {cat.label}
@@ -489,7 +503,7 @@ const StudentDashboard: React.FC = () => {
                         <button
                           key={cat.key}
                           onClick={() => setAvatarFilter(cat.key)}
-                          className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 ${avatarFilter === cat.key
+                          className={`px-3 py-2 min-h-10 rounded-full text-[11px] font-bold whitespace-nowrap border transition duration-200 ${avatarFilter === cat.key
                               ? 'bg-white/15 text-white border-white/25'
                               : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
                             }`}
@@ -551,13 +565,13 @@ const StudentDashboard: React.FC = () => {
                             <div className="mt-2 w-full">
                               {owned ? (
                                 equipped ? (
-                                  <button className="w-full py-1.5 glass text-amber-400/60 rounded-lg text-[10px] font-bold cursor-default" disabled>
+                                  <button className="w-full py-2.5 min-h-10 glass text-amber-400/60 rounded-lg text-[10px] font-bold cursor-default" disabled>
                                     ⭐ Equipado
                                   </button>
                                 ) : (
                                   <button
                                     onClick={() => handleEquip(item.id)}
-                                    className="w-full py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-[10px] font-bold transition-all hover:brightness-110 active:scale-95"
+                                    className="w-full py-2.5 min-h-10 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-[10px] font-bold transition hover:brightness-110 active:scale-95"
                                   >
                                     👗 Equipar
                                   </button>
@@ -566,7 +580,7 @@ const StudentDashboard: React.FC = () => {
                                 <button
                                   onClick={() => buyAvatarItem(item.id)}
                                   disabled={currentUser!.points < item.cost}
-                                  className="w-full py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 disabled:from-surface-700 disabled:to-surface-700 disabled:text-white/20 text-white rounded-lg text-[10px] font-bold transition-all hover:shadow-neon-purple active:scale-95 hover:brightness-110"
+                                  className="w-full py-2.5 min-h-10 bg-gradient-to-r from-purple-500 to-pink-500 disabled:from-surface-700 disabled:to-surface-700 disabled:text-white/20 text-white rounded-lg text-[10px] font-bold transition hover:shadow-neon-purple active:scale-95 hover:brightness-110"
                                 >
                                   {item.cost === 0 ? '🎁 Gratis' : `⭐ ${item.cost}`}
                                 </button>
@@ -613,7 +627,7 @@ const StudentDashboard: React.FC = () => {
                       <button
                         key={cat.key}
                         onClick={() => setWardrobeFilter(cat.key)}
-                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 relative ${wardrobeFilter === cat.key
+                        className={`px-3 py-2 min-h-10 rounded-full text-[11px] font-bold whitespace-nowrap border transition duration-200 relative ${wardrobeFilter === cat.key
                             ? 'bg-white/15 text-white border-white/25'
                             : 'border-white/10 text-white/35 hover:text-white/60 hover:border-white/20'
                           }`}
@@ -629,7 +643,7 @@ const StudentDashboard: React.FC = () => {
                 {currentUser?.avatarConfig?.[AVATAR_CATEGORIES.find(c => c.key === wardrobeFilter)!.configKey] && (
                   <button
                     onClick={() => handleUnequip(wardrobeFilter)}
-                    className="w-full mb-3 py-2 glass rounded-xl text-xs font-bold text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-all"
+                    className="w-full mb-3 py-2 glass rounded-xl text-xs font-bold text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition"
                   >
                     ✕ Quitar {AVATAR_CATEGORIES.find(c => c.key === wardrobeFilter)?.label}
                   </button>
@@ -653,7 +667,7 @@ const StudentDashboard: React.FC = () => {
                         onClick={() => equipped ? handleUnequip(item.type) : handleEquip(item.id)}
                         onMouseEnter={() => setPreviewItem(item.id)}
                         onMouseLeave={() => setPreviewItem(null)}
-                        className={`glass-student-card rounded-2xl p-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.05] ${equipped ? 'ring-2 ring-amber-400/60 bg-amber-400/10' : ''
+                        className={`glass-student-card rounded-2xl p-3 flex flex-col items-center transition duration-200 hover:scale-[1.05] ${equipped ? 'ring-2 ring-amber-400/60 bg-amber-400/10' : ''
                           }`}
                         style={{ animation: `slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.04}s both` }}
                       >
@@ -740,12 +754,13 @@ const StudentDashboard: React.FC = () => {
             <div className="p-3 glass-student flex gap-2">
               <input
                 className="input-glass flex-1 rounded-full text-sm py-2"
-                placeholder="Escribe un mensaje... ✏️"
+                placeholder="Escribe un mensaje… ✏️"
+                aria-label="Mensaje para tu profe"
                 value={chatMessage}
                 onChange={e => setChatMessage(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
               />
-              <button onClick={handleSendMessage} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-2.5 rounded-full shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all active:scale-95 hover:scale-105">
+              <button aria-label="Enviar" onClick={handleSendMessage} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-2.5 rounded-full shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition active:scale-95 hover:scale-105">
                 <Send size={16} />
               </button>
             </div>
@@ -765,13 +780,13 @@ const StudentDashboard: React.FC = () => {
               <div className="flex gap-2 mb-4 p-1 glass rounded-xl">
                 <button
                   onClick={() => setBuzonContext('SCHOOL')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${buzonContext === 'SCHOOL' ? 'bg-red-500/80 text-white' : 'text-white/40 hover:text-white/60'}`}
+                  className={`flex-1 py-2.5 min-h-10 text-xs font-bold rounded-lg transition duration-200 ${buzonContext === 'SCHOOL' ? 'bg-red-500/80 text-white' : 'text-white/40 hover:text-white/60'}`}
                 >
                   🏫 Para el Cole
                 </button>
                 <button
                   onClick={() => setBuzonContext('HOME')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${buzonContext === 'HOME' ? 'bg-red-500/80 text-white' : 'text-white/40 hover:text-white/60'}`}
+                  className={`flex-1 py-2.5 min-h-10 text-xs font-bold rounded-lg transition duration-200 ${buzonContext === 'HOME' ? 'bg-red-500/80 text-white' : 'text-white/40 hover:text-white/60'}`}
                 >
                   🏠 Para Casa
                 </button>
@@ -779,7 +794,8 @@ const StudentDashboard: React.FC = () => {
 
               <textarea
                 className="input-glass w-full rounded-xl text-sm p-3 mb-3 resize-none h-24"
-                placeholder={buzonContext === 'SCHOOL' ? "Escribe a tu tutor..." : "Escribe a tu familia..."}
+                aria-label="Mensaje para el buzón"
+                placeholder={buzonContext === 'SCHOOL' ? "Escribe a tu tutor…" : "Escribe a tu familia…"}
                 value={buzonMessage}
                 onChange={e => setBuzonMessage(e.target.value)}
               />
@@ -798,7 +814,7 @@ const StudentDashboard: React.FC = () => {
 
               <button
                 onClick={handleSendBuzonMessage}
-                className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition active:scale-95 flex items-center justify-center gap-2"
               >
                 <Send size={16} /> Enviar al Buzón
               </button>
@@ -842,7 +858,7 @@ const StudentDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-4 rounded-xl transition-all duration-200 relative ${active ? 'text-white scale-110' : 'text-white/35'
+                className={`flex flex-col items-center py-1.5 px-4 rounded-xl transition duration-200 relative ${active ? 'text-white scale-110' : 'text-white/35'
                   }`}
               >
                 {tab.badge && tab.badge > 0 && (
@@ -850,7 +866,7 @@ const StudentDashboard: React.FC = () => {
                     {tab.badge}
                   </div>
                 )}
-                <div className={`p-1.5 rounded-xl transition-all duration-200 ${active ? 'bg-white/15 student-tab-active' : ''}`}>
+                <div className={`p-1.5 rounded-xl transition duration-200 ${active ? 'bg-white/15 student-tab-active' : ''}`}>
                   <span className="text-lg">{tab.emoji}</span>
                 </div>
                 <span className="text-[10px] font-bold mt-0.5">{tab.label}</span>
@@ -884,7 +900,7 @@ const RewardCard: React.FC<{ reward: any, onRedeem: () => void, userPoints: numb
       <button
         onClick={onRedeem}
         disabled={!canAfford || !inStock}
-        className={`w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 ${canAfford && inStock
+        className={`w-full py-2.5 min-h-10 rounded-lg text-[10px] font-bold transition active:scale-95 ${canAfford && inStock
           ? `bg-gradient-to-r ${isSchool ? 'from-primary-500 to-primary-400 shadow-primary-500/20' : 'from-secondary-500 to-secondary-400 shadow-secondary-500/20'} text-white shadow-lg hover:shadow-xl hover:brightness-110`
           : 'bg-white/5 text-white/20 cursor-not-allowed'
           }`}

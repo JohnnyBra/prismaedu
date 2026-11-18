@@ -29,7 +29,7 @@ const MoveClassModal: React.FC<MoveClassModalProps> = ({ student, classes, users
           <h3 className="text-lg font-display font-bold text-white/90 flex items-center gap-2">
             <Repeat size={20} /> Cambiar de Clase
           </h3>
-          <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors"><X size={24} /></button>
+          <button aria-label="Cerrar" onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors"><X size={24} /></button>
         </div>
 
         <div className="space-y-4 mb-6">

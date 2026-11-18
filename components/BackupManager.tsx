@@ -137,7 +137,7 @@ const BackupManager: React.FC<BackupManagerProps> = ({ createBackup, listBackups
             disabled={creating}
             className="btn-primary flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Download size={18} /> {creating ? 'Creando...' : 'Crear Copia de Seguridad'}
+            <Download size={18} /> {creating ? 'Creando…' : 'Crear Copia de Seguridad'}
           </button>
         </div>
       </div>
@@ -149,7 +149,7 @@ const BackupManager: React.FC<BackupManagerProps> = ({ createBackup, listBackups
       <div className="glass rounded-2xl shadow-glass overflow-hidden">
         <div className="px-4 py-3 border-b border-white/10 glass-light flex justify-between items-center">
           <h3 className="font-display font-bold text-white/80">Copias Almacenadas en el Servidor</h3>
-          <button onClick={refreshBackups} className="text-white/30 hover:text-white/60 transition-colors" title="Actualizar lista">
+          <button aria-label="Actualizar" onClick={refreshBackups} className="p-2 text-white/30 hover:text-white/60 transition-colors" title="Actualizar lista">
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
@@ -194,7 +194,7 @@ const BackupManager: React.FC<BackupManagerProps> = ({ createBackup, listBackups
             <div className="flex gap-3">
               <button onClick={() => setPendingRestore(null)} disabled={restoring} className="btn-ghost flex-1 disabled:opacity-40">Cancelar</button>
               <button onClick={confirmRestore} disabled={restoring} className="btn-danger flex-1 disabled:opacity-40">
-                {restoring ? 'Restaurando...' : 'Confirmar Restauración'}
+                {restoring ? 'Restaurando…' : 'Confirmar Restauración'}
               </button>
             </div>
           </div>

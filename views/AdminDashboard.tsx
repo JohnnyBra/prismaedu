@@ -862,9 +862,9 @@ const AdminDashboard: React.FC = () => {
               >
                 <Upload size={18} /> Importar CSV
               </button>
-              <button
+              <button aria-label="Eliminar"
                 onClick={handleDeleteAllStudents}
-                className="btn-ghost flex items-center gap-2 text-sm !bg-red-500/15 !border-red-500/25 !text-red-400 hover:!bg-red-500/25"
+                className="p-2 btn-ghost flex items-center gap-2 text-sm !bg-red-500/15 !border-red-500/25 !text-red-400 hover:!bg-red-500/25"
                 title="Eliminar todos los alumnos"
               >
                 <Trash2 size={18} />
@@ -915,7 +915,7 @@ const AdminDashboard: React.FC = () => {
                  className="input-glass flex-1"
                />
                <button onClick={handleAddStudentToClass} className="btn-primary !p-2.5"><CheckSquare size={20}/></button>
-               <button onClick={() => setAddingStudentClassId(null)} className="text-white/30 hover:text-white/60 p-2 transition-colors"><X size={20}/></button>
+               <button aria-label="Cerrar" onClick={() => setAddingStudentClassId(null)} className="text-white/30 hover:text-white/60 p-2 transition-colors"><X size={20}/></button>
              </div>
         )}
 
@@ -963,7 +963,7 @@ const AdminDashboard: React.FC = () => {
              <div className="glass-strong rounded-3xl p-6 w-full max-w-md shadow-glass-lg modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
                    <h3 className="text-lg font-display font-bold text-white/90">Editar Alumno</h3>
-                   <button onClick={() => setEditingStudent(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={24}/></button>
+                   <button aria-label="Cerrar" onClick={() => setEditingStudent(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={24}/></button>
                 </div>
 
                 <div className="space-y-4 mb-6">
@@ -1031,7 +1031,7 @@ const AdminDashboard: React.FC = () => {
             className="input-glass flex-1"
           />
           <button onClick={handleCreateClass} className="btn-primary !p-2.5"><Save size={20}/></button>
-          <button onClick={() => setShowAddClass(false)} className="btn-ghost !p-2.5"><X size={20}/></button>
+          <button aria-label="Cerrar" onClick={() => setShowAddClass(false)} className="btn-ghost !p-2.5"><X size={20}/></button>
         </div>
       )}
 
@@ -1051,7 +1051,7 @@ const AdminDashboard: React.FC = () => {
                    className="input-glass flex-1"
                  />
                  <button onClick={() => { updateClass(cls.id, editName); setEditingId(null); }} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save size={18} /></button>
-                 <button onClick={() => setEditingId(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={18} /></button>
+                 <button aria-label="Cerrar" onClick={() => setEditingId(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={18} /></button>
               </div>
             ) : (
               <div className="flex items-center gap-3">
@@ -1066,8 +1066,8 @@ const AdminDashboard: React.FC = () => {
             )}
 
             <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-              <button onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-white/20 hover:text-primary-400 transition-colors"><Edit2 size={18} /></button>
-              <button onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-white/20 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
+              <button aria-label="Editar" onClick={() => { setEditingId(cls.id); setEditName(cls.name); }} className="p-2 text-white/20 hover:text-primary-400 transition-colors"><Edit2 size={18} /></button>
+              <button aria-label="Eliminar" onClick={() => { if(confirm('¿Borrar clase?')) deleteClass(cls.id) }} className="p-2 text-white/20 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
               <ChevronRight size={20} className="text-white/15 ml-2" />
             </div>
           </div>
@@ -1081,9 +1081,9 @@ const AdminDashboard: React.FC = () => {
   const renderTutorsTab = () => {
     return (
       <div className="space-y-4 animate-fade-in">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap justify-between items-center gap-3">
           <h2 className="text-xl font-display font-bold text-white/90">Profesores / Tutores</h2>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button onClick={() => importTutorsFileRef.current?.click()} className="btn-ghost flex items-center gap-2 !bg-emerald-500/15 !border-emerald-500/25 !text-emerald-300 hover:!bg-emerald-500/25">
                 <Upload size={18} /> Importar CSV
             </button>
@@ -1113,7 +1113,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-        <div className="glass rounded-2xl shadow-glass overflow-hidden">
+        <div className="glass rounded-2xl shadow-glass overflow-x-auto">
           <table className="w-full text-left">
             <thead className="glass-light border-b border-white/10">
                <tr>
@@ -1131,6 +1131,7 @@ const AdminDashboard: React.FC = () => {
                       <select
                         value={tutor.classId || ''}
                         onChange={(e) => updateUser(tutor.id, { classId: e.target.value })}
+                        aria-label={`Clase de ${tutor.name}`}
                         className="input-glass text-sm !py-1 !px-2 !rounded-lg"
                       >
                          <option value="">-- Ninguna --</option>
@@ -1139,8 +1140,8 @@ const AdminDashboard: React.FC = () => {
                    </td>
                    <td className="p-4 font-mono text-white/40">{tutor.pin}</td>
                    <td className="p-4 text-right flex items-center justify-end gap-2">
-                     <button onClick={() => handleEditTutor(tutor)} className="text-white/20 hover:text-primary-400 transition-colors"><Edit2 size={18} /></button>
-                     <button onClick={() => { if(confirm('¿Eliminar profesor?')) deleteUser(tutor.id) }} className="text-white/20 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
+                     <button aria-label="Editar" onClick={() => handleEditTutor(tutor)} className="p-2 text-white/20 hover:text-primary-400 transition-colors"><Edit2 size={18} /></button>
+                     <button aria-label="Eliminar" onClick={() => { if(confirm('¿Eliminar profesor?')) deleteUser(tutor.id) }} className="p-2 text-white/20 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
                    </td>
                  </tr>
                ))}
@@ -1193,7 +1194,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-        <div className="glass rounded-2xl shadow-glass overflow-hidden">
+        <div className="glass rounded-2xl shadow-glass overflow-x-auto">
           <table className="w-full text-left">
             <thead className="glass-light border-b border-white/10">
                <tr>
@@ -1221,7 +1222,7 @@ const AdminDashboard: React.FC = () => {
                    <td className="p-4 font-mono text-white/40">{user.pin}</td>
                    <td className="p-4 text-right">
                      {user.id !== 'admin' && (
-                       <button onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(user.id) }} className="text-white/15 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
+                       <button aria-label="Eliminar" onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(user.id) }} className="p-2 text-white/15 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
                      )}
                    </td>
                  </tr>
@@ -1298,7 +1299,7 @@ const AdminDashboard: React.FC = () => {
                             <div
                                 key={cls.id}
                                 onClick={() => setSelectedFamilyClass(cls)}
-                                className={`glass rounded-2xl glow-border-orange p-6 cursor-pointer hover:bg-white/10 transition-all group animate-scale-in stagger-${Math.min(idx + 1, 8)}`}
+                                className={`glass rounded-2xl glow-border-orange p-6 cursor-pointer hover:bg-white/10 transition group animate-scale-in stagger-${Math.min(idx + 1, 8)}`}
                             >
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="w-12 h-12 rounded-xl bg-secondary-500/20 flex items-center justify-center text-secondary-400 group-hover:bg-secondary-500/30 transition-colors">
@@ -1315,7 +1316,7 @@ const AdminDashboard: React.FC = () => {
                     {/* Unassigned Families Card */}
                     <div
                         onClick={() => setSelectedFamilyClass({ id: 'unassigned', name: 'Sin Asignar / Otros' })}
-                        className="glass rounded-2xl p-6 cursor-pointer hover:bg-white/10 transition-all group animate-scale-in"
+                        className="glass rounded-2xl p-6 cursor-pointer hover:bg-white/10 transition group animate-scale-in"
                     >
                         <div className="flex items-center justify-between mb-2">
                             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white/40 group-hover:bg-white/15 transition-colors">
@@ -1382,7 +1383,7 @@ const AdminDashboard: React.FC = () => {
              <div className="glass-strong rounded-3xl shadow-glass-lg w-full max-w-sm overflow-hidden modal-content">
                 <div className="p-4 glass-light border-b border-white/10 flex justify-between items-center">
                    <h3 className="font-display font-bold text-secondary-300">Mover Usuario de Familia</h3>
-                   <button onClick={() => setUserToMove(null)}><X size={20} className="text-white/30 hover:text-white/60 transition-colors" /></button>
+                   <button aria-label="Cerrar" onClick={() => setUserToMove(null)}><X size={20} className="text-white/30 hover:text-white/60 transition-colors" /></button>
                 </div>
                 <div className="p-6">
                    <p className="text-sm text-white/60 mb-4 font-body">
@@ -1393,7 +1394,7 @@ const AdminDashboard: React.FC = () => {
                       onChange={(e) => setDestinationFamilyId(e.target.value)}
                       className="input-glass w-full mb-6"
                    >
-                     <option value="" disabled>Selecciona familia...</option>
+                     <option value="" disabled>Selecciona familia…</option>
                      {/* Show all families here for moving, not just class families */}
                      {Array.from(new Set(users.filter(u => u.familyId).map(u => u.familyId!))).map(fid => (
                        <option key={fid} value={fid}>{getFamilyName(fid)}</option>
@@ -1417,7 +1418,7 @@ const AdminDashboard: React.FC = () => {
              <div className="glass-strong rounded-3xl p-6 w-full max-w-md shadow-glass-lg modal-content" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
                    <h3 className="text-lg font-display font-bold text-white/90">Editar Usuario</h3>
-                   <button onClick={() => setEditingUserGeneric(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={24}/></button>
+                   <button aria-label="Cerrar" onClick={() => setEditingUserGeneric(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={24}/></button>
                 </div>
 
                 <div className="space-y-4 mb-6">
@@ -1479,7 +1480,7 @@ const AdminDashboard: React.FC = () => {
                               className="input-glass !py-0.5 !px-2 text-xs"
                             />
                             <button onClick={() => handleSaveFamily(famId)} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Save size={16} /></button>
-                            <button onClick={() => setEditingFamilyId(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={16} /></button>
+                            <button aria-label="Cerrar" onClick={() => setEditingFamilyId(null)} className="text-white/30 hover:text-white/60 transition-colors"><X size={16} /></button>
                          </div>
                        ) : (
                          <span className="text-[10px] text-white/20 glass px-2 py-0.5 rounded-lg font-mono">{famId}</span>
@@ -1489,16 +1490,16 @@ const AdminDashboard: React.FC = () => {
                     <div className="flex items-center gap-3">
                       {!isEditing && (
                         <>
-                          <button
+                          <button aria-label="Editar"
                             onClick={() => handleEditFamily(famId)}
-                            className="text-white/20 hover:text-primary-400 p-1 rounded transition-colors"
+                            className="text-white/20 hover:text-primary-400 p-2 rounded transition-colors"
                             title="Editar ID Familia"
                           >
                             <Edit2 size={16} />
                           </button>
-                          <button
+                          <button aria-label="Eliminar"
                             onClick={() => handleDeleteFamily(famId)}
-                            className="text-white/20 hover:text-red-400 p-1 rounded transition-colors"
+                            className="text-white/20 hover:text-red-400 p-2 rounded transition-colors"
                             title="Eliminar Familia Completa"
                           >
                             <Trash2 size={16} />
@@ -1534,7 +1535,7 @@ const AdminDashboard: React.FC = () => {
 
                         {newMemberRole === Role.STUDENT && (
                           <select value={newMemberClass} onChange={e => setNewMemberClass(e.target.value)} className="input-glass text-sm">
-                             <option value="">Clase...</option>
+                             <option value="">Clase…</option>
                              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                           </select>
                         )}
@@ -1557,9 +1558,9 @@ const AdminDashboard: React.FC = () => {
                                {p.archived && <span className="text-[9px] text-amber-400/70 ml-1 uppercase font-bold">Archivado</span>}
                              </span>
                              <div className="flex items-center gap-1">
-                               <button
+                               <button aria-label="Editar"
                                   onClick={() => handleEditGenericUser(p)}
-                                  className="text-white/20 hover:text-primary-400 p-1 transition-colors"
+                                  className="text-white/20 hover:text-primary-400 p-2 transition-colors"
                                   title="Editar PIN/Nombre"
                                >
                                   <Edit2 size={14} />
@@ -1571,7 +1572,7 @@ const AdminDashboard: React.FC = () => {
                                >
                                   <ArrowRightLeft size={14} />
                                </button>
-                               <button onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(p.id) }} className="text-white/15 hover:text-red-400 p-1 transition-colors"><X size={14} /></button>
+                               <button aria-label="Cerrar" onClick={() => { if(confirm('¿Eliminar usuario?')) deleteUser(p.id) }} className="text-white/15 hover:text-red-400 p-1 transition-colors"><X size={14} /></button>
                              </div>
                            </li>
                          ))}
@@ -1603,9 +1604,9 @@ const AdminDashboard: React.FC = () => {
                                 >
                                   <Repeat size={14} />
                                 </button>
-                                <button
+                                <button aria-label="Editar"
                                   onClick={() => handleEditGenericUser(s)}
-                                  className="text-white/20 hover:text-primary-400 transition-colors"
+                                  className="p-2 text-white/20 hover:text-primary-400 transition-colors"
                                   title="Editar PIN/Nombre"
                                 >
                                   <Edit2 size={14} />
@@ -1617,7 +1618,7 @@ const AdminDashboard: React.FC = () => {
                                 >
                                   <ArrowRightLeft size={14} />
                                 </button>
-                                <button onClick={() => { if(confirm('¿Eliminar alumno?')) deleteUser(s.id) }} className="text-white/15 hover:text-red-400 transition-colors"><X size={14} /></button>
+                                <button aria-label="Cerrar" onClick={() => { if(confirm('¿Eliminar alumno?')) deleteUser(s.id) }} className="text-white/15 hover:text-red-400 transition-colors"><X size={14} /></button>
                              </div>
                            </li>
                          ))}
@@ -1633,7 +1634,7 @@ const AdminDashboard: React.FC = () => {
         {/* Footer */}
         <footer className="mt-8 text-center text-white/20 text-xs py-4">
            <p className="font-semibold text-white/30">Cooperativa de Enseñanza La Hispanidad</p>
-           <p className="mt-1">Creado por Javi Barrero</p>
+           <p className="mt-1 hs-firma">Creado por Javi Barrero</p>
         </footer>
       </div>
     );
@@ -1651,7 +1652,7 @@ const AdminDashboard: React.FC = () => {
               For now, we focus on editing existing ones as requested. */}
         </div>
 
-        <div className="glass rounded-2xl shadow-glass overflow-hidden">
+        <div className="glass rounded-2xl shadow-glass overflow-x-auto">
           <table className="w-full text-left">
             <thead className="glass-light border-b border-white/10">
                <tr>
@@ -1702,7 +1703,7 @@ const AdminDashboard: React.FC = () => {
                        </td>
                        <td className="p-4 text-right flex gap-2 justify-end">
                          <button onClick={saveTask} className="text-emerald-400 p-1 hover:bg-emerald-500/15 rounded-lg transition-colors"><Save size={18} /></button>
-                         <button onClick={() => setEditingTaskId(null)} className="text-white/30 p-1 hover:bg-white/10 rounded-lg transition-colors"><X size={18} /></button>
+                         <button aria-label="Cerrar" onClick={() => setEditingTaskId(null)} className="text-white/30 p-1 hover:bg-white/10 rounded-lg transition-colors"><X size={18} /></button>
                        </td>
                      </tr>
                    )
@@ -1721,8 +1722,8 @@ const AdminDashboard: React.FC = () => {
                        )}
                      </td>
                      <td className="p-4 text-right">
-                       <button onClick={() => startEditingTask(task)} className="text-white/20 hover:text-primary-400 mr-2 transition-colors"><Edit2 size={18} /></button>
-                       <button onClick={() => { if(confirm('¿Eliminar esta tarea para todos los alumnos?')) deleteTask(task.id) }} className="text-white/15 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
+                       <button aria-label="Editar" onClick={() => startEditingTask(task)} className="p-2 text-white/20 hover:text-primary-400 mr-2 transition-colors"><Edit2 size={18} /></button>
+                       <button aria-label="Eliminar" onClick={() => { if(confirm('¿Eliminar esta tarea para todos los alumnos?')) deleteTask(task.id) }} className="p-2 text-white/15 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
                      </td>
                    </tr>
                  );
@@ -1753,10 +1754,10 @@ const AdminDashboard: React.FC = () => {
          </div>
          <div className="flex items-center gap-4">
              <ThemeToggle className="text-white/30 hover:text-white/70" />
-             <button onClick={() => setShowChangePin(true)} aria-label="Cambiar PIN" className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
+             <button onClick={() => setShowChangePin(true)} aria-label="Cambiar PIN" className="text-white/30 hover:text-white/70 flex items-center gap-2 px-2 py-2.5 rounded-lg text-sm font-bold transition-colors">
                 <Key size={18} /> <span className="hidden sm:inline">Cambiar PIN</span>
              </button>
-             <button onClick={logout} aria-label="Salir" className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
+             <button onClick={logout} aria-label="Salir" className="text-white/30 hover:text-white/70 flex items-center gap-2 px-2 py-2.5 rounded-lg text-sm font-bold transition-colors">
                 <LogOut size={18} /> <span className="hidden sm:inline">Salir</span>
              </button>
          </div>

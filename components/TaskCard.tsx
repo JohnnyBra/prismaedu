@@ -13,7 +13,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete, completed }) => {
 
   return (
     <div className={`
-      group relative glass rounded-2xl p-4 transition-all duration-300
+      group relative glass rounded-2xl p-4 transition duration-300
       ${isSchool ? 'glow-border-blue hover:shadow-neon-blue' : 'glow-border-orange hover:shadow-neon-orange'}
       ${completed ? 'opacity-40' : 'hover:-translate-y-1'}
     `}>
@@ -56,7 +56,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete, completed }) => {
               onClick={onComplete}
               className={`
                 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-xs font-semibold
-                transition-all duration-200 active:scale-95 shadow-lg
+                transition duration-200 active:scale-95 shadow-lg
                 ${isSchool
                   ? 'bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 shadow-primary-500/25'
                   : 'bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-500 hover:to-secondary-400 shadow-secondary-500/25'
