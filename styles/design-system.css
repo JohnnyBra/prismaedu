@@ -1662,7 +1662,7 @@ html[data-theme="light"] [class~="!text-gray-400/80"] { color: #475569 !importan
 
 /* ============ CENTRO DE ACCESOS DEL TUTOR ============
    El mismo prisma del login, pequeño, reparte su luz en cinco rayos (uno por app)
-   y cada tarjeta aparece al final de su rayo. Móvil: abanico de luz y cascada.   */
+   y cada tarjeta aparece al final de su rayo. Móvil: prisma arriba y tarjetas en cascada.   */
 .hub-saludo { margin-bottom: 4px; }
 
 .hub-escena {
@@ -1691,19 +1691,6 @@ html[data-theme="light"] [class~="!text-gray-400/80"] { color: #475569 !importan
 
 .hub-rayos { display: none; }
 
-/* Móvil: la luz cae del prisma en abanico hacia la lista */
-.hub-abanico {
-  height: 46px;
-  margin: -34px 8px -6px;
-  background: linear-gradient(90deg, var(--hs-e3), var(--hs-e4), var(--hs-e2), var(--hs-e1), var(--hs-e5));
-  clip-path: polygon(48% 0, 52% 0, 100% 100%, 0 100%);
-  opacity: 0.5;
-  filter: blur(2px);
-  transform-origin: top center;
-  animation: hub-abanico 0.6s var(--hs-curva) 0.5s backwards;
-}
-html[data-theme="light"] .hub-abanico { opacity: 0.35; }
-
 .hub-tarjeta {
   position: relative;
   display: flex;
@@ -1727,7 +1714,6 @@ html[data-theme="light"] .hub-abanico { opacity: 0.35; }
 .hub-icono { display: inline-flex; transition: transform 0.25s var(--hs-curva); }
 .hub-tarjeta:hover .hub-icono { transform: scale(1.1) rotate(-4deg); }
 
-@keyframes hub-abanico { from { transform: scaleY(0); opacity: 0; } }
 @keyframes hub-llega { from { opacity: 0; transform: translateY(-16px) scale(0.96); } }
 
 /* Escritorio: pentágono de tarjetas alrededor del prisma, unidas por rayos */
@@ -1744,7 +1730,6 @@ html[data-theme="light"] .hub-abanico { opacity: 0.35; }
   .hub-prisma .lp-prisma { scale: 0.7; }
   .hub-prisma .lp-escudo { height: 104px; }
   .hub-prisma .lp-nucleo { width: 190px; height: 190px; }
-  .hub-abanico { display: none; }
   .hub-rayos {
     display: block;
     position: absolute;
