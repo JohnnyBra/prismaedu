@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import Avatar from '../components/Avatar';
-import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, ExternalLink, BookOpen, Monitor, Map, Newspaper, LayoutDashboard, ListChecks, ChevronRight, ChevronDown, Mailbox } from 'lucide-react';
+import { Plus, Minus, Send, Users, LogOut, CheckSquare, Settings, X, MessageSquare, Gift, School, Trash2, CheckCircle, Circle, ArrowRight, LayoutDashboard, ListChecks, ChevronRight, ChevronDown, Mailbox } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import { Role, User, Task } from '../types';
 
@@ -178,461 +178,76 @@ const TutorDashboard: React.FC = () => {
 
   // Hub Renderer
   const renderHub = () => {
-    // Definimos los enlaces y sus propiedades
+    // Los cinco accesos: cada uno recibe un rayo de la luz del prisma, en el color de su app
+    const icono = (nombre: string) => <img src={`/suite/iconos/${nombre}.webp`} alt="" className="w-12 h-12 object-contain shrink-0" />;
     const hubItems = [
-      {
-        type: 'link' as const,
-        href: "https://bibliohispa.es/",
-        title: "Biblioteca",
-        desc: "Gestión de préstamos y catálogo.",
-        icon: <img src="/suite/iconos/biblioteca.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
-        color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
-        border: "glow-border-green",
-        pos: { x: 0, y: -230 }
-      },
-      {
-        type: 'link' as const,
-        href: "https://aulas.bibliohispa.es/",
-        title: "Reservas Aulas",
-        desc: "Gestión de aulas digitales.",
-        icon: <img src="/suite/iconos/aulas.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
-        color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
-        border: "glow-border-purple",
-        pos: { x: 265, y: -40 }
-      },
-      {
-        type: 'link' as const,
-        href: "https://excursiones.bibliohispa.es/",
-        title: "Excursiones",
-        desc: "Planificación y gestión de salidas.",
-        icon: <img src="/suite/iconos/excursiones.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
-        color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
-        border: "glow-border-orange",
-        pos: { x: 195, y: 190 }
-      },
-      {
-        type: 'link' as const,
-        href: "https://intranet.bibliohispa.es/",
-        title: "Intranet",
-        desc: "Portal del profesorado.",
-        icon: <img src="/suite/iconos/intranet.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
-        color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
-        border: "glow-border-coral",
-        pos: { x: -195, y: 190 }
-      },
-      {
-        type: 'button' as const,
-        onClick: () => setShowHub(false),
-        title: "Prisma Aula",
-        desc: "Gestión gamificada del aula.",
-        icon: <img src="/suite/iconos/prisma-aula.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
-        color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
-        border: "glow-border-blue",
-        pos: { x: -265, y: -40 }
-      }
+      { type: 'link' as const, href: "https://bibliohispa.es/", title: "Biblioteca", desc: "Gestión de préstamos y catálogo.", icon: icono('biblioteca'), c: 'var(--hs-e3)', pos: { x: 0, y: -215 } },
+      { type: 'link' as const, href: "https://aulas.bibliohispa.es/", title: "Reservas Aulas", desc: "Gestión de aulas digitales.", icon: icono('aulas'), c: 'var(--hs-e4)', pos: { x: 290, y: -55 } },
+      { type: 'link' as const, href: "https://excursiones.bibliohispa.es/", title: "Excursiones", desc: "Planificación y gestión de salidas.", icon: icono('excursiones'), c: 'var(--hs-e2)', pos: { x: 190, y: 185 } },
+      { type: 'link' as const, href: "https://intranet.bibliohispa.es/", title: "Intranet", desc: "Portal del profesorado.", icon: icono('intranet'), c: 'var(--hs-e1)', pos: { x: -190, y: 185 } },
+      { type: 'button' as const, onClick: () => setShowHub(false), title: "Prisma Aula", desc: "Gestión gamificada del aula.", icon: icono('prisma-aula'), c: 'var(--hs-e5)', pos: { x: -290, y: -55 } },
     ];
 
     return (
-      <div className="min-h-screen min-h-[100dvh] mesh-tutor flex flex-col items-center justify-center p-4 relative overflow-hidden font-body">
-        {/* Decorative Background Glow Orbs */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500/15 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ animation: 'float 8s ease-in-out infinite' }}></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" style={{ animation: 'float 10s ease-in-out infinite 2s' }}></div>
-
+      <div className="min-h-screen min-h-[100dvh] mesh-tutor flex flex-col items-center p-4 relative overflow-hidden font-body">
         {/* Theme Toggle */}
-        <div className="absolute top-4 right-4 z-20">
+        <div className="absolute top-4 right-4 z-20" style={{ paddingTop: 'var(--safe-top)' }}>
           <ThemeToggle className="glass text-white/70 hover:text-white" />
         </div>
 
-        <div className="w-full max-w-5xl z-10 flex flex-col items-center animate-fade-in relative mt-8">
-
+        <div className="w-full max-w-5xl z-10 flex flex-col items-center relative mt-6 md:mt-10">
           {/* Greeting */}
-          <div className="text-center mb-8 relative z-30">
-            {/* Ocultamos el logo estático en desktop y en mobile ya que tenemos la nueva animación central */}
-            <h2 className="font-display text-3xl font-bold text-white/90 drop-shadow-md">Hola, {currentUser?.name}</h2>
-            <p className="text-white/40 text-lg font-body">Prisma Educación - La Hispanidad</p>
+          <div className="text-center relative z-30 hub-saludo px-12 md:px-0">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-white/90">Hola, {currentUser?.name}</h2>
+            <p className="text-white/50 text-base">Prisma Educación · La Hispanidad</p>
           </div>
 
-          {/* MOBILE VIEW (3D Wheel Unroll Animation) */}
-          <div className="flex md:hidden relative w-full h-[520px] mx-auto perspective-[1200px] mt-4">
-            <style>{`
-              /* Rueda/tampón que baja y gira */
-              @keyframes mobile-stamp-roll {
-                0% { transform: translateY(0px) rotateX(0deg); opacity: 0; }
-                5% { transform: translateY(0px) rotateX(0deg); opacity: 1; }
-                23% { transform: translateY(0px) rotateX(0deg); opacity: 1; }
-                80% { transform: translateY(420px) rotateX(-288deg); opacity: 1; }
-                85% { transform: translateY(420px) rotateX(-288deg); opacity: 0; }
-                100% { transform: translateY(420px) rotateX(-288deg); opacity: 0; }
-              }
-
-              /* Fade out instantáneo de cada tarjeta falsa al estamparse */
-              @keyframes fake-vanish {
-                0%, 99% { opacity: 1; }
-                100% { opacity: 0; }
-              }
-
-              /* Fade in con rebote de cada tarjeta real que se queda en pantalla */
-              @keyframes real-deploy {
-                0% { opacity: 0; transform: scale(0.85) translateZ(-20px); pointer-events: none; }
-                1% { opacity: 1; transform: scale(0.85) translateZ(-20px); pointer-events: none; }
-                100% { opacity: 1; transform: scale(1) translateZ(0px); pointer-events: auto; }
-              }
-
-              /* El contenedor principal solo espera la fusión de los cuadrados y luego vuela hacia arriba */
-              @keyframes logo-fly {
-                0% { transform: translateY(0px) translateZ(85px) scale(1); opacity: 1; }
-                23% { transform: translateY(0px) translateZ(85px) scale(1.1); opacity: 1; }
-                80% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
-                100% { transform: translateY(-240px) translateZ(0px) scale(0.9); opacity: 1; }
-              }
-
-
-              .mobile-stamp-scene {
-                width: 100%;
-                height: 100px;
-                position: absolute;
-                top: 0;
-                transform-style: preserve-3d;
-                animation: mobile-stamp-roll 2s linear forwards;
-              }
-
-              .mobile-stamp-face {
-                 position: absolute;
-                 left: 1rem; right: 1rem;
-                 top: 10px;
-                 display: flex; justify-content: center;
-                 transform-style: preserve-3d;
-                 /* transform is set via inline style for var(--rx) */
-                 animation: fake-vanish 0.01s forwards;
-              }
-
-              .mobile-flying-logo {
-                 position: absolute;
-                 left: 50%; top: 25px;
-                 margin-left: -32px;
-                 width: 64px; height: 64px;
-                 display: flex; align-items: center; justify-content: center;
-                 z-index: 50;
-                 animation: logo-fly 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-              }
-
-              .mobile-lid {
-                position: absolute;
-                left: 50%;
-                margin-left: -48px;
-                /* Colocado en la profundidad del cilindro para hacer de "tapa" o base del rodillo */
-                transform: translateY(45px) rotateX(-90deg) translateZ(100px);
-                background: rgba(15, 23, 42, 0.9);
-                border: 1px solid rgba(59, 130, 246, 0.4);
-                border-radius: 20px;
-                width: 96px; height: 96px;
-                display: flex; align-items: center; justify-content: center;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-                animation: mobile-lid-fade 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-              }
-
-              .mobile-card-wrapper {
-                 position: absolute;
-                 left: 1rem; right: 1rem;
-                 display: flex; justify-content: center;
-                 transform-style: preserve-3d;
-                 /* Adding individual delays to unroll them one by one like a scroll */
-                 animation: mobile-card-deploy 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                            mobile-fake-fade 3.5s linear forwards;
-              }
-            `}</style>
-
-            {/* Flying Logo that returns to the top */}
-            <div className="mobile-flying-logo z-50">
-<div className="w-16 h-16 rounded-full flex items-center justify-center animate-scale-in" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(200,232,252,0.75) 45%, rgba(10,160,220,0) 72%)' }}>
-                <img src="/suite/escudo.png" alt="" className="h-11 w-auto drop-shadow-md" />
-              </div>
-            </div>
-
-            {/* Flying Simulated Cylinder (Stamp Roller) */}
-            <div className="mobile-stamp-scene z-10">
-              {hubItems.map((item, i) => {
-                const content = (
-                  <>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
-                      {item.icon}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1">{item.title}</h3>
-                      <p className="text-sm text-white/40 leading-snug">{item.desc}</p>
-                    </div>
-                    <ArrowRight size={18} className="text-white/20" />
-                  </>
-                );
-
-                const finalY = i * 105; // Spacing
-
-                return (
-                  <div
-                    key={`mb-fly-${i}`}
-                    className="mobile-stamp-face"
-                    style={{
-                      transform: `rotateX(${i * 72}deg) translateZ(85px)`,
-                      animationDelay: `${0.45 + i * 0.28}s`
-                    }}
-                  >
-                    <div className={`glass rounded-2xl p-5 border border-white/10 flex items-center gap-4 w-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-slate-900/40 backdrop-blur-md`}>
-                      {content}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Actual Interactive Target List */}
-            <div className="absolute inset-x-0 top-0 bottom-0 z-30">
-              {hubItems.map((item, i) => {
-                const content = (
-                  <>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${item.color}`}>
-                      {item.icon}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1">{item.title}</h3>
-                      <p className="text-sm text-white/40 leading-snug">{item.desc}</p>
-                    </div>
-                    <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
-                  </>
-                );
-
-                const className = `absolute left-4 right-4 glass rounded-2xl p-5 ${item.border} hover:bg-white/10 transition group flex items-center gap-4 shadow-xl active:scale-95`;
-                const style = {
-                  top: `${i * 105}px`,
-                  animation: `real-deploy 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both`,
-                  animationDelay: `${0.45 + i * 0.28}s`
-                } as React.CSSProperties;
-
-                if (item.type === 'button') {
-                  return (
-                    <button key={`mb-final-${i}`} onClick={item.onClick} className={className} style={style}>
-                      {content}
-                    </button>
-                  );
-                }
-                return (
-                  <a key={`mb-final-${i}`} href={item.href} className={className} style={style}>
-                    {content}
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* DESKTOP VIEW (3D Animation) */}
-          <div className="hidden md:flex relative w-full h-[600px] mt-4 mx-auto justify-center items-center perspective-[1200px]">
-            {/* Scoped Animations */}
-            <style>{`
-              /* Escena base con rotación 3D del prisma completo */
-              @keyframes scene-rotate {
-                0% { transform: rotateX(-15deg) rotateY(0deg) translateY(50px); }
-                40% { transform: rotateX(-15deg) rotateY(-360deg) translateY(50px); }
-                55% { transform: rotateX(0deg) rotateY(-360deg) translateY(0px); }
-                100% { transform: rotateX(0deg) rotateY(-360deg) translateY(0px); }
-              }
-
-              /* Caras del prisma cayendo hacia fuera como pétalos (apertura) */
-              @keyframes face-open {
-                0% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(0deg); opacity: 1; border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02)); }
-                40% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(0deg); opacity: 1; border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02)); }
-                55% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(-90deg); opacity: 0; border-color: transparent; background: transparent; }
-                100% { transform: rotateY(var(--ry)) translateZ(69px) rotateX(-90deg); opacity: 0; }
-              }
-
-              /* La tapa superior es inicialmente un polígono, luego se vuelve el logo plano */
-              @keyframes lid-transform {
-                0% { transform: translateY(-150px) rotateX(90deg) scale(0.9); opacity: 1; }
-                40% { transform: translateY(-150px) rotateX(90deg) scale(1.1); opacity: 1; }
-                55% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
-                100% { transform: translateY(0px) rotateX(0deg) scale(1.3); opacity: 1; }
-              }
-
-              /* Fade out del borde 3D de la tapa cuando baja a su sitio */
-              @keyframes lid-border-fade {
-                 0% { border-color: rgba(59, 130, 246, 0.4); background: rgba(15, 23, 42, 0.8); }
-                 40% { border-color: rgba(59, 130, 246, 0.4); background: rgba(15, 23, 42, 0.8); }
-                 55% { border-color: transparent; background: transparent; }
-                 100% { border-color: transparent; background: transparent; }
-              }
-
-              /* Los iconos vuelan desde sus caras 3D a sus posiciones 2D absolutas finales */
-              @keyframes card-deploy {
-                 0% { 
-                    opacity: 0; 
-                    transform: rotateY(var(--ry)) translateZ(71px) translateY(-20px) scale(0.3);
-                 }
-                 10% { opacity: 1; transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); }
-                 40% { 
-                    opacity: 1; 
-                    transform: rotateY(var(--ry)) translateZ(71px) translateY(0px) scale(0.6); 
-                 }
-                 74% { 
-                    /* Aterriza suavemente y se expande la tarjeta final */
-                    opacity: 1; 
-                    transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
-                 }
-                 100% { 
-                    opacity: 1; 
-                    transform: translateX(var(--tx)) translateY(var(--ty)) rotateY(360deg) scale(1); 
-                 }
-              }
-
-              /* Fade in and expand actual interactive cards right out of the landing icon */
-              @keyframes final-card-deploy {
-                0% { opacity: 0; transform: scale(0.85); pointer-events: none; }
-                74% { opacity: 0; transform: scale(0.85); pointer-events: none; }
-                85% { opacity: 1; transform: scale(1.02); pointer-events: none; }
-                100% { opacity: 1; transform: scale(1); pointer-events: auto; }
-              }
-
-              /* Ocultar prism-cards simulados suavemente cruzando con las reales */
-              @keyframes fake-card-fade {
-                0% { opacity: 1; }
-                74% { opacity: 1; }
-                85% { opacity: 0; }
-                100% { opacity: 0; }
-              }
-
-              .prism-scene {
-                width: 0px; 
-                height: 0px; 
-                position: absolute; 
-                top: 50%; left: 50%;
-                transform-style: preserve-3d;
-                animation: scene-rotate 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-              }
-
-              .prism-face {
-                position: absolute;
-                width: 100px;
-                height: 300px;
-                margin-left: -50px; /* Centrado en 0,0 */
-                margin-top: -150px; 
-                border: 2px solid color-mix(in srgb, var(--c) 60%, transparent);
-                background: linear-gradient(180deg, color-mix(in srgb, var(--c) 22%, transparent), color-mix(in srgb, var(--c) 4%, transparent));
-                box-shadow: inset 0 0 30px color-mix(in srgb, var(--c) 30%, transparent);
-                backdrop-filter: blur(4px);
-                /* Al hacer la caja más alta (300px), el origen de rotación para que se abra bien como los pétalos de una flor larga debe ajustarse desde donde tocan la junta base. */
-                transform-origin: 50% 75%;
-                animation: face-open 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-                backface-visibility: hidden;
-              }
-
-              .prism-top {
-                position: absolute;
-                width: 154px; /* Aprox ancho máximo de un pentágono de lado 100 */
-                height: 146px; 
-                margin-left: -77px;
-                margin-top: -73px;
-                display: flex;
-                align-items: center; justify-content: center;
-                /* El pentágono base shape for top lid */
-                clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
-                animation: lid-transform 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                           lid-border-fade 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-              }
-
-              .flying-icon-wrapper {
-                 position: absolute;
-                 width: 0; height: 0;
-                 display: flex; align-items: center; justify-content: center;
-                 transform-style: preserve-3d;
-                 animation: card-deploy 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-                            fake-card-fade 2.2s linear forwards;
-              }
-
-              @keyframes glow-spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-              }
-            `}</style>
-
-            {/* THE 3D SCENE */}
-            <div className="prism-scene z-10">
-              {/* 5 Wall Faces */}
-              {[0, 1, 2, 3, 4].map(i => (
-                <div
-                  key={`face-${i}`}
-                  className="prism-face"
-                  style={{ '--ry': `${i * 72}deg`, '--c': `var(--hs-e${[3, 4, 2, 1, 5][i]})` } as React.CSSProperties}
-                />
-              ))}
-
-              {/* Top Lid -> Transforms into Logo Center */}
-              <div className="prism-top z-50">
-                <div className="w-24 h-24 rounded-full flex items-center justify-center relative" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(200,232,252,0.75) 45%, rgba(10,160,220,0) 72%)' }}>
-                  <img src="/suite/escudo.png" alt="" className="h-16 w-auto drop-shadow-md" />
-                </div>
-              </div>
-
-              {/* Flying Icons Simulation (they start attached to rotating faces, then fly out) */}
+          {/* Centro de accesos: el prisma reparte su luz en cinco rayos, uno por app */}
+          <div className="hub-escena">
+            <svg className="hub-rayos" viewBox="-420 -300 840 600" aria-hidden="true">
               {hubItems.map((item, i) => (
-                <div
-                  key={`fly-${i}`}
-                  className="flying-icon-wrapper"
-                  style={{
-                    '--ry': `${i * 72}deg`,
-                    '--tx': `${item.pos.x}px`,
-                    '--ty': `${item.pos.y}px`
-                  } as React.CSSProperties}
-                >
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 shadow-xl ${item.color}`}>
-                    {item.icon}
-                  </div>
-                </div>
+                <line key={item.title} x1={0} y1={0} x2={item.pos.x} y2={item.pos.y} className="hub-rayo" style={{ '--i': i, stroke: item.c } as React.CSSProperties} />
               ))}
+            </svg>
+
+            <div className="hub-prisma" aria-hidden="true">
+              <div className="lp-nucleo" />
+              <div className="lp-prisma">
+                <div className="lp-giro">
+                  {hubItems.map((item, i) => (
+                    <div key={item.title} className="lp-cara" style={{ '--ry': `${i * 72}deg`, '--c': item.c } as React.CSSProperties} />
+                  ))}
+                  <div className="lp-tapa lp-tapa--arriba" />
+                  <div className="lp-tapa lp-tapa--abajo" />
+                </div>
+              </div>
+              <img src="/suite/escudo.png" alt="" className="lp-escudo" />
             </div>
+            <div className="hub-abanico" aria-hidden="true" />
 
-            {/* Glowing Ring deleted by user request */}
-
-            {/* THE FINAL INTERACTIVE CARDS (Fade in exactly when flying icons disappear) */}
             {hubItems.map((item, i) => {
-              const content = (
+              const contenido = (
                 <>
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-colors ${item.color}`}>
-                    {item.icon}
-                  </div>
-                  <div className="flex-1 text-left min-w-0 pr-2">
-                    <h3 className="font-display font-bold text-white/90 text-lg leading-tight mb-1 truncate">{item.title}</h3>
-                    <p className="text-xs text-white/40 leading-snug line-clamp-2">{item.desc}</p>
-                  </div>
-                  <ArrowRight size={18} className="text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
+                  <span className="hub-icono">{item.icon}</span>
+                  <span className="flex-1 text-left min-w-0">
+                    <span className="block font-display font-bold text-white/90 text-lg leading-tight">{item.title}</span>
+                    <span className="block text-sm text-white/60 leading-snug">{item.desc}</span>
+                  </span>
+                  <ArrowRight size={18} className="text-white/40 group-hover:text-white/80 transition-colors shrink-0" />
                 </>
               );
-
-              const className = `absolute z-30 glass rounded-[20px] p-4 ${item.border} hover:bg-white/10 transition group flex items-center gap-4 w-[280px] shadow-2xl shadow-black/20 hover:scale-105 active:scale-[0.98]`;
-
-              const style = {
-                marginLeft: '-140px',
-                marginTop: '-45px',
-                left: `calc(50% + ${item.pos.x}px)`,
-                top: `calc(50% + ${item.pos.y}px)`,
-                transformOrigin: '44px 50%',
-                animation: `final-card-deploy 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
-                opacity: 0,
-              } as React.CSSProperties;
-
-              if (item.type === 'button') {
-                return (
-                  <button key={`final-${i}`} onClick={item.onClick} className={className} style={style}>
-                    {content}
-                  </button>
-                );
-              }
-              return (
-                <a key={`final-${i}`} href={item.href} className={className} style={style}>
-                  {content}
-                </a>
-              );
+              const props = {
+                className: 'hub-tarjeta glass group',
+                style: { '--i': i, '--x': `${item.pos.x}px`, '--y': `${item.pos.y}px`, '--c': item.c } as React.CSSProperties,
+              };
+              return item.type === 'button'
+                ? <button key={item.title} type="button" onClick={item.onClick} {...props}>{contenido}</button>
+                : <a key={item.title} href={item.href} {...props}>{contenido}</a>;
             })}
           </div>
 
           {/* User actions */}
-          <div className="flex gap-3 mt-10 relative z-30 md:mt-4">
+          <div className="flex gap-3 mt-8 relative z-30 md:mt-2">
             <button onClick={() => setShowSettings(true)} className="glass rounded-xl px-4 py-2 text-white/40 hover:text-white/80 flex items-center gap-2 text-sm font-semibold transition-colors">
               <Settings size={16} /> Cambiar PIN
             </button>

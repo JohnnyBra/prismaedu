@@ -218,7 +218,7 @@ const AuthView: React.FC = () => {
           className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-blue flex flex-col items-center gap-4"
         >
           <div className="w-20 h-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
-            <img src="/suite/iconos/profesor.webp" alt="" className="w-20 h-20 object-contain drop-shadow-lg" />
+            <img src="/suite/iconos/profesor.webp" alt="" className="w-20 h-20 object-contain" />
           </div>
           <span className="font-display text-lg font-bold text-white/90">Soy Profesor</span>
         </button>
@@ -231,7 +231,7 @@ const AuthView: React.FC = () => {
           className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-orange flex flex-col items-center gap-4"
         >
           <div className="w-20 h-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-            <img src="/suite/iconos/familia.webp" alt="" className="w-20 h-20 object-contain drop-shadow-lg" />
+            <img src="/suite/iconos/familia.webp" alt="" className="w-20 h-20 object-contain" />
           </div>
           <span className="font-display text-lg font-bold text-white/90">Soy Familia</span>
         </button>
