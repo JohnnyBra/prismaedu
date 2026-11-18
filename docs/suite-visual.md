@@ -8,7 +8,7 @@ La identidad visual que comparten Prisma, Aulas, Excursiones, Biblioteca e Intra
 | `escudo.png` | El emblema del cole (sin texto), para cabeceras e iconos. |
 | `escudo-completo.png` | El escudo con «La Hispanidad · Colegio» y el 50 aniversario. |
 | `ejemplo.html` | Una página de referencia que se puede abrir y copiar. |
-| `iconos/` | Iconos de cristal hechos en Canva: `biblioteca`, `aulas`, `excursiones`, `intranet`, `prisma-aula`, `profesor`, `familia`, `admin` (`.webp` 512 px con transparencia), más `<app>-64.png` (favicon) y `<app>-180.png` (icono de acceso directo de iOS, sobre blanco). |
+| `iconos/` | Iconos planos en dos tonos hechos en Canva: `biblioteca`, `aulas`, `excursiones`, `intranet`, `prisma-aula`, `profesor`, `familia`, `admin` (`.webp` 512 px con transparencia), más `<app>-64.png` (favicon) y `<app>-180.png` (icono de acceso directo de iOS, sobre blanco). |
 
 ## Adoptarlo en otra app (Aulas, Excursiones, Biblioteca, Intranet)
 
@@ -35,4 +35,6 @@ La identidad visual que comparten Prisma, Aulas, Excursiones, Biblioteca e Intra
 
 ## Iconos nuevos
 
-Mismo estilo: un objeto 3D de **cristal translúcido** teñido del color de su app, con brillos y reflejos de arcoíris, sobre fondo blanco, sin texto. En Canva, con `generate-image` usando como referencia los ids `MAHbQ8xZtVo` (libro) y `MAHbQ3XLOB8` (birrete). Después: página con `create-design`, exportación PNG de 1024 y recorte con `python3 herramientas/recorta-icono.py export.png salida.webp`. Hay que revisarlos sobre fondo claro y oscuro.
+Mismo estilo (elegido por Javi el 2026-11-18): **icono plano 2D en dos tonos** del color de su app (por ejemplo, celeste `#0aa0dc` y azul `#2373bd`), con degradados suaves y formas redondeadas. Sin 3D, sin cristal, sin sombras y sin texto, sobre fondo blanco. Se evita el marino muy oscuro para que se vea en modo oscuro.
+
+En Canva: `generate-image` con la referencia `MAHbRP2Pm7s` (libro con bocadillo) y el prompt «In exactly the same flat 2D duotone vector icon style as the reference image: <objeto>, in <color> and <tono>, soft subtle gradients, rounded friendly shapes, clean minimal modern UI icon, no 3D, no glass, no shadows, centered, plain flat white background, no text». La miniatura de 200 px basta para los tamaños de la Suite (≤ 80 px). Se recorta con `python3 herramientas/recorta-icono.py <png> <salida.webp> 256` y se revisa sobre fondo claro y oscuro.

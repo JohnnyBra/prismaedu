@@ -185,7 +185,7 @@ const TutorDashboard: React.FC = () => {
         href: "https://bibliohispa.es/",
         title: "Biblioteca",
         desc: "Gestión de préstamos y catálogo.",
-        icon: <img src="/suite/iconos/biblioteca.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
+        icon: <img src="/suite/iconos/biblioteca.webp" alt="" className="w-14 h-14 object-contain" />,
         color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
         border: "glow-border-green",
         pos: { x: 0, y: -230 }
@@ -195,7 +195,7 @@ const TutorDashboard: React.FC = () => {
         href: "https://aulas.bibliohispa.es/",
         title: "Reservas Aulas",
         desc: "Gestión de aulas digitales.",
-        icon: <img src="/suite/iconos/aulas.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
+        icon: <img src="/suite/iconos/aulas.webp" alt="" className="w-14 h-14 object-contain" />,
         color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
         border: "glow-border-purple",
         pos: { x: 265, y: -40 }
@@ -205,7 +205,7 @@ const TutorDashboard: React.FC = () => {
         href: "https://excursiones.bibliohispa.es/",
         title: "Excursiones",
         desc: "Planificación y gestión de salidas.",
-        icon: <img src="/suite/iconos/excursiones.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
+        icon: <img src="/suite/iconos/excursiones.webp" alt="" className="w-14 h-14 object-contain" />,
         color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
         border: "glow-border-orange",
         pos: { x: 195, y: 190 }
@@ -215,7 +215,7 @@ const TutorDashboard: React.FC = () => {
         href: "https://intranet.bibliohispa.es/",
         title: "Intranet",
         desc: "Portal del profesorado.",
-        icon: <img src="/suite/iconos/intranet.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
+        icon: <img src="/suite/iconos/intranet.webp" alt="" className="w-14 h-14 object-contain" />,
         color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
         border: "glow-border-coral",
         pos: { x: -195, y: 190 }
@@ -225,7 +225,7 @@ const TutorDashboard: React.FC = () => {
         onClick: () => setShowHub(false),
         title: "Prisma Aula",
         desc: "Gestión gamificada del aula.",
-        icon: <img src="/suite/iconos/prisma-aula.webp" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />,
+        icon: <img src="/suite/iconos/prisma-aula.webp" alt="" className="w-14 h-14 object-contain" />,
         color: "group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300",
         border: "glow-border-blue",
         pos: { x: -265, y: -40 }
