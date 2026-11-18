@@ -217,8 +217,8 @@ const AuthView: React.FC = () => {
           }}
           className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-blue flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition duration-300 group-hover:shadow-neon-blue group-hover:scale-110">
-            <School size={32} />
+          <div className="w-20 h-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
+            <img src="/suite/iconos/profesor.webp" alt="" className="w-20 h-20 object-contain drop-shadow-lg" />
           </div>
           <span className="font-display text-lg font-bold text-white/90">Soy Profesor</span>
         </button>
@@ -230,8 +230,8 @@ const AuthView: React.FC = () => {
           }}
           className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-orange flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 rounded-2xl bg-secondary-500/20 flex items-center justify-center text-secondary-400 group-hover:bg-secondary-500 group-hover:text-white transition duration-300 group-hover:shadow-neon-orange group-hover:scale-110">
-            <Home size={32} />
+          <div className="w-20 h-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+            <img src="/suite/iconos/familia.webp" alt="" className="w-20 h-20 object-contain drop-shadow-lg" />
           </div>
           <span className="font-display text-lg font-bold text-white/90">Soy Familia</span>
         </button>
@@ -245,7 +245,7 @@ const AuthView: React.FC = () => {
           }}
           className="text-xs text-white/30 hover:text-white/60 font-semibold flex items-center justify-center gap-1.5 mx-auto px-4 py-3 rounded-xl transition-colors"
         >
-          <Shield size={12} /> Administrador
+          <img src="/suite/iconos/admin.webp" alt="" className="w-5 h-5 object-contain" /> Administrador
         </button>
       </div>
     </div>
