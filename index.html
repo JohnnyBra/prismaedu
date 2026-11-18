@@ -3,37 +3,46 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#161040" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f0f0ff" media="(prefers-color-scheme: light)" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#06121f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f5f3ee" media="(prefers-color-scheme: light)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="icon" type="image/png" href="/suite/escudo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
     <title>Prisma Educación</title>
-    <!-- Fonts: Outfit (display) + Plus Jakarta Sans (body) -->
+    <!-- Fonts: Bricolage Grotesque (display) + Figtree (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="/suite/hispanidad-suite.css" />
     <link rel="stylesheet" href="/styles/design-system.css" />
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              display: ['Outfit', 'sans-serif'],
-              body: ['Plus Jakarta Sans', 'sans-serif'],
+              display: ['Bricolage Grotesque', 'Figtree', 'sans-serif'],
+              body: ['Figtree', 'sans-serif'],
             },
             colors: {
-              primary: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81', 950: '#1e1b4b' },
-              secondary: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12' },
-              accent: { 50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 300: '#d8b4fe', 400: '#c084fc', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce', 800: '#6b21a8', 900: '#581c87' },
-              school: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
-              home: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12' },
-              surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' },
+              // Paleta «La luz del prisma»: marino y celeste del escudo + espectro (sin violeta)
+              primary: { 50: '#eef5fb', 100: '#d5e7f6', 200: '#abcfed', 300: '#78b1e0', 400: '#4a9ad8', 500: '#2373bd', 600: '#145ea6', 700: '#0a4a8c', 800: '#0b3d72', 900: '#0c325c', 950: '#081f3a' },
+              secondary: { 50: '#fff8eb', 100: '#feedc8', 200: '#fdd98d', 300: '#f8bf57', 400: '#f2a93b', 500: '#e48b17', 600: '#c66b0f', 700: '#a14d10', 800: '#833d14', 900: '#6c3314' },
+              accent: { 50: '#ecf9fe', 100: '#d2f0fc', 200: '#a6e1f8', 300: '#6ccdf2', 400: '#30b5e8', 500: '#0aa0dc', 600: '#0882b6', 700: '#0b6893', 800: '#0f5678', 900: '#124864' },
+              school: { 50: '#eef5fb', 100: '#d5e7f6', 200: '#abcfed', 300: '#78b1e0', 400: '#4a9ad8', 500: '#2373bd', 600: '#145ea6', 700: '#0a4a8c', 800: '#0b3d72', 900: '#0c325c' },
+              home: { 50: '#fff8eb', 100: '#feedc8', 200: '#fdd98d', 300: '#f8bf57', 400: '#f2a93b', 500: '#e48b17', 600: '#c66b0f', 700: '#a14d10', 800: '#833d14', 900: '#6c3314' },
+              surface: { 50: '#f6f8fb', 100: '#eaf0f6', 200: '#d5dfea', 300: '#b4c3d4', 400: '#8399b2', 500: '#5d7590', 600: '#425a76', 700: '#2a405b', 800: '#152a44', 900: '#0a1a2e' },
+              // Los violetas, índigos y rosas de las vistas se redirigen a la paleta del cole
+              indigo: { 50: '#eef5fb', 100: '#d5e7f6', 200: '#abcfed', 300: '#78b1e0', 400: '#4a9ad8', 500: '#2373bd', 600: '#145ea6', 700: '#0a4a8c', 800: '#0b3d72', 900: '#0c325c', 950: '#081f3a' },
+              violet: { 50: '#ecf9fe', 100: '#d2f0fc', 200: '#a6e1f8', 300: '#6ccdf2', 400: '#30b5e8', 500: '#0aa0dc', 600: '#0882b6', 700: '#0b6893', 800: '#0f5678', 900: '#124864', 950: '#0b2f42' },
+              purple: { 50: '#ecf9fe', 100: '#d2f0fc', 200: '#a6e1f8', 300: '#6ccdf2', 400: '#30b5e8', 500: '#0aa0dc', 600: '#0882b6', 700: '#0b6893', 800: '#0f5678', 900: '#124864', 950: '#0b2f42' },
+              pink: { 50: '#fef4f2', 100: '#fde5e1', 200: '#fbcbc4', 300: '#f6a399', 400: '#f27b6e', 500: '#ef5b4c', 600: '#d9412f', 700: '#b53324', 800: '#952c21', 900: '#7c2920' },
+              fuchsia: { 50: '#fef4f2', 100: '#fde5e1', 200: '#fbcbc4', 300: '#f6a399', 400: '#f27b6e', 500: '#ef5b4c', 600: '#d9412f', 700: '#b53324', 800: '#952c21', 900: '#7c2920' },
+              rose: { 50: '#fef4f2', 100: '#fde5e1', 200: '#fbcbc4', 300: '#f6a399', 400: '#f27b6e', 500: '#ef5b4c', 600: '#d9412f', 700: '#b53324', 800: '#952c21', 900: '#7c2920' },
             },
             animation: {
               'float': 'float 6s ease-in-out infinite',
@@ -58,10 +67,10 @@
               'glass': '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
               'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
               'glass-hover': '0 20px 60px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
-              'neon-blue': '0 0 20px rgba(99, 102, 241, 0.3)',
-              'neon-orange': '0 0 20px rgba(249, 115, 22, 0.3)',
+              'neon-blue': '0 0 22px rgba(35, 115, 189, 0.38)',
+              'neon-orange': '0 0 22px rgba(242, 169, 59, 0.35)',
               'neon-green': '0 0 20px rgba(34, 197, 94, 0.3)',
-              'neon-purple': '0 0 20px rgba(168, 85, 247, 0.3)',
+              'neon-purple': '0 0 22px rgba(10, 160, 220, 0.35)',
             },
           }
         }

@@ -92,23 +92,26 @@ const ParentDashboard: React.FC = () => {
     <div className="min-h-screen min-h-[100dvh] mesh-parent flex flex-col font-body relative">
 
       {/* Top Bar */}
-      <header className="glass-medium sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
-        <div className="flex justify-between items-center max-w-5xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center text-secondary-400">
+      <header className="glass-medium hs-luz sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
+        <div className="flex justify-between items-center gap-2 max-w-5xl mx-auto">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <img src="/suite/escudo.png" alt="Colegio La Hispanidad" className="hs-escudo" />
+            <div className="hidden sm:flex w-10 h-10 rounded-xl bg-secondary-500/20 items-center justify-center text-secondary-400">
               <Home size={20} />
             </div>
-            <div>
-              <h1 className="font-display font-bold text-white/90 text-base leading-none">Panel Familiar</h1>
-              <p className="text-xs text-white/40 mt-0.5">{currentUser?.name}</p>
+            <div className="min-w-0">
+              <h1 className="font-display font-bold text-white/90 text-base leading-none truncate">Panel Familiar</h1>
+              <p className="text-xs text-white/40 mt-0.5 truncate">{currentUser?.name}</p>
+              <p className="hs-firma mt-0.5">Creado por Javi Barrero</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={() => {
                 setShowChat(true);
                 if (tutor && currentUser) markMessagesRead(tutor.id, currentUser.id);
               }}
+              aria-label="Mensajes del tutor"
               className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors relative"
             >
               <MessageSquare size={18} />
@@ -121,7 +124,7 @@ const ParentDashboard: React.FC = () => {
             {activeTab === 'DASHBOARD' && (
               <button
                 onClick={() => setShowTaskModal(true)}
-                className="bg-gradient-to-r from-secondary-600 to-secondary-500 text-white px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-secondary-500/25 hover:shadow-secondary-500/40 transition-all active:scale-95"
+                className="bg-gradient-to-r from-secondary-600 to-secondary-500 text-white px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-secondary-500/25 hover:shadow-secondary-500/40 transition active:scale-95"
               >
                 <Plus size={14} /> Tarea
               </button>
@@ -129,16 +132,16 @@ const ParentDashboard: React.FC = () => {
             {activeTab === 'REWARDS' && (
               <button
                 onClick={() => setShowRewardModal(true)}
-                className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all active:scale-95"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition active:scale-95"
               >
                 <Plus size={14} /> Premio
               </button>
             )}
             <ThemeToggle className="glass rounded-xl text-white/40 hover:text-white/80" />
-            <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors">
+            <button aria-label="Ajustes" onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors">
               <Settings size={18} />
             </button>
-            <button onClick={logout} className="glass rounded-xl p-2.5 text-red-400/60 hover:text-red-400 transition-colors">
+            <button aria-label="Cerrar sesión" onClick={logout} className="glass rounded-xl p-2.5 text-red-400/60 hover:text-red-400 transition-colors">
               <LogOut size={18} />
             </button>
           </div>
@@ -154,7 +157,7 @@ const ParentDashboard: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-3 border-b-2 font-display font-bold text-sm flex items-center gap-2 transition-all duration-200 ${active
+              className={`py-3 border-b-2 font-display font-bold text-sm flex items-center gap-2 transition duration-200 ${active
                 ? tab.id === 'DASHBOARD' ? 'border-secondary-500 text-secondary-400' : tab.id === 'BUZON' ? 'border-red-500 text-red-500' : 'border-emerald-500 text-emerald-400'
                 : 'border-transparent text-white/30 hover:text-white/50'
                 }`}
@@ -174,7 +177,7 @@ const ParentDashboard: React.FC = () => {
         {showSettings && (
           <div className="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
             <div className="glass-strong rounded-3xl p-6 w-full max-w-sm shadow-glass-lg modal-content relative">
-              <button onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors">
+              <button aria-label="Cerrar" onClick={() => setShowSettings(false)} className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors">
                 <X size={20} />
               </button>
               <h2 className="font-display text-lg font-bold text-white/90 mb-4 flex items-center gap-2"><Settings size={18} /> Ajustes</h2>
@@ -189,7 +192,7 @@ const ParentDashboard: React.FC = () => {
                   placeholder="0000"
                 />
               </div>
-              <button onClick={handleUpdatePin} className="w-full bg-gradient-to-r from-secondary-600 to-secondary-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-secondary-500/25 transition-all active:scale-[0.98]">
+              <button onClick={handleUpdatePin} className="w-full bg-gradient-to-r from-secondary-600 to-secondary-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-secondary-500/25 transition active:scale-[0.98]">
                 Guardar Nuevo PIN
               </button>
             </div>
@@ -205,7 +208,7 @@ const ParentDashboard: React.FC = () => {
                   <MessageSquare size={16} className="text-accent-400" />
                   Chat con {tutor?.name || 'Tutor'}
                 </div>
-                <button onClick={() => setShowChat(false)} className="text-white/30 hover:text-white/70 transition-colors"><X size={18} /></button>
+                <button aria-label="Cerrar" onClick={() => setShowChat(false)} className="text-white/30 hover:text-white/70 transition-colors"><X size={18} /></button>
               </div>
               <div className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide">
                 {conversation.map(msg => {
@@ -226,12 +229,12 @@ const ParentDashboard: React.FC = () => {
               <div className="p-3 glass-medium flex gap-2">
                 <input
                   className="input-glass flex-1 rounded-full text-sm py-2"
-                  placeholder="Mensaje..."
+                  placeholder="Mensaje…"
                   value={chatMessage}
                   onChange={e => setChatMessage(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                 />
-                <button onClick={handleSendMessage} className="bg-gradient-to-r from-primary-600 to-accent-600 text-white p-2.5 rounded-full shadow-lg shadow-primary-500/20 transition-all active:scale-95">
+                <button aria-label="Enviar" onClick={handleSendMessage} className="bg-gradient-to-r from-primary-600 to-accent-600 text-white p-2.5 rounded-full shadow-lg shadow-primary-500/20 transition active:scale-95">
                   <Send size={16} />
                 </button>
               </div>
@@ -264,13 +267,13 @@ const ParentDashboard: React.FC = () => {
                   <div className="flex gap-2 mb-5">
                     <button
                       onClick={() => assignPoints(kid.id, -5)}
-                      className="flex-1 py-2.5 rounded-xl glass text-red-400 font-bold text-xs hover:bg-red-500/10 transition-all active:scale-95"
+                      className="flex-1 py-2.5 rounded-xl glass text-red-400 font-bold text-xs hover:bg-red-500/10 transition active:scale-95"
                     >
                       <Minus size={14} className="inline mr-1" /> Mal
                     </button>
                     <button
                       onClick={() => assignPoints(kid.id, 5)}
-                      className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all active:scale-95"
+                      className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition active:scale-95"
                     >
                       <Plus size={14} className="inline mr-1" /> Bien
                     </button>
@@ -334,7 +337,7 @@ const ParentDashboard: React.FC = () => {
                 <div className="col-span-3 text-center py-16 glass rounded-2xl">
                   <Gift size={40} className="mx-auto mb-3 text-white/15" />
                   <p className="text-white/30 text-sm">No has creado premios para casa.</p>
-                  <button onClick={() => setShowRewardModal(true)} className="mt-3 text-secondary-400 font-bold text-sm hover:text-secondary-300 transition-colors">
+                  <button onClick={() => setShowRewardModal(true)} className="mt-2 py-2.5 px-3 text-secondary-400 font-bold text-sm hover:text-secondary-300 transition-colors">
                     Crear el primero
                   </button>
                 </div>
@@ -354,9 +357,9 @@ const ParentDashboard: React.FC = () => {
                       <span className="text-xs text-white/30 font-bold">{reward.cost} pts</span>
                     </div>
                   </div>
-                  <button
+                  <button aria-label="Eliminar"
                     onClick={() => deleteReward(reward.id)}
-                    className="text-white/15 hover:text-red-400 p-2 transition-colors"
+                    className="p-2 text-white/15 hover:text-red-400 p-2 transition-colors"
                     title="Borrar Premio"
                   >
                     <Trash2 size={16} />
@@ -408,7 +411,7 @@ const ParentDashboard: React.FC = () => {
                       {!msg.read && (
                         <button
                           onClick={() => markMessagesRead(msg.fromId, currentUser!.id)}
-                          className="self-end bg-gradient-to-r from-red-600 to-red-500 text-white font-bold text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                          className="self-end bg-gradient-to-r from-red-600 to-red-500 text-white font-bold text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 shadow-lg shadow-red-500/20 transition active:scale-95"
                         >
                           <CheckCircle size={14} /> Marcar como visto
                         </button>
@@ -437,7 +440,7 @@ const ParentDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-6 rounded-xl transition-all duration-200 relative ${active ? 'text-white' : 'text-white/30'
+                className={`flex flex-col items-center py-1.5 px-6 rounded-xl transition duration-200 relative ${active ? 'text-white' : 'text-white/30'
                   }`}
               >
                 {tab.id === 'BUZON' && unreadBuzonCount > 0 && (
@@ -445,7 +448,7 @@ const ParentDashboard: React.FC = () => {
                     {unreadBuzonCount}
                   </div>
                 )}
-                <div className={`p-1.5 rounded-xl transition-all duration-200 ${active ? 'bg-white/15' : ''}`}>
+                <div className={`p-1.5 rounded-xl transition duration-200 ${active ? 'bg-white/15' : ''}`}>
                   <Icon size={20} />
                 </div>
                 <span className="text-[10px] font-semibold mt-0.5">{tab.label}</span>
@@ -477,7 +480,7 @@ const ParentDashboard: React.FC = () => {
               />
               <div className="flex gap-3">
                 <button onClick={() => setShowTaskModal(false)} className="btn-ghost flex-1">Cancelar</button>
-                <button onClick={handleCreateChore} className="flex-1 py-2.5 bg-gradient-to-r from-secondary-600 to-secondary-500 text-white rounded-xl font-bold shadow-lg shadow-secondary-500/25 transition-all active:scale-[0.98]">Asignar</button>
+                <button onClick={handleCreateChore} className="flex-1 py-2.5 bg-gradient-to-r from-secondary-600 to-secondary-500 text-white rounded-xl font-bold shadow-lg shadow-secondary-500/25 transition active:scale-[0.98]">Asignar</button>
               </div>
             </div>
           </div>
@@ -508,7 +511,7 @@ const ParentDashboard: React.FC = () => {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setShowRewardModal(false)} className="btn-ghost flex-1">Cancelar</button>
-                <button onClick={handleCreateReward} className="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98]">Crear</button>
+                <button onClick={handleCreateReward} className="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/25 transition active:scale-[0.98]">Crear</button>
               </div>
             </div>
           </div>

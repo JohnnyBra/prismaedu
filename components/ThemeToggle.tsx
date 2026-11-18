@@ -16,7 +16,7 @@ const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <button
       onClick={cycle}
-      className={`p-2 rounded-xl hover:scale-105 active:scale-95 transition-transform ${className}`}
+      className={`p-2 min-w-10 min-h-10 inline-flex items-center justify-center rounded-xl hover:scale-105 active:scale-95 transition-transform ${className}`}
       title={`Tema: ${label}`}
       aria-label={`Cambiar tema (actual: ${label})`}
     >

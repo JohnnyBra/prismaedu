@@ -7,6 +7,9 @@ import Avatar from '../components/Avatar';
 
 type LoginStep = 'MODE_SELECT' | 'TEACHER_METHOD_SELECT' | 'CLASS_SELECT' | 'GROUP_SELECT' | 'USER_SELECT' | 'PIN_ENTRY' | 'EMAIL_ENTRY';
 
+// Una cara del prisma por app de la Suite: Intranet, Excursiones, Biblioteca, Aulas y Prisma
+const PRISM_FACES = ['var(--hs-e1)', 'var(--hs-e2)', 'var(--hs-e3)', 'var(--hs-e4)', 'var(--hs-e5)'];
+
 const AuthView: React.FC = () => {
   const { login, users, classes } = useData();
 
@@ -119,6 +122,10 @@ const AuthView: React.FC = () => {
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
               <input
                 type="email"
+                name="email"
+                autoComplete="email"
+                spellCheck={false}
+                aria-label="Correo corporativo"
                 value={emailInput}
                 onChange={(e) => {
                   setEmailInput(e.target.value);
@@ -141,8 +148,8 @@ const AuthView: React.FC = () => {
                     }
                   }
                 }}
-                placeholder="nombre@colegio.com"
-                className="w-full pl-12 pr-4 py-4 rounded-xl input-glass bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-primary-400 focus:ring-1 focus:ring-primary-400/50 transition-all"
+                placeholder="nombre@colegiolahispanidad.es"
+                className="w-full pl-12 pr-4 py-4 rounded-xl input-glass bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-primary-400 focus:ring-1 focus:ring-primary-400/50 transition"
                 autoFocus
               />
             </div>
@@ -171,7 +178,7 @@ const AuthView: React.FC = () => {
               }
             }}
             disabled={!emailInput.trim()}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-display font-bold text-lg shadow-lg shadow-primary-500/25 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-display font-bold text-lg shadow-lg shadow-primary-500/25 transition hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continuar
           </button>
@@ -181,14 +188,25 @@ const AuthView: React.FC = () => {
   );
 
   const renderModeSelect = () => (
-    <div className="space-y-8 animate-slide-up w-full max-w-md px-4">
+    <div className="space-y-8 animate-slide-up w-full max-w-md px-4 flex flex-col items-center [&>*]:w-full">
       <div className="text-center flex flex-col items-center">
-        <div className="relative mb-6">
-          <div className="absolute inset-0 bg-primary-500/30 rounded-full blur-2xl animate-glow-pulse" />
-          <img src="/logo.png" alt="Logo" className="relative h-28 w-auto object-contain drop-shadow-2xl" onError={(e) => e.currentTarget.style.display = 'none'} />
+        <div className="lp-escena" aria-hidden="true">
+          <div className="lp-haz" />
+          <div className="lp-abanico" />
+          <div className="lp-nucleo" />
+          <div className="lp-prisma">
+            <div className="lp-giro">
+              {PRISM_FACES.map((color, i) => (
+                <div key={i} className="lp-cara" style={{ '--ry': `${i * 72}deg`, '--c': color } as React.CSSProperties} />
+              ))}
+              <div className="lp-tapa lp-tapa--arriba" />
+              <div className="lp-tapa lp-tapa--abajo" />
+            </div>
+          </div>
+          <img src="/suite/escudo.png" alt="" className="lp-escudo" />
         </div>
-        <h1 className="font-display text-5xl font-black gradient-text mb-3 tracking-tight">Prisma</h1>
-        <p className="text-white/50 text-sm font-medium tracking-wide uppercase">Cooperativa de Enseñanza La Hispanidad</p>
+        <h1 className="lp-titulo gradient-text mb-3">Prisma</h1>
+        <p className="text-white/60 text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase">Colegio La Hispanidad · Huelva</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -197,9 +215,9 @@ const AuthView: React.FC = () => {
             setSelectedContext('SCHOOL');
             setStep('TEACHER_METHOD_SELECT');
           }}
-          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 hover:shadow-neon-blue flex flex-col items-center gap-4"
+          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-blue flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all duration-300 group-hover:shadow-neon-blue group-hover:scale-110">
+          <div className="w-16 h-16 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition duration-300 group-hover:shadow-neon-blue group-hover:scale-110">
             <School size={32} />
           </div>
           <span className="font-display text-lg font-bold text-white/90">Soy Profesor</span>
@@ -210,9 +228,9 @@ const AuthView: React.FC = () => {
             setSelectedContext('HOME');
             setStep('CLASS_SELECT');
           }}
-          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 hover:shadow-neon-orange flex flex-col items-center gap-4"
+          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-orange flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 rounded-2xl bg-secondary-500/20 flex items-center justify-center text-secondary-400 group-hover:bg-secondary-500 group-hover:text-white transition-all duration-300 group-hover:shadow-neon-orange group-hover:scale-110">
+          <div className="w-16 h-16 rounded-2xl bg-secondary-500/20 flex items-center justify-center text-secondary-400 group-hover:bg-secondary-500 group-hover:text-white transition duration-300 group-hover:shadow-neon-orange group-hover:scale-110">
             <Home size={32} />
           </div>
           <span className="font-display text-lg font-bold text-white/90">Soy Familia</span>
@@ -225,7 +243,7 @@ const AuthView: React.FC = () => {
             setSelectedContext('ADMIN');
             setStep('USER_SELECT');
           }}
-          className="text-xs text-white/30 hover:text-white/60 font-semibold flex items-center justify-center gap-1.5 mx-auto transition-colors"
+          className="text-xs text-white/30 hover:text-white/60 font-semibold flex items-center justify-center gap-1.5 mx-auto px-4 py-3 rounded-xl transition-colors"
         >
           <Shield size={12} /> Administrador
         </button>
@@ -239,9 +257,9 @@ const AuthView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button
           onClick={() => setStep('EMAIL_ENTRY')}
-          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 hover:shadow-neon-blue flex flex-col items-center gap-4"
+          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-blue flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all duration-300 group-hover:scale-110">
+          <div className="w-16 h-16 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition duration-300 group-hover:scale-110">
             <KeyRound size={32} />
           </div>
           <div className="text-center">
@@ -252,9 +270,9 @@ const AuthView: React.FC = () => {
 
         <a
           href="/auth/google"
-          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 hover:-translate-y-1 hover:shadow-neon-purple flex flex-col items-center gap-4"
+          className="group glass-light rounded-2xl p-6 hover:bg-white/15 transition duration-300 hover:-translate-y-1 hover:shadow-neon-purple flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 rounded-2xl bg-accent-500/20 flex items-center justify-center text-accent-400 group-hover:bg-accent-500 group-hover:text-white transition-all duration-300 group-hover:scale-110">
+          <div className="w-16 h-16 rounded-2xl bg-accent-500/20 flex items-center justify-center text-accent-400 group-hover:bg-accent-500 group-hover:text-white transition duration-300 group-hover:scale-110">
             <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -283,10 +301,10 @@ const AuthView: React.FC = () => {
               setStep('PIN_ENTRY');
               setSelectedUser(null);
             }}
-            className={`group glass rounded-2xl p-5 hover:bg-white/12 transition-all duration-300 hover:-translate-y-1 hover:shadow-neon-blue text-center stagger-${Math.min(i + 1, 8)}`}
+            className={`group glass rounded-2xl p-5 hover:bg-white/12 transition duration-300 hover:-translate-y-1 hover:shadow-neon-blue text-center stagger-${Math.min(i + 1, 8)}`}
             style={{ animation: `slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s both` }}
           >
-            <div className="w-12 h-12 mx-auto rounded-xl bg-primary-500/20 flex items-center justify-center text-primary-400 mb-3 group-hover:bg-primary-500 group-hover:text-white transition-all duration-300 group-hover:scale-110">
+            <div className="w-12 h-12 mx-auto rounded-xl bg-primary-500/20 flex items-center justify-center text-primary-400 mb-3 group-hover:bg-primary-500 group-hover:text-white transition duration-300 group-hover:scale-110">
               <School size={22} />
             </div>
             <span className="font-display font-semibold text-white/80 text-sm">{cls.name}</span>
@@ -322,10 +340,10 @@ const AuthView: React.FC = () => {
                   setSelectedGroupId(fam.id!);
                   setStep('USER_SELECT');
                 }}
-                className="group glass rounded-2xl p-5 hover:bg-white/12 transition-all duration-300 hover:-translate-y-1 hover:shadow-neon-orange text-center"
+                className="group glass rounded-2xl p-5 hover:bg-white/12 transition duration-300 hover:-translate-y-1 hover:shadow-neon-orange text-center"
                 style={{ animation: `slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s both` }}
               >
-                <div className="w-12 h-12 mx-auto rounded-xl bg-secondary-500/20 flex items-center justify-center text-secondary-400 mb-3 group-hover:bg-secondary-500 group-hover:text-white transition-all duration-300 group-hover:scale-110">
+                <div className="w-12 h-12 mx-auto rounded-xl bg-secondary-500/20 flex items-center justify-center text-secondary-400 mb-3 group-hover:bg-secondary-500 group-hover:text-white transition duration-300 group-hover:scale-110">
                   <Home size={22} />
                 </div>
                 <span className="font-display font-semibold text-white/80 text-sm">{fam.name}</span>
@@ -362,12 +380,12 @@ const AuthView: React.FC = () => {
                 setSelectedUser(user);
                 setStep('PIN_ENTRY');
               }}
-              className="group glass rounded-2xl p-4 hover:bg-white/12 transition-all duration-300 hover:-translate-y-1 flex flex-col items-center"
+              className="group glass rounded-2xl p-4 hover:bg-white/12 transition duration-300 hover:-translate-y-1 flex flex-col items-center"
               style={{ animation: `slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.04}s both` }}
             >
               <div className="mb-3">
                 {user.role === Role.TUTOR || user.role === Role.PARENT || user.role === Role.ADMIN || user.role === Role.DIRECCION || user.role === Role.TESORERIA ? (
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition duration-300 group-hover:scale-110 ${
                     user.role === Role.ADMIN || user.role === Role.DIRECCION || user.role === Role.TESORERIA
                       ? 'bg-surface-700 text-white/70 group-hover:bg-surface-600'
                       : 'bg-primary-500/20 text-primary-400 group-hover:bg-primary-500/30'
@@ -375,7 +393,7 @@ const AuthView: React.FC = () => {
                     {user.role === Role.TUTOR ? <GraduationCap size={28} /> : user.role === Role.ADMIN ? <Shield size={28} /> : <UserIcon size={28} />}
                   </div>
                 ) : (
-                  <Avatar config={user.avatarConfig} size={64} showRing glowColor="rgba(99,102,241,0.3)" />
+                  <Avatar config={user.avatarConfig} size={64} showRing glowColor="rgba(10,160,220,0.3)" />
                 )}
               </div>
               <span className="font-display font-semibold text-white/80 text-center text-sm">{user.name}</span>
@@ -397,7 +415,7 @@ const AuthView: React.FC = () => {
         <div className="mx-auto w-20 h-20 mb-4">
           {selectedUser ? (
             selectedUser.role === Role.STUDENT ? (
-              <Avatar config={selectedUser.avatarConfig} size={80} showRing glowColor="rgba(99,102,241,0.4)" />
+              <Avatar config={selectedUser.avatarConfig} size={80} showRing glowColor="rgba(10,160,220,0.4)" />
             ) : (
               <div className={`w-full h-full rounded-2xl flex items-center justify-center ${
                 selectedUser.role === Role.ADMIN || selectedUser.role === Role.DIRECCION || selectedUser.role === Role.TESORERIA
@@ -424,7 +442,7 @@ const AuthView: React.FC = () => {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`w-12 h-14 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-200 ${
+            className={`w-12 h-14 rounded-xl flex items-center justify-center text-2xl font-bold transition duration-200 ${
               pin[i]
                 ? 'bg-primary-500/20 border-2 border-primary-500/50 text-primary-400 shadow-neon-blue scale-105'
                 : 'bg-white/5 border-2 border-white/10 text-white/20'
@@ -443,7 +461,7 @@ const AuthView: React.FC = () => {
           <button
             key={num}
             onClick={() => handleDigit(num.toString())}
-            className="h-14 rounded-xl bg-white/6 hover:bg-white/12 active:bg-white/18 active:scale-95 font-display font-bold text-xl text-white/80 transition-all duration-150"
+            className="h-14 rounded-xl bg-white/6 hover:bg-white/12 active:bg-white/18 active:scale-95 font-display font-bold text-xl text-white/80 transition duration-150"
           >
             {num}
           </button>
@@ -451,13 +469,14 @@ const AuthView: React.FC = () => {
         <div />
         <button
           onClick={() => handleDigit('0')}
-          className="h-14 rounded-xl bg-white/6 hover:bg-white/12 active:bg-white/18 active:scale-95 font-display font-bold text-xl text-white/80 transition-all duration-150"
+          className="h-14 rounded-xl bg-white/6 hover:bg-white/12 active:bg-white/18 active:scale-95 font-display font-bold text-xl text-white/80 transition duration-150"
         >
           0
         </button>
         <button
           onClick={handleBackspace}
-          className="h-14 rounded-xl bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 active:scale-95 flex items-center justify-center text-red-400 transition-all duration-150"
+          aria-label="Borrar"
+          className="h-14 rounded-xl bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 active:scale-95 flex items-center justify-center text-red-400 transition duration-150"
         >
           <Delete size={22} />
         </button>
@@ -466,7 +485,7 @@ const AuthView: React.FC = () => {
       <button
         onClick={handleSubmitPin}
         disabled={pin.length !== 4}
-        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 disabled:opacity-30 disabled:cursor-not-allowed text-white font-display font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-primary-500/25 transition-all duration-200 active:scale-[0.98]"
+        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 disabled:opacity-30 disabled:cursor-not-allowed text-white font-display font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-primary-500/25 transition duration-200 active:scale-[0.98]"
       >
         Entrar <ArrowRight size={18} />
       </button>
@@ -488,7 +507,7 @@ const AuthView: React.FC = () => {
       {step !== 'MODE_SELECT' && (
         <button
           onClick={goBack}
-          className="fixed top-4 left-4 z-50 glass rounded-full px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/15 flex items-center gap-2 text-sm font-semibold transition-all duration-200"
+          className="fixed top-4 left-4 z-50 glass rounded-full px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/15 flex items-center gap-2 text-sm font-semibold transition duration-200"
           style={{ paddingTop: 'calc(0.625rem + var(--safe-top))' }}
         >
           <ArrowLeft size={16} /> Atrás
@@ -505,9 +524,9 @@ const AuthView: React.FC = () => {
         {step === 'PIN_ENTRY' && renderPinEntry()}
       </div>
 
-      <footer className="mt-4 text-center text-white/20 text-[10px] py-3 z-10">
-        <p className="font-semibold tracking-widest uppercase">Cooperativa de Enseñanza La Hispanidad</p>
-        <p className="mt-1 opacity-60">Creado por Javi Barrero</p>
+      <footer className="mt-4 text-center py-3 z-10 flex flex-col items-center gap-1">
+        <p className="text-white/40 text-[10px] font-semibold tracking-[0.2em] uppercase">Cooperativa de Enseñanza La Hispanidad</p>
+        <p className="hs-firma">Creado por Javi Barrero</p>
       </footer>
     </div>
   );
