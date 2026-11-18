@@ -122,6 +122,10 @@ const AuthView: React.FC = () => {
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
               <input
                 type="email"
+                name="email"
+                autoComplete="email"
+                spellCheck={false}
+                aria-label="Correo corporativo"
                 value={emailInput}
                 onChange={(e) => {
                   setEmailInput(e.target.value);
@@ -144,7 +148,7 @@ const AuthView: React.FC = () => {
                     }
                   }
                 }}
-                placeholder="nombre@colegio.com"
+                placeholder="nombre@colegiolahispanidad.es"
                 className="w-full pl-12 pr-4 py-4 rounded-xl input-glass bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-primary-400 focus:ring-1 focus:ring-primary-400/50 transition-all"
                 autoFocus
               />
@@ -471,6 +475,7 @@ const AuthView: React.FC = () => {
         </button>
         <button
           onClick={handleBackspace}
+          aria-label="Borrar"
           className="h-14 rounded-xl bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 active:scale-95 flex items-center justify-center text-red-400 transition-all duration-150"
         >
           <Delete size={22} />
