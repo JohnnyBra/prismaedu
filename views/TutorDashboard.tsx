@@ -223,7 +223,6 @@ const TutorDashboard: React.FC = () => {
               </div>
               <img src="/suite/escudo.png" alt="" className="lp-escudo" />
             </div>
-            <div className="hub-abanico" aria-hidden="true" />
 
             {hubItems.map((item, i) => {
               const contenido = (
