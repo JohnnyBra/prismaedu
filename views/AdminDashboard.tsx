@@ -22,7 +22,7 @@ const getSortKey = (u: User) => {
 };
 
 const AdminDashboard: React.FC = () => {
-  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers, migratePins, moveStudentClass, setClassNextTarget, applyPromotion, restoreFromSnapshot, createBackup, listBackups, restoreBackup } = useData();
+  const { logout, users, classes, tasks, addClass, updateClass, deleteClass, addUser, addUsers, updateUser, deleteUser, updateTask, deleteTask, deleteFamily, updateFamilyId, updatePin, setAllUsers, migratePins, moveStudentClass, setClassNextTarget, applyPromotion, restoreFromSnapshot, createBackup, listBackups, restoreBackup, schoolYear, setSchoolYear } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('CLASSES');
 
   // Local state for edits/creation
@@ -1824,6 +1824,8 @@ const AdminDashboard: React.FC = () => {
              setClassNextTarget={setClassNextTarget}
              applyPromotion={applyPromotion}
              restoreFromSnapshot={restoreFromSnapshot}
+             schoolYear={schoolYear}
+             setSchoolYear={setSchoolYear}
            />
          )}
          {activeTab === 'BACKUPS' && (

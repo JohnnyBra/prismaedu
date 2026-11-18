@@ -18,6 +18,8 @@ interface PromotionPanelProps {
   setClassNextTarget: (classId: string, nextClassId: string) => void;
   applyPromotion: (plan: PromotionPlan) => void;
   restoreFromSnapshot: (users: User[], classes: ClassGroup[]) => void;
+  schoolYear: number | null;
+  setSchoolYear: (startYear: number) => void;
 }
 
 interface DirectRow {
@@ -239,7 +241,7 @@ export const computeCapacityWarnings = (
   return warnings;
 };
 
-const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClassNextTarget, applyPromotion, restoreFromSnapshot }) => {
+const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClassNextTarget, applyPromotion, restoreFromSnapshot, schoolYear, setSchoolYear }) => {
   const rows = useMemo(() => buildRows(users, classes), [users, classes]);
   const [manualAssignments, setManualAssignments] = useState<Record<string, Record<string, string>>>({});
   const [directOverrides, setDirectOverrides] = useState<Record<string, string>>({});
@@ -372,6 +374,19 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
     </>
   );
 
+  const schoolYearCard = schoolYear !== null && (
+    <div className="glass rounded-2xl shadow-glass p-4 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p className="font-bold text-white/90 font-body">Curso escolar actual: {schoolYear}/{String(schoolYear + 1).slice(-2)}</p>
+        <p className="text-xs text-white/40">Excursiones lo usa por defecto. Cámbialo al empezar el curso nuevo.</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <button onClick={() => setSchoolYear(schoolYear - 1)} className="btn-ghost text-sm">← {schoolYear - 1}/{String(schoolYear).slice(-2)}</button>
+        <button onClick={() => setSchoolYear(schoolYear + 1)} className="btn-primary text-sm">Pasar a {schoolYear + 1}/{String(schoolYear + 2).slice(-2)} →</button>
+      </div>
+    </div>
+  );
+
   if (rows.length === 0) {
     return (
       <div className="space-y-4 animate-fade-in">
@@ -379,6 +394,7 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
           <h2 className="text-xl font-display font-bold text-white/90">Promoción de Curso</h2>
           {restoreControls}
         </div>
+        {schoolYearCard}
         <div className="glass rounded-2xl p-8 text-center text-white/40 font-body">
           No hay alumnos activos pendientes de promoción.
         </div>
@@ -400,6 +416,8 @@ const PromotionPanel: React.FC<PromotionPanelProps> = ({ users, classes, setClas
           </button>
         </div>
       </div>
+
+      {schoolYearCard}
 
       <div className="space-y-3">
         {rowsWithResolvedTargets.map(row => (
