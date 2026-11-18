@@ -298,7 +298,8 @@ const StudentDashboard: React.FC = () => {
               <p className="hs-firma mt-0.5">Creado por Javi Barrero</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <img src="/suite/escudo.png" alt="Colegio La Hispanidad" className="hs-escudo mr-1" />
             <ThemeToggle className="glass rounded-xl text-white/50 hover:text-white/90 hover:bg-white/10" />
             <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/50 hover:text-white/90 hover:bg-white/10 transition-all hover:scale-105">
               <Settings size={18} />
