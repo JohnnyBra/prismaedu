@@ -4,11 +4,9 @@ import { GraduationCap, Home, User as UserIcon, Delete, ArrowRight, ArrowLeft, S
 import ThemeToggle from '../components/ThemeToggle';
 import { Role, User } from '../types';
 import Avatar from '../components/Avatar';
+import EscenaPrisma from '../components/EscenaPrisma';
 
 type LoginStep = 'MODE_SELECT' | 'TEACHER_METHOD_SELECT' | 'CLASS_SELECT' | 'GROUP_SELECT' | 'USER_SELECT' | 'PIN_ENTRY' | 'EMAIL_ENTRY';
-
-// Una cara del prisma por app de la Suite: Intranet, Excursiones, Biblioteca, Aulas y Prisma
-const PRISM_FACES = ['var(--hs-e1)', 'var(--hs-e2)', 'var(--hs-e3)', 'var(--hs-e4)', 'var(--hs-e5)'];
 
 const AuthView: React.FC = () => {
   const { login, users, classes } = useData();
@@ -189,25 +187,7 @@ const AuthView: React.FC = () => {
 
   const renderModeSelect = () => (
     <div className="space-y-8 animate-slide-up w-full max-w-md px-4 flex flex-col items-center [&>*]:w-full">
-      <div className="text-center flex flex-col items-center">
-        <div className="lp-escena" aria-hidden="true">
-          <div className="lp-haz" />
-          <div className="lp-abanico" />
-          <div className="lp-nucleo" />
-          <div className="lp-prisma">
-            <div className="lp-giro">
-              {PRISM_FACES.map((color, i) => (
-                <div key={i} className="lp-cara" style={{ '--ry': `${i * 72}deg`, '--c': color } as React.CSSProperties} />
-              ))}
-              <div className="lp-tapa lp-tapa--arriba" />
-              <div className="lp-tapa lp-tapa--abajo" />
-            </div>
-          </div>
-          <img src="/suite/escudo.png" alt="" className="lp-escudo" />
-        </div>
-        <h1 className="lp-titulo gradient-text mb-3">Prisma</h1>
-        <p className="text-white/60 text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase">Colegio La Hispanidad · Huelva</p>
-      </div>
+      <EscenaPrisma />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button
