@@ -47,7 +47,7 @@ const Avatar: React.FC<AvatarProps> = ({ config, size = 100, className = '', glo
   const isAlien = config.baseId === 'base_5';
 
   const ringStyle = showRing ? {
-    boxShadow: `0 0 0 3px ${glowColor || 'rgba(99,102,241,0.4)'}, 0 0 20px ${glowColor || 'rgba(99,102,241,0.2)'}`
+    boxShadow: `0 0 0 3px ${glowColor || 'rgba(10,160,220,0.45)'}, 0 0 20px ${glowColor || 'rgba(10,160,220,0.22)'}`
   } : {};
 
   return (

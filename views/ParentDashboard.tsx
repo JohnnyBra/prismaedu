@@ -92,18 +92,20 @@ const ParentDashboard: React.FC = () => {
     <div className="min-h-screen min-h-[100dvh] mesh-parent flex flex-col font-body relative">
 
       {/* Top Bar */}
-      <header className="glass-medium sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
-        <div className="flex justify-between items-center max-w-5xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center text-secondary-400">
+      <header className="glass-medium hs-luz sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
+        <div className="flex justify-between items-center gap-2 max-w-5xl mx-auto">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <img src="/suite/escudo.png" alt="Colegio La Hispanidad" className="hs-escudo" />
+            <div className="hidden sm:flex w-10 h-10 rounded-xl bg-secondary-500/20 items-center justify-center text-secondary-400">
               <Home size={20} />
             </div>
-            <div>
-              <h1 className="font-display font-bold text-white/90 text-base leading-none">Panel Familiar</h1>
-              <p className="text-xs text-white/40 mt-0.5">{currentUser?.name}</p>
+            <div className="min-w-0">
+              <h1 className="font-display font-bold text-white/90 text-base leading-none truncate">Panel Familiar</h1>
+              <p className="text-xs text-white/40 mt-0.5 truncate">{currentUser?.name}</p>
+              <p className="hs-firma mt-0.5">Creado por Javi Barrero</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={() => {
                 setShowChat(true);

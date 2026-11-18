@@ -7,6 +7,9 @@ import Avatar from '../components/Avatar';
 
 type LoginStep = 'MODE_SELECT' | 'TEACHER_METHOD_SELECT' | 'CLASS_SELECT' | 'GROUP_SELECT' | 'USER_SELECT' | 'PIN_ENTRY' | 'EMAIL_ENTRY';
 
+// Una cara del prisma por app de la Suite: Intranet, Excursiones, Biblioteca, Aulas y Prisma
+const PRISM_FACES = ['var(--hs-e1)', 'var(--hs-e2)', 'var(--hs-e3)', 'var(--hs-e4)', 'var(--hs-e5)'];
+
 const AuthView: React.FC = () => {
   const { login, users, classes } = useData();
 
@@ -181,14 +184,25 @@ const AuthView: React.FC = () => {
   );
 
   const renderModeSelect = () => (
-    <div className="space-y-8 animate-slide-up w-full max-w-md px-4">
+    <div className="space-y-8 animate-slide-up w-full max-w-md px-4 flex flex-col items-center [&>*]:w-full">
       <div className="text-center flex flex-col items-center">
-        <div className="relative mb-6">
-          <div className="absolute inset-0 bg-primary-500/30 rounded-full blur-2xl animate-glow-pulse" />
-          <img src="/logo.png" alt="Logo" className="relative h-28 w-auto object-contain drop-shadow-2xl" onError={(e) => e.currentTarget.style.display = 'none'} />
+        <div className="lp-escena" aria-hidden="true">
+          <div className="lp-haz" />
+          <div className="lp-abanico" />
+          <div className="lp-nucleo" />
+          <div className="lp-prisma">
+            <div className="lp-giro">
+              {PRISM_FACES.map((color, i) => (
+                <div key={i} className="lp-cara" style={{ '--ry': `${i * 72}deg`, '--c': color } as React.CSSProperties} />
+              ))}
+              <div className="lp-tapa lp-tapa--arriba" />
+              <div className="lp-tapa lp-tapa--abajo" />
+            </div>
+          </div>
+          <img src="/suite/escudo.png" alt="" className="lp-escudo" />
         </div>
-        <h1 className="font-display text-5xl font-black gradient-text mb-3 tracking-tight">Prisma</h1>
-        <p className="text-white/50 text-sm font-medium tracking-wide uppercase">Cooperativa de Enseñanza La Hispanidad</p>
+        <h1 className="lp-titulo gradient-text mb-3">Prisma</h1>
+        <p className="text-white/60 text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase">Colegio La Hispanidad · Huelva</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -375,7 +389,7 @@ const AuthView: React.FC = () => {
                     {user.role === Role.TUTOR ? <GraduationCap size={28} /> : user.role === Role.ADMIN ? <Shield size={28} /> : <UserIcon size={28} />}
                   </div>
                 ) : (
-                  <Avatar config={user.avatarConfig} size={64} showRing glowColor="rgba(99,102,241,0.3)" />
+                  <Avatar config={user.avatarConfig} size={64} showRing glowColor="rgba(10,160,220,0.3)" />
                 )}
               </div>
               <span className="font-display font-semibold text-white/80 text-center text-sm">{user.name}</span>
@@ -397,7 +411,7 @@ const AuthView: React.FC = () => {
         <div className="mx-auto w-20 h-20 mb-4">
           {selectedUser ? (
             selectedUser.role === Role.STUDENT ? (
-              <Avatar config={selectedUser.avatarConfig} size={80} showRing glowColor="rgba(99,102,241,0.4)" />
+              <Avatar config={selectedUser.avatarConfig} size={80} showRing glowColor="rgba(10,160,220,0.4)" />
             ) : (
               <div className={`w-full h-full rounded-2xl flex items-center justify-center ${
                 selectedUser.role === Role.ADMIN || selectedUser.role === Role.DIRECCION || selectedUser.role === Role.TESORERIA
@@ -505,9 +519,9 @@ const AuthView: React.FC = () => {
         {step === 'PIN_ENTRY' && renderPinEntry()}
       </div>
 
-      <footer className="mt-4 text-center text-white/20 text-[10px] py-3 z-10">
-        <p className="font-semibold tracking-widest uppercase">Cooperativa de Enseñanza La Hispanidad</p>
-        <p className="mt-1 opacity-60">Creado por Javi Barrero</p>
+      <footer className="mt-4 text-center py-3 z-10 flex flex-col items-center gap-1">
+        <p className="text-white/40 text-[10px] font-semibold tracking-[0.2em] uppercase">Cooperativa de Enseñanza La Hispanidad</p>
+        <p className="hs-firma">Creado por Javi Barrero</p>
       </footer>
     </div>
   );

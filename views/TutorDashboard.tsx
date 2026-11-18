@@ -216,8 +216,8 @@ const TutorDashboard: React.FC = () => {
         title: "Intranet",
         desc: "Portal del profesorado.",
         icon: <Newspaper size={24} />,
-        color: "bg-violet-500/20 text-violet-400 group-hover:bg-violet-500/30",
-        border: "glow-border-purple",
+        color: "bg-pink-500/20 text-pink-400 group-hover:bg-pink-500/30",
+        border: "glow-border-coral",
         pos: { x: -195, y: 190 }
       },
       {
@@ -378,12 +378,9 @@ const TutorDashboard: React.FC = () => {
 
             {/* Flying Logo that returns to the top */}
             <div className="mobile-flying-logo z-50">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-auto drop-shadow-2xl text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect className="logo-rect-1" width="7" height="7" x="3" y="3" rx="1" />
-                <rect className="logo-rect-2" width="7" height="7" x="14" y="3" rx="1" fill="#3b82f6" stroke="#3b82f6" />
-                <rect className="logo-rect-3" width="7" height="7" x="14" y="14" rx="1" />
-                <rect className="logo-rect-4" width="7" height="7" x="3" y="14" rx="1" />
-              </svg>
+<div className="w-16 h-16 rounded-full flex items-center justify-center animate-scale-in" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(200,232,252,0.75) 45%, rgba(10,160,220,0) 72%)' }}>
+                <img src="/suite/escudo.png" alt="" className="h-11 w-auto drop-shadow-md" />
+              </div>
             </div>
 
             {/* Flying Simulated Cylinder (Stamp Roller) */}
@@ -549,8 +546,9 @@ const TutorDashboard: React.FC = () => {
                 height: 300px;
                 margin-left: -50px; /* Centrado en 0,0 */
                 margin-top: -150px; 
-                border: 2px solid rgba(59, 130, 246, 0.4);
-                background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02));
+                border: 2px solid color-mix(in srgb, var(--c) 60%, transparent);
+                background: linear-gradient(180deg, color-mix(in srgb, var(--c) 22%, transparent), color-mix(in srgb, var(--c) 4%, transparent));
+                box-shadow: inset 0 0 30px color-mix(in srgb, var(--c) 30%, transparent);
                 backdrop-filter: blur(4px);
                 /* Al hacer la caja más alta (300px), el origen de rotación para que se abra bien como los pétalos de una flor larga debe ajustarse desde donde tocan la junta base. */
                 transform-origin: 50% 75%;
@@ -594,19 +592,14 @@ const TutorDashboard: React.FC = () => {
                 <div
                   key={`face-${i}`}
                   className="prism-face"
-                  style={{ '--ry': `${i * 72}deg` } as React.CSSProperties}
+                  style={{ '--ry': `${i * 72}deg`, '--c': `var(--hs-e${[3, 4, 2, 1, 5][i]})` } as React.CSSProperties}
                 />
               ))}
 
               {/* Top Lid -> Transforms into Logo Center */}
               <div className="prism-top z-50">
-                <div className="w-24 h-24 bg-slate-900/40 rounded-3xl border border-primary-500/40 flex items-center justify-center backdrop-blur-md shadow-2xl relative">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="7" height="7" x="3" y="3" rx="1.5" />
-                    <rect width="7" height="7" x="14" y="3" rx="1.5" fill="#3b82f6" stroke="#3b82f6" />
-                    <rect width="7" height="7" x="14" y="14" rx="1.5" />
-                    <rect width="7" height="7" x="3" y="14" rx="1.5" />
-                  </svg>
+                <div className="w-24 h-24 rounded-full flex items-center justify-center relative" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(200,232,252,0.75) 45%, rgba(10,160,220,0) 72%)' }}>
+                  <img src="/suite/escudo.png" alt="" className="h-16 w-auto drop-shadow-md" />
                 </div>
               </div>
 
@@ -1124,21 +1117,22 @@ const TutorDashboard: React.FC = () => {
     <div className="min-h-screen min-h-[100dvh] mesh-tutor flex flex-col font-body relative">
 
       {/* Header */}
-      <header className="glass-medium sticky top-0 z-50 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Logo" className="h-12 w-auto object-contain opacity-80" onError={(e) => e.currentTarget.style.display = 'none'} />
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center text-primary-400">
+      <header className="glass-medium hs-luz sticky top-0 z-50 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
+        <div className="flex justify-between items-center gap-2 max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <img src="/suite/escudo.png" alt="Colegio La Hispanidad" className="hs-escudo" />
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="hidden sm:flex w-10 h-10 rounded-xl bg-primary-500/20 items-center justify-center text-primary-400">
                 <Users size={20} />
               </div>
-              <div>
-                <h1 className="font-display font-bold text-white/90 text-base leading-none">Panel {currentClass?.name || 'del Profesor'}</h1>
-                <p className="text-xs text-white/40 mt-0.5">Bienvenido/a, {currentUser?.name}</p>
+              <div className="min-w-0">
+                <h1 className="font-display font-bold text-white/90 text-base leading-none truncate">Panel {currentClass?.name || 'del Profesor'}</h1>
+                <p className="text-xs text-white/40 mt-0.5 truncate">Bienvenido/a, {currentUser?.name}</p>
+                <p className="hs-firma mt-0.5">Creado por Javi Barrero</p>
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={() => setShowHub(true)}
               className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors flex flex-col items-center"
@@ -1151,7 +1145,7 @@ const TutorDashboard: React.FC = () => {
               onClick={() => setShowTaskModal(true)}
               className="bg-gradient-to-r from-primary-600 to-primary-500 text-white px-3 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all active:scale-95"
             >
-              <Send size={14} /> Nueva Tarea
+              <Send size={14} /> <span className="hidden sm:inline">Nueva Tarea</span><span className="sm:hidden">Tarea</span>
             </button>
             <ThemeToggle className="glass rounded-xl text-white/40 hover:text-white/80" />
             <button onClick={() => setShowSettings(true)} className="glass rounded-xl p-2.5 text-white/40 hover:text-white/80 transition-colors">

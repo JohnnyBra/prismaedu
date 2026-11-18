@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suite La Hispanidad · ejemplo</title>
+  <link rel="icon" type="image/png" href="escudo.png">
+  <link rel="stylesheet" href="hispanidad-suite.css">
+  <script>
+    /* Tema compartido de la Suite: cookie HISPA_THEME = light | dark | system */
+    (function () {
+      var m = document.cookie.match(/(?:^|; )HISPA_THEME=(light|dark)/);
+      if (m) document.documentElement.dataset.theme = m[1];
+    })();
+  </script>
+  <style>
+    main { max-width: 960px; margin: 0 auto; padding: 32px 16px; display: grid; gap: 20px; }
+    .demo { padding: 24px; }
+    .demo h2 { font-family: var(--hs-letra-titulo); margin: 0 0 8px; }
+    .demo p { color: var(--hs-texto-suave); margin: 0 0 16px; }
+    .fila { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .acciones { display: flex; gap: 8px; align-items: center; }
+  </style>
+</head>
+<body class="hs-cuerpo">
+  <!-- Cabecera común: copia este bloque y cambia el nombre de la app -->
+  <header class="hs-header">
+    <a class="hs-marca" href="/">
+      <img class="hs-escudo" src="escudo.png" alt="Colegio La Hispanidad">
+      <span>
+        <span class="hs-marca-nombre">Aulas</span>
+        <span class="hs-firma">Creado por Javi Barrero</span>
+      </span>
+    </a>
+    <nav class="acciones">
+      <a class="hs-boton hs-boton--suave" href="https://prisma.bibliohispa.es/">Volver a Prisma</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hs-tarjeta demo">
+      <h2>La luz del prisma</h2>
+      <p>Marino y celeste del escudo; el espectro solo en la línea de la cabecera y en los momentos especiales.</p>
+      <div class="fila">
+        <button class="hs-boton" type="button">Reservar aula</button>
+        <button class="hs-boton hs-boton--suave" type="button">Cancelar</button>
+        <span class="hs-prisma" title="Marca de Prisma"></span>
+      </div>
+    </section>
+    <section class="hs-tarjeta demo">
+      <h2>Tema claro y oscuro</h2>
+      <p>Sigue a <code>html[data-theme]</code> (la cookie <code>HISPA_THEME</code> que comparten las apps) o, sin atributo, al sistema.</p>
+      <div class="fila">
+        <button class="hs-boton hs-boton--suave" type="button" onclick="document.documentElement.dataset.theme='light'">Claro</button>
+        <button class="hs-boton hs-boton--suave" type="button" onclick="document.documentElement.dataset.theme='dark'">Oscuro</button>
+      </div>
+    </section>
+    <span class="hs-espectro" aria-hidden="true"></span>
+  </main>
+</body>
+</html>

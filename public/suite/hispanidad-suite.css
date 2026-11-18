@@ -1,0 +1,242 @@
+/* ==========================================================================
+   Suite La Hispanidad — «La luz del prisma»
+   Identidad común de Prisma, Aulas, Excursiones, Biblioteca e Intranet.
+   CSS puro, sin dependencias. Guía: docs/suite-visual.md · Ejemplo: suite/ejemplo.html
+   Tema: html[data-theme="light"|"dark"]; sin atributo, sigue al sistema.
+   Creado por Javi Barrero.
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+:root {
+  /* Colores del escudo */
+  --hs-marino: #0a4a8c;
+  --hs-celeste: #0aa0dc;
+  --hs-tinta: #06121f;
+  --hs-papel: #f5f3ee;
+
+  /* El espectro: la luz que sale del prisma, un color por app */
+  --hs-e1: #ef5b4c; /* Intranet */
+  --hs-e2: #f2a93b; /* Excursiones */
+  --hs-e3: #2fb47c; /* Biblioteca */
+  --hs-e4: #0aa0dc; /* Aulas */
+  --hs-e5: #2563c9; /* Prisma */
+  --hs-espectro: linear-gradient(90deg, var(--hs-e1), var(--hs-e2), var(--hs-e3), var(--hs-e4), var(--hs-e5));
+
+  --hs-letra-titulo: 'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
+  --hs-letra: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --hs-radio: 14px;
+  --hs-radio-grande: 22px;
+  --hs-curva: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Tema oscuro (por defecto) */
+  --hs-fondo: #06121f;
+  --hs-fondo-2: #0b223d;
+  --hs-superficie: rgba(14, 34, 58, 0.72);
+  --hs-superficie-solida: #0e223a;
+  --hs-borde: rgba(160, 205, 240, 0.14);
+  --hs-texto: #eef4fa;
+  --hs-texto-suave: rgba(226, 238, 250, 0.68);
+  --hs-acento: #4cc3f0;
+  --hs-sombra: 0 18px 50px rgba(0, 8, 20, 0.45);
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --hs-fondo: #f5f3ee;
+  --hs-fondo-2: #e9eef5;
+  --hs-superficie: rgba(255, 255, 255, 0.78);
+  --hs-superficie-solida: #ffffff;
+  --hs-borde: rgba(10, 74, 140, 0.12);
+  --hs-texto: #0c1e33;
+  --hs-texto-suave: rgba(12, 30, 51, 0.66);
+  --hs-acento: #0a4a8c;
+  --hs-sombra: 0 14px 40px rgba(10, 40, 80, 0.10);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  html:not([data-theme]) {
+    --hs-fondo: #f5f3ee;
+    --hs-fondo-2: #e9eef5;
+    --hs-superficie: rgba(255, 255, 255, 0.78);
+    --hs-superficie-solida: #ffffff;
+    --hs-borde: rgba(10, 74, 140, 0.12);
+    --hs-texto: #0c1e33;
+    --hs-texto-suave: rgba(12, 30, 51, 0.66);
+    --hs-acento: #0a4a8c;
+    --hs-sombra: 0 14px 40px rgba(10, 40, 80, 0.10);
+    color-scheme: light;
+  }
+}
+
+/* Cuerpo opcional para apps nuevas: <body class="hs-cuerpo"> */
+.hs-cuerpo {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--hs-letra);
+  color: var(--hs-texto);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--hs-celeste) 22%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--hs-fondo) 0%, var(--hs-fondo-2) 100%) fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Cabecera común ----------
+   <header class="hs-header">
+     <a class="hs-marca" href="/">
+       <img class="hs-escudo" src="/suite/escudo.png" alt="Colegio La Hispanidad">
+       <span><span class="hs-marca-nombre">Aulas</span><span class="hs-firma">Creado por Javi Barrero</span></span>
+     </a>
+     … acciones a la derecha …
+   </header>                                                              */
+.hs-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  background: var(--hs-superficie);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  border-bottom: 1px solid var(--hs-borde);
+  font-family: var(--hs-letra);
+  color: var(--hs-texto);
+}
+
+/* La firma de la Suite: la luz del prisma bajo cada cabecera */
+/* .hs-luz: añade la línea de luz a una cabecera propia sin cambiar su maquetación.
+   La cabecera debe estar posicionada (sticky, fixed o relative). */
+.hs-header::after,
+.hs-luz::after,
+.hs-espectro {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: var(--hs-espectro);
+  opacity: 0.9;
+  pointer-events: none;
+}
+.hs-espectro { position: relative; display: block; bottom: auto; }
+
+.hs-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.hs-escudo {
+  height: 40px;
+  width: auto;
+  flex: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+}
+/* En oscuro, el escudo descansa sobre un halo de luz para no perder el marino */
+html[data-theme="dark"] .hs-escudo {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .hs-escudo {
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+  }
+}
+.hs-marca > span { display: flex; flex-direction: column; min-width: 0; }
+.hs-marca-nombre {
+  font-family: var(--hs-letra-titulo);
+  font-weight: 800;
+  font-size: 1.15rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hs-marca-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hs-texto-suave);
+}
+
+/* Discreta pero visible */
+.hs-firma {
+  font-family: var(--hs-letra);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--hs-texto-suave);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* ---------- Marca del prisma (pentágono con el espectro) ---------- */
+.hs-prisma {
+  --t: 28px;
+  display: inline-block;
+  width: var(--t);
+  height: calc(var(--t) * 0.951);
+  clip-path: polygon(50% 0%, 100% 38.2%, 80.9% 100%, 19.1% 100%, 0% 38.2%);
+  background: conic-gradient(from -18deg at 50% 52.6%, var(--hs-e1) 0 72deg, var(--hs-e2) 0 144deg, var(--hs-e3) 0 216deg, var(--hs-e4) 0 288deg, var(--hs-e5) 0 360deg);
+  flex: none;
+}
+
+/* ---------- Botones y tarjetas ---------- */
+.hs-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--hs-radio);
+  background: linear-gradient(180deg, #1468bf, var(--hs-marino));
+  color: #fff;
+  font: 700 0.95rem/1 var(--hs-letra);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(10, 74, 140, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: transform 0.18s var(--hs-curva), box-shadow 0.18s var(--hs-curva), filter 0.18s;
+}
+.hs-boton:hover { transform: translateY(-1px); filter: brightness(1.08); box-shadow: 0 10px 26px rgba(10, 74, 140, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.22); }
+.hs-boton:active { transform: translateY(0) scale(0.98); }
+.hs-boton--suave {
+  background: transparent;
+  color: var(--hs-texto);
+  border: 1px solid var(--hs-borde);
+  box-shadow: none;
+}
+.hs-boton--suave:hover { background: color-mix(in srgb, var(--hs-celeste) 10%, transparent); box-shadow: none; }
+
+.hs-tarjeta {
+  background: var(--hs-superficie);
+  border: 1px solid var(--hs-borde);
+  border-radius: var(--hs-radio-grande);
+  box-shadow: var(--hs-sombra);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.hs-header :focus-visible,
+.hs-boton:focus-visible,
+.hs-marca:focus-visible {
+  outline: 2px solid var(--hs-celeste);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .hs-escudo { height: 34px; }
+  .hs-marca-nombre { font-size: 1.05rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-boton { transition: none; }
+}

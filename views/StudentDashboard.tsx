@@ -248,12 +248,12 @@ const StudentDashboard: React.FC = () => {
           `}</style>
 
           {/* Background */}
-          <div className={`absolute inset-0 ${greetingState === 'CLOSING' ? 'animate-close-overlay' : 'bg-[#0f172a]/90 backdrop-blur-md animate-fade-in'}`} />
+          <div className={`absolute inset-0 ${greetingState === 'CLOSING' ? 'animate-close-overlay' : 'bg-[#06121f]/90 backdrop-blur-md animate-fade-in'}`} />
 
           {/* Avatar */}
           <div className={`absolute z-10 ${greetingState === 'CLOSING' ? 'animate-close-avatar' : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'}`}>
             <div className={greetingState === 'SHOWING' ? 'animate-wave-large' : ''}>
-              <Avatar config={currentUser?.avatarConfig} size={250} showRing glowColor="rgba(168,85,247,0.8)" />
+              <Avatar config={currentUser?.avatarConfig} size={250} showRing glowColor="rgba(10,160,220,0.8)" />
             </div>
           </div>
 
@@ -280,11 +280,11 @@ const StudentDashboard: React.FC = () => {
       )}
 
       {/* Top Bar */}
-      <div className="glass-student sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
+      <div className="glass-student hs-luz sticky top-0 z-40 px-4 py-3" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
         <div className="flex justify-between items-center max-w-4xl mx-auto">
           <div className="flex items-center gap-3 cursor-pointer group">
             <div onClick={(e) => { e.stopPropagation(); setGreetingState('SHOWING'); }} className="hover:scale-110 transition-transform">
-              <Avatar config={currentUser?.avatarConfig} size={48} showRing glowColor="rgba(168,85,247,0.5)" />
+              <Avatar config={currentUser?.avatarConfig} size={48} showRing glowColor="rgba(10,160,220,0.5)" />
             </div>
             <div onClick={() => setShowSettings(true)}>
               <h1 className="font-display font-extrabold text-white leading-none text-base">
@@ -295,6 +295,7 @@ const StudentDashboard: React.FC = () => {
                 <span className="font-display font-extrabold text-amber-400 text-sm">{currentUser?.points}</span>
                 <span className="text-amber-400/70 text-[10px] font-bold">puntos</span>
               </div>
+              <p className="hs-firma mt-0.5">Creado por Javi Barrero</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -501,7 +502,7 @@ const StudentDashboard: React.FC = () => {
                     {previewItem && (
                       <div className="flex justify-center mb-4 animate-scale-in">
                         <div className="glass-student-card rounded-2xl p-4 flex items-center gap-4 glow-border-candy">
-                          <Avatar config={previewConfig} size={80} showRing glowColor="rgba(168,85,247,0.5)" />
+                          <Avatar config={previewConfig} size={80} showRing glowColor="rgba(10,160,220,0.5)" />
                           <div className="text-xs text-white/60">
                             <p className="font-display font-bold text-white text-sm">Vista previa</p>
                             <p>Asi se vera tu avatar</p>
@@ -597,7 +598,7 @@ const StudentDashboard: React.FC = () => {
                 {/* Large avatar preview */}
                 <div className="flex justify-center mb-6">
                   <div className="glass-student-card rounded-3xl p-6 glow-border-candy">
-                    <Avatar config={previewConfig} size={140} showRing glowColor="rgba(168,85,247,0.5)" />
+                    <Avatar config={previewConfig} size={140} showRing glowColor="rgba(10,160,220,0.5)" />
                     <p className="text-center text-white/50 text-xs mt-3 font-display font-bold">Tu Avatar</p>
                   </div>
                 </div>

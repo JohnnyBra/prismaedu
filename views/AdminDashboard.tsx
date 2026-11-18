@@ -1737,26 +1737,27 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen min-h-[100dvh] mesh-admin flex flex-col font-body relative">
       {/* Admin Header */}
-      <header className="glass-medium sticky top-0 z-50 px-4 py-3 flex justify-between items-center" style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))' }}>
-         <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain rounded-lg opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+      <header className="glass-medium hs-luz sticky top-0 z-50 px-4 py-3 flex justify-between items-center gap-3" style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))' }}>
+         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <img src="/suite/escudo.png" alt="Colegio La Hispanidad" className="hs-escudo" />
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/60">
+              <div className="hidden sm:flex w-10 h-10 rounded-xl bg-white/10 items-center justify-center text-white/60">
                  <ShieldIcon />
               </div>
               <div>
-                <h1 className="font-display font-bold text-lg text-white/90">Panel de Administración</h1>
+                <h1 className="font-display font-bold text-base sm:text-lg leading-tight text-white/90">Panel de Administración</h1>
                 <p className="text-xs text-white/30">Prisma System</p>
+                <p className="hs-firma mt-0.5">Creado por Javi Barrero</p>
               </div>
            </div>
          </div>
          <div className="flex items-center gap-4">
              <ThemeToggle className="text-white/30 hover:text-white/70" />
-             <button onClick={() => setShowChangePin(true)} className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
-                <Key size={18} /> Cambiar PIN
+             <button onClick={() => setShowChangePin(true)} aria-label="Cambiar PIN" className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
+                <Key size={18} /> <span className="hidden sm:inline">Cambiar PIN</span>
              </button>
-             <button onClick={logout} className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
-                <LogOut size={18} /> Salir
+             <button onClick={logout} aria-label="Salir" className="text-white/30 hover:text-white/70 flex items-center gap-2 text-sm font-bold transition-colors">
+                <LogOut size={18} /> <span className="hidden sm:inline">Salir</span>
              </button>
          </div>
       </header>
