@@ -8,6 +8,7 @@ La identidad visual que comparten Prisma, Aulas, Excursiones, Biblioteca e Intra
 | `escudo.png` | El emblema del cole (sin texto), para cabeceras e iconos. |
 | `escudo-completo.png` | El escudo con «La Hispanidad · Colegio» y el 50 aniversario. |
 | `ejemplo.html` | Una página de referencia que se puede abrir y copiar. |
+| `iconos/` | Iconos de cristal hechos en Canva: `biblioteca`, `aulas`, `excursiones`, `intranet`, `prisma-aula`, `profesor`, `familia`, `admin` (`.webp` 512 px con transparencia), más `<app>-64.png` (favicon) y `<app>-180.png` (icono de acceso directo de iOS, sobre blanco). |
 
 ## Adoptarlo en otra app (Aulas, Excursiones, Biblioteca, Intranet)
 
@@ -19,7 +20,8 @@ La identidad visual que comparten Prisma, Aulas, Excursiones, Biblioteca e Intra
    Si se prefiere no depender de Prisma, se copia la carpeta `suite/` en la carpeta pública de la app y se enlaza en local.
 2. **Cabecera:** se copia la de `ejemplo.html` y se cambia el nombre de la app en `.hs-marca-nombre`. Si la app ya tiene cabecera propia, basta con añadirle la clase `hs-luz` (pinta la línea de luz debajo; la cabecera tiene que estar posicionada: `sticky`, `fixed` o `relative`), poner el escudo con la clase `hs-escudo` y añadir la firma `<span class="hs-firma">Creado por Javi Barrero</span>`.
 3. **Tema:** el kit sigue a `html[data-theme="light"|"dark"]`. Las apps del dominio comparten la cookie `HISPA_THEME` (`light`, `dark` o `system`); cada app la lee y pone el atributo. Sin atributo, sigue al sistema.
-4. **Fondo, botones y tarjetas (opcional):** `<body class="hs-cuerpo">`, `.hs-boton`, `.hs-boton--suave` y `.hs-tarjeta`. Para colores propios hay variables: `var(--hs-marino)`, `var(--hs-celeste)`, `var(--hs-texto)`, `var(--hs-superficie)`…
+4. **Favicon de la app:** `<link rel="icon" type="image/png" href="https://prisma.bibliohispa.es/suite/iconos/<app>-64.png">` y `<link rel="apple-touch-icon" href="https://prisma.bibliohispa.es/suite/iconos/<app>-180.png">`.
+5. **Fondo, botones y tarjetas (opcional):** `<body class="hs-cuerpo">`, `.hs-boton`, `.hs-boton--suave` y `.hs-tarjeta`. Para colores propios hay variables: `var(--hs-marino)`, `var(--hs-celeste)`, `var(--hs-texto)`, `var(--hs-superficie)`…
 
 ## Reglas de la identidad
 
@@ -30,3 +32,7 @@ La identidad visual que comparten Prisma, Aulas, Excursiones, Biblioteca e Intra
 - **Letras:** Bricolage Grotesque para los titulares y Figtree para el texto (el kit las carga).
 - **Firma:** «Creado por Javi Barrero», discreta pero visible, en la cabecera de cada app.
 - **Movimiento:** suave y con sentido; si el sistema pide reducir movimiento, se respeta.
+
+## Iconos nuevos
+
+Mismo estilo: un objeto 3D de **cristal translúcido** teñido del color de su app, con brillos y reflejos de arcoíris, sobre fondo blanco, sin texto. En Canva, con `generate-image` usando como referencia los ids `MAHbQ8xZtVo` (libro) y `MAHbQ3XLOB8` (birrete). Después: página con `create-design`, exportación PNG de 1024 y recorte con `python3 herramientas/recorta-icono.py export.png salida.webp`. Hay que revisarlos sobre fondo claro y oscuro.
