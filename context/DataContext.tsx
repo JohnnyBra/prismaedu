@@ -18,6 +18,8 @@ export interface BackupData {
 
 interface DataContextType {
   currentUser: User | null;
+  /** Hay sesión guardada pero aún no han llegado los datos: no hay que pintar el login. */
+  restoringSession: boolean;
   users: User[];
   classes: ClassGroup[];
   tasks: Task[];
@@ -91,7 +93,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('sc_session_user', JSON.stringify({ id, at: Date.now() }));
   };
 
-  const [currentUserId, setCurrentUserId] = useState<string | null>(() => readSession());
+  // Al volver de Google el usuario llega en la URL: se toma desde el primer render para no pintar el login.
+  const [currentUserId, setCurrentUserId] = useState<string | null>(() =>
+    new URLSearchParams(window.location.search).get('user_id') || readSession());
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   // Data State
   const [users, setUsers] = useState<User[]>([]);
@@ -104,6 +109,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Derived current user
   const currentUser = users.find(u => u.id === currentUserId) || null;
+  const restoringSession = !!currentUserId && !dataLoaded;
 
   // Check for Google Login redirect
   useEffect(() => {
@@ -128,6 +134,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     newSocket.on('disconnect', () => setConnected(false));
 
     newSocket.on('init_state', (data) => {
+      setDataLoaded(true);
       setUsers(data.users);
       setClasses(data.classes);
       setTasks(data.tasks);
@@ -579,6 +586,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   return (
     <DataContext.Provider value={{
       currentUser,
+      restoringSession,
       users,
       classes,
       tasks,
